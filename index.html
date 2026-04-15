@@ -283,7 +283,7 @@ function createReelCard(card, item){
 
     clearInterval(interval);
 
-    card.innerHTML += `
+    card.innerHTML = `
       <img src="${item.image}" class="cover">
       <div class="title">${item.title}</div>
       <div class="author">${item.author}</div>
