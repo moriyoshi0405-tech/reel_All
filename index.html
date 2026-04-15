@@ -19,32 +19,77 @@ color:#333;
 /* 🌿 ヘッダー */
 .header{
 text-align:center;
-padding:40px 20px;
-background:#111;
+padding:50px 20px 30px;
+background: linear-gradient(180deg, #111 0%, #ffffff 100%);
 color:white;
 }
 
 .header h1{
-font-size:22px;
+font-size:26px;
+font-weight:700;
 margin:0;
+}
+
+.header p{
+font-size:14px;
+opacity:.8;
+margin-top:8px;
+}
+
+/* 🌿 メイン */
+.container{
+max-width:900px;
+margin:-20px auto 0;
+padding:10px 20px 30px;
+}
+
+/* 🔍 検索 */
+.search{
+margin-bottom:10px;
+}
+
+.search input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+/* 🏷 タグ */
+.tags{
+margin-bottom:10px;
+}
+
+.tag{
+display:inline-block;
+padding:4px 8px;
+margin:3px;
+border-radius:12px;
+background:#eee;
+font-size:10px;
+cursor:pointer;
+}
+
+.tag.active{
+background:#222;
+color:#fff;
 }
 
 /* 🌿 グリッド */
 .grid{
 display:grid;
 gap:16px;
-padding:20px;
 }
 
-@media (max-width:767px){
+@media (max-width: 767px){
 .grid{
-grid-template-columns: repeat(2,1fr);
+grid-template-columns: repeat(2, 1fr);
 }
 }
 
-@media (min-width:768px){
+@media (min-width: 768px){
 .grid{
-grid-template-columns: repeat(3,1fr);
+grid-template-columns: repeat(3, 1fr);
 }
 }
 
@@ -60,6 +105,19 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
+position:relative;
+}
+
+/* 🆕 New */
+.new{
+position:absolute;
+top:8px;
+left:8px;
+background:#ff4d4d;
+color:#fff;
+font-size:9px;
+padding:2px 6px;
+border-radius:6px;
 }
 
 /* 🌿 表紙 */
@@ -90,6 +148,7 @@ background:#222;
 color:white;
 text-decoration:none;
 margin-top:4px;
+display:inline-block;
 }
 
 .subbtn{
@@ -113,40 +172,158 @@ opacity:1;
 transform:translateY(0);
 }
 
+/* 🌿 フッター */
+.footer{
+text-align:center;
+padding:40px 20px 60px;
+background: linear-gradient(180deg, #ffffff 0%, #111 100%);
+}
+
+.footer a{
+display:inline-block;
+padding:10px 20px;
+border-radius:25px;
+background:#222;
+color:white;
+text-decoration:none;
+font-size:14px;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h1>すべての本を見る</h1>
+  <h1>本との出会いは、たった30秒で変わる</h1>
+  <p>読む前に、ちょっとだけ覗いてみる。</p>
 </div>
 
-<div class="grid" id="grid"></div>
+<div class="container">
+
+  <!-- 🔍 検索 -->
+  <div class="search">
+    <input id="search" placeholder="本を検索...">
+  </div>
+
+  <!-- 🏷 タグ -->
+  <div id="tags" class="tags"></div>
+
+  <!-- 📚 一覧 -->
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<div class="footer">
+  <a href="ここに一覧ページURL">他の本も見る</a>
+</div>
 
 <script>
 
 const API_URL = "https://script.google.com/macros/s/AKfycbzQ8_J-Pyj-qC5nq6GRl1VNVRUuGziXYCnPIGJAssycvoCEeIVtvOPlKWTtp6Svg_qd/exec";
 
+let allData = [];
+let activeTag = null;
+
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
 
-  const grid = document.getElementById("grid");
+  allData = data;
 
-  // 🔥 全件表示（制限なし）
+  renderTags(data);
+  render(data);
+
+});
+
+// 🔍 ひらがな⇄カタカナ対応
+function normalize(text){
+  return text.toLowerCase()
+    .replace(/[ァ-ン]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) - 0x60)
+    );
+}
+
+// 🔍 検索
+document.getElementById("search").addEventListener("input", filter);
+
+// 🏷 タグ生成
+function renderTags(data){
+
+  const tagBox = document.getElementById("tags");
+  const set = new Set();
+
+  data.forEach(d => d.tags.forEach(t => set.add(t)));
+
+  set.forEach(tag => {
+
+    const el = document.createElement("span");
+    el.className = "tag";
+    el.textContent = tag;
+
+    el.onclick = ()=>{
+      activeTag = activeTag === tag ? null : tag;
+
+      document.querySelectorAll(".tag").forEach(t=>t.classList.remove("active"));
+      if(activeTag) el.classList.add("active");
+
+      filter();
+    };
+
+    tagBox.appendChild(el);
+
+  });
+
+}
+
+// 🔍 フィルター
+function filter(){
+
+  const keyword = normalize(document.getElementById("search").value);
+
+  const filtered = allData.filter(item => {
+
+    const text = normalize(item.title + item.author);
+
+    const matchText = text.includes(keyword);
+    const matchTag = !activeTag || item.tags.includes(activeTag);
+
+    return matchText && matchTag;
+
+  });
+
+  render(filtered);
+
+}
+
+// 🎬 描画
+function render(data){
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
   data.forEach(item => {
 
     const card = document.createElement("div");
     card.className = "card";
 
-    grid.appendChild(card);
+    // 🆕 New判定
+    if(item.created){
+      const diff = (Date.now() - new Date(item.created)) / (1000*60*60*24);
+      if(diff <= 7){
+        const badge = document.createElement("div");
+        badge.className = "new";
+        badge.textContent = "New!";
+        card.appendChild(badge);
+      }
+    }
 
+    grid.appendChild(card);
     createReelCard(card, item);
 
   });
 
-});
+}
 
 function createReelCard(card, item){
 
@@ -157,7 +334,7 @@ function createReelCard(card, item){
 
     clearInterval(interval);
 
-    card.innerHTML = `
+    card.innerHTML += `
       <img src="${item.image}" class="cover">
       <div class="title">${item.title}</div>
       <div class="author">${item.author}</div>
@@ -188,7 +365,14 @@ function createReelCard(card, item){
 
       setTimeout(()=>{
 
-        text.innerHTML = item.reel[index] || "";
+        let content = item.reel[index] || "";
+
+        // 1行なら強調
+        if(!content.includes("<br>")){
+          content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
+        }
+
+        text.innerHTML = content;
         text.classList.add("show");
 
         index++;
