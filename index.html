@@ -148,13 +148,51 @@ opacity:1;
 transform:translateY(0);
 }
 
+/* 🌿 ジブリ風ヘッダー */
+.header{
+  text-align:center;
+  padding:80px 20px 60px;
+  color:#2f3e2f;
+  background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%);
+  position:relative;
+  overflow:hidden;
+}
+
+/* 🌿 ふんわり光 */
+.header::before{
+  content:"";
+  position:absolute;
+  top:-50px;
+  left:-50px;
+  width:200px;
+  height:200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.8), transparent);
+  filter:blur(20px);
+}
+
+/* 🌿 タイトル */
+.header h1{
+  font-size:24px;
+  font-weight:700;
+  margin:0;
+  letter-spacing:1px;
+}
+
+/* 🌿 サブ */
+.header p{
+  margin-top:10px;
+  font-size:13px;
+  opacity:0.7;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h1>すべての本を見る</h1>
+  <h1>物語の世界を、少しだけのぞいてみる</h1>
+  <p>気になる一冊が、きっと見つかる</p>
 </div>
 
 <div class="container">
