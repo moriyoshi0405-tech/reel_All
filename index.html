@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* 🌿 全体 */
+body{
+margin:0;
+font-family:'Zen Maru Gothic',sans-serif;
+background:#ffffff;
+color:#333;
+}
+
+/* 🌿 ヘッダー */
+.header{
+text-align:center;
+padding:40px 20px;
+background:#111;
+color:white;
+}
+
+.header h1{
+font-size:22px;
+margin:0;
+}
+
+/* 🌿 グリッド */
+.grid{
+display:grid;
+gap:16px;
+padding:20px;
+}
+
+@media (max-width:767px){
+.grid{
+grid-template-columns: repeat(2,1fr);
+}
+}
+
+@media (min-width:768px){
+.grid{
+grid-template-columns: repeat(3,1fr);
+}
+}
+
+/* 🌿 カード */
+.card{
+background:white;
+border-radius:14px;
+padding:10px;
+box-shadow:0 10px 30px rgba(0,0,0,0.12);
+height:180px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+/* 🌿 表紙 */
+.cover{
+width:60px;
+border-radius:6px;
+margin-bottom:6px;
+}
+
+/* 🌿 テキスト */
+.title{
+font-size:11px;
+font-weight:bold;
+}
+
+.author{
+font-size:9px;
+opacity:.6;
+margin-bottom:6px;
+}
+
+/* 🌿 ボタン */
+.button{
+font-size:9px;
+padding:5px 8px;
+border-radius:20px;
+background:#222;
+color:white;
+text-decoration:none;
+margin-top:4px;
+}
+
+.subbtn{
+font-size:9px;
+margin-top:6px;
+cursor:pointer;
+opacity:.6;
+}
+
+/* 🌿 リール */
+.text{
+font-size:11px;
+line-height:1.4;
+opacity:0;
+transform:translateY(10px);
+transition:.5s;
+}
+
+.text.show{
+opacity:1;
+transform:translateY(0);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>すべての本を見る</h1>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzQ8_J-Pyj-qC5nq6GRl1VNVRUuGziXYCnPIGJAssycvoCEeIVtvOPlKWTtp6Svg_qd/exec";
+
+fetch(API_URL)
+.then(res => res.json())
+.then(data => {
+
+  const grid = document.getElementById("grid");
+
+  // 🔥 全件表示（制限なし）
+  data.forEach(item => {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    grid.appendChild(card);
+
+    createReelCard(card, item);
+
+  });
+
+});
+
+function createReelCard(card, item){
+
+  let index = 0;
+  let interval = null;
+
+  function showIntro(){
+
+    clearInterval(interval);
+
+    card.innerHTML = `
+      <img src="${item.image}" class="cover">
+      <div class="title">${item.title}</div>
+      <div class="author">${item.author}</div>
+
+      <a href="${item.url}" target="_blank" class="button">
+        感想記事を読む
+      </a>
+
+      <div class="subbtn">▶ 短い紹介を見る</div>
+    `;
+
+    card.querySelector(".subbtn").onclick = startReel;
+
+  }
+
+  function startReel(){
+
+    const text = document.createElement("div");
+    text.className = "text";
+    card.innerHTML = "";
+    card.appendChild(text);
+
+    index = 0;
+
+    function show(){
+
+      text.classList.remove("show");
+
+      setTimeout(()=>{
+
+        text.innerHTML = item.reel[index] || "";
+        text.classList.add("show");
+
+        index++;
+
+        if(index >= item.reel.length){
+          clearInterval(interval);
+          setTimeout(showIntro, 2000);
+        }
+
+      },200);
+
+    }
+
+    show();
+    interval = setInterval(show, 3500);
+
+  }
+
+  showIntro();
+
+}
+
+</script>
+
+</body>
+</html>
