@@ -185,6 +185,20 @@ transform:translateY(0);
   opacity:0.7;
 }
 
+.sort-btn{
+  padding:6px 12px;
+  border:none;
+  border-radius:20px;
+  background:#eee;
+  cursor:pointer;
+  font-size:11px;
+}
+
+.sort-btn.active{
+  background:#222;
+  color:#fff;
+}
+
 </style>
 </head>
 
@@ -201,6 +215,10 @@ transform:translateY(0);
     <input id="search" placeholder="本を検索...">
   </div>
 
+  <div style="margin-bottom:10px;">
+  <button id="sortBtn" class="sort-btn">新しい順にする</button>
+  </div>
+
   <div id="tags" class="tags"></div>
 
   <div class="grid" id="grid"></div>
@@ -213,6 +231,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzQ8_J-Pyj-qC5nq6GRl1VN
 
 let allData = [];
 let activeTag = null;
+let sortMode = "default";
 
 fetch(API_URL)
 .then(res => res.json())
@@ -224,6 +243,24 @@ fetch(API_URL)
   render(data);
 
 });
+
+// 🔽 ここに追加
+document.getElementById("sortBtn").onclick = () => {
+
+  sortMode = sortMode === "default" ? "new" : "default";
+
+  const btn = document.getElementById("sortBtn");
+
+  if(sortMode === "new"){
+    btn.textContent = "表示順に戻す";
+    btn.classList.add("active");
+  }else{
+    btn.textContent = "新しい順にする";
+    btn.classList.remove("active");
+  }
+
+  filter();
+};
 
 // 🔍 ひらがな⇄カタカナ
 function normalize(text){
@@ -268,7 +305,7 @@ function filter(){
 
   const keyword = normalize(document.getElementById("search").value);
 
-  const filtered = allData.filter(item => {
+  let filtered = allData.filter(item => {
 
     const text = normalize(item.title + item.author);
 
@@ -279,7 +316,15 @@ function filter(){
 
   });
 
+  // 👇 ここ追加（超重要）
+  if(sortMode === "new"){
+    filtered.sort((a,b)=> new Date(b.created) - new Date(a.created));
+  }else{
+    filtered.sort((a,b)=> a.order - b.order);
+  }
+
   render(filtered);
+
 }
 
 // 描画
