@@ -161,7 +161,20 @@ margin-bottom:6px;
 }
 
 /* テキスト */
-.title{ font-size:11px;font-weight:bold; }
+.text{
+font-size:11px;
+line-height:1.6;
+opacity:0;
+transform:translateY(10px);
+transition:.5s;
+
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+
+height:100%;
+}
 .author{ font-size:9px;opacity:.6;margin-bottom:4px; }
 
 /* 🔽 カード内タグ */
@@ -482,39 +495,48 @@ function createReelCard(card, item){
   }
 
   function startReel(){
-
+  
     const text = document.createElement("div");
     text.className = "text";
     card.innerHTML = "";
     card.appendChild(text);
-
+  
     let index = 0;
-
+  
+    // 🔽 ここ追加（重要）
+    const reelArray = typeof item.reel === "string"
+      ? item.reel.split(",")
+      : item.reel;
+  
     function show(){
-
+  
       text.classList.remove("show");
-
+  
       setTimeout(()=>{
-
-        let content = item.reel[index] || "";
-
+  
+        let content = reelArray[index] || "";
+  
         if(!content.includes("<br>")){
           content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
         }
-
+  
         text.innerHTML = content;
         text.classList.add("show");
-
+  
         index++;
-
-        if(index >= item.reel.length){
-          clearInterval(interval); // ← ★これ追加
+  
+        if(index >= reelArray.length){
+          clearInterval(interval);
           setTimeout(showIntro, 2000);
         }
-
+  
       },200);
-
+  
     }
+  
+    show();
+    const interval = setInterval(show, 3500);
+  }
 
     show();
     const interval = setInterval(show, 3500);
