@@ -287,6 +287,82 @@ animation:dots 1.5s steps(3,end) infinite;
 100%{ content:"..."; }
 }
 
+/* 🌿 リール背景共通 */
+.reel-bg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+overflow:hidden;
+border-radius:14px;
+}
+
+/* テキストを前面に */
+.text{
+position:relative;
+z-index:1;
+}
+
+/* 🌿 ① 光がふわふわ */
+.bg-light{
+background:linear-gradient(120deg,#e6f4ea,#ffffff);
+}
+
+.bg-light::before{
+content:"";
+position:absolute;
+width:200%;
+height:200%;
+background:radial-gradient(circle, rgba(255,255,255,0.6), transparent 60%);
+animation:floatLight 10s linear infinite;
+}
+
+@keyframes floatLight{
+0%{ transform:translate(-20%,-20%); }
+50%{ transform:translate(20%,20%); }
+100%{ transform:translate(-20%,-20%); }
+}
+
+/* 🌿 ② 空のゆらぎ */
+.bg-sky{
+background:linear-gradient(#dbeafe,#ffffff);
+}
+
+.bg-sky::before{
+content:"";
+position:absolute;
+width:200%;
+height:200%;
+background:linear-gradient(45deg, rgba(255,255,255,0.4), transparent);
+animation:skyMove 12s linear infinite;
+}
+
+@keyframes skyMove{
+0%{ transform:translateX(0); }
+100%{ transform:translateX(-50%); }
+}
+
+/* 🌿 ③ 木漏れ日 */
+.bg-forest{
+background:linear-gradient(#e6f4ea,#fdfdfd);
+}
+
+.bg-forest::before{
+content:"";
+position:absolute;
+width:200%;
+height:200%;
+background:radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%);
+animation:forestLight 8s ease-in-out infinite;
+}
+
+@keyframes forestLight{
+0%,100%{ transform:translate(0,0); }
+50%{ transform:translate(10%,10%); }
+}
+
 </style>
 </head>
 
@@ -494,54 +570,58 @@ function createReelCard(card, item){
     card.querySelector(".subbtn").onclick = startReel;
   }
 
-  function startReel(){
-  
-    const text = document.createElement("div");
-    text.className = "text";
-    card.innerHTML = "";
-    card.appendChild(text);
-  
-    let index = 0;
-  
-    // 🔽 ここ追加（重要）
-    const reelArray = typeof item.reel === "string"
-      ? item.reel.split(",")
-      : item.reel;
-  
-    function show(){
-  
-      text.classList.remove("show");
-  
-      setTimeout(()=>{
-  
-        let content = reelArray[index] || "";
-  
-        if(!content.includes("<br>")){
-          content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
-        }
-  
-        text.innerHTML = content;
-        text.classList.add("show");
-  
-        index++;
-  
-        if(index >= reelArray.length){
-          clearInterval(interval);
-          setTimeout(showIntro, 2000);
-        }
-  
-      },200);
-  
-    }
-  
-    show();
-    const interval = setInterval(show, 3500);
+function startReel(){
+
+  const text = document.createElement("div");
+  text.className = "text";
+
+  // 🔽 背景をランダム生成
+  const bg = document.createElement("div");
+  bg.className = "reel-bg";
+
+  const bgTypes = ["bg-light","bg-sky","bg-forest"];
+  const randomBg = bgTypes[Math.floor(Math.random()*bgTypes.length)];
+  bg.classList.add(randomBg);
+
+  card.innerHTML = "";
+  card.appendChild(bg);   // ← 背景
+  card.appendChild(text); // ← テキスト
+
+  let index = 0;
+
+  const reelArray = typeof item.reel === "string"
+    ? item.reel.split(",")
+    : item.reel;
+
+  function show(){
+
+    text.classList.remove("show");
+
+    setTimeout(()=>{
+
+      let content = reelArray[index] || "";
+
+      if(!content.includes("<br>")){
+        content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
+      }
+
+      text.innerHTML = content;
+      text.classList.add("show");
+
+      index++;
+
+      if(index >= reelArray.length){
+        clearInterval(interval);
+        setTimeout(showIntro, 2000);
+      }
+
+    },200);
+
   }
 
-    show();
-    const interval = setInterval(show, 3500);
-  }
-
+  show();
+  const interval = setInterval(show, 3500);
+}
   showIntro();
 }
 
