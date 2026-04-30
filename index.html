@@ -447,23 +447,29 @@ async function askGemini(userMessage, bookData) {
   `;
 
   // 3. 実行（少しだけ書き方を変えて安定させます）
+  // 🔽 ここが「body」部分を含む通信の設定です
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }]
+      contents: [{ parts: [{ text: prompt }] }],
+      // ✨安全フィルターを解除する設定（これがないと「空」になりやすいです）
+      safetySettings: [
+        { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+        { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+        { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+      ]
     })
   });
   
   const data = await response.json();
 
-  // ⚠️ ここが重要：データがちゃんと返ってきているか確認する処理を追加
   if (data.candidates && data.candidates[0] && data.candidates[0].content) {
     return data.candidates[0].content.parts[0].text;
   } else {
-    // エラー内容を画面に出すためのヒント
-    console.error("API Error Response:", data);
-    throw new Error("AIの返答が空でした。");
+    console.error("APIエラーの全容:", data);
+    throw new Error("AIが回答を拒否したか、準備ができていません。数分待って試してください。");
   }
 }
 
