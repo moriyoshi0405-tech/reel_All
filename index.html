@@ -1,71 +1,458 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"></head>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* 🌿 全体 */
+body{
+margin:0;
+font-family:'Zen Maru Gothic',sans-serif;
+background:#ffffff;
+color:#333;
+}
+
+/* 🌿 ローディング */
+#loading{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:white;
+z-index:999;
+}
+
+.spinner{
+width:40px;
+height:40px;
+border:4px solid #eee;
+border-top:4px solid #333;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{ transform:rotate(360deg); }
+}
+
+/* 🌿 ヘッダー */
+.header{
+text-align:center;
+padding:80px 20px 60px;
+color:#2f3e2f;
+background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%);
+position:relative;
+overflow:hidden;
+}
+
+.header h1{
+font-size:24px;
+font-weight:700;
+margin:0;
+}
+
+.header p{
+margin-top:10px;
+font-size:13px;
+opacity:0.7;
+}
+
+/* 🌿 コンテナ */
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+/* 🔍 検索 */
+.search input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+/* 🏷 タグ */
+.tags{
+margin:10px 0;
+}
+
+.tag{
+display:inline-block;
+padding:4px 8px;
+margin:3px;
+border-radius:12px;
+background:#eee;
+font-size:10px;
+cursor:pointer;
+}
+
+.tag.active{
+background:#222;
+color:#fff;
+}
+
+/* 🌿 グリッド */
+.grid{
+display:grid;
+gap:16px;
+}
+
+@media (max-width:767px){
+.grid{ grid-template-columns:repeat(2,1fr); }
+}
+
+@media (min-width:768px){
+.grid{ grid-template-columns:repeat(3,1fr); }
+}
+
+/* 🌿 カード */
+.card{
+background:white;
+border-radius:14px;
+padding:10px;
+box-shadow:0 10px 30px rgba(0,0,0,0.12);
+height:200px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:flex-start;
+text-align:center;
+position:relative;
+overflow:hidden;
+}
+
+.new{
+position:absolute;
+top:8px;
+left:8px;
+background:#ff4d4d;
+color:#fff;
+font-size:9px;
+padding:2px 6px;
+border-radius:6px;
+}
+
+.cover{
+width:60px;
+border-radius:6px;
+margin-bottom:6px;
+}
+
+.title{
+font-size:10px;
+font-weight:700;
+margin-bottom:4px;
+}
+
+.author{ font-size:9px;opacity:.6;margin-bottom:4px; }
+
+.card-tags{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:4px;
+max-height:32px;
+overflow:hidden;
+margin-bottom:4px;
+}
+
+.card-tag{
+font-size:8px;
+padding:2px 6px;
+border-radius:10px;
+color:#333;
+white-space:nowrap;
+}
+
+.button{
+font-size:9px;
+padding:5px 8px;
+border-radius:20px;
+background:#222;
+color:white;
+text-decoration:none;
+margin-top:auto;
+}
+
+.subbtn{
+font-size:9px;
+margin-top:6px;
+cursor:pointer;
+opacity:.6;
+}
+
+.text{
+font-size:11px;
+line-height:1.4;
+opacity:0;
+transform:translateY(10px);
+transition:.5s;
+position:relative;
+z-index:1;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+height:100%;
+}
+
+.text.show{
+opacity:1;
+transform:translateY(0);
+}
+
+.sort-btn{
+padding:6px 12px;
+border:none;
+border-radius:20px;
+background:#eee;
+cursor:pointer;
+font-size:11px;
+}
+
+.sort-btn.active{
+background:#222;
+color:#fff;
+}
+
+#loading.fade-out{
+opacity:0;
+transition:opacity .6s ease;
+pointer-events:none;
+}
+
+.loader-inner{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:12px;
+}
+
+.loading-text{
+font-size:13px;
+color:#555;
+letter-spacing:1px;
+animation:fadeText 1.8s ease-in-out infinite;
+}
+
+@keyframes fadeText{
+0%, 100%{ opacity:.3; }
+50%{ opacity:1; }
+}
+
+/* 🌿 リール背景共通 */
+.reel-bg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+overflow:hidden;
+border-radius:14px;
+}
+
+.bg-light{ background:linear-gradient(120deg,#e6f4ea,#ffffff); }
+.bg-sky{ background:linear-gradient(#dbeafe,#ffffff); }
+.bg-forest{ background:linear-gradient(#e6f4ea,#fdfdfd); }
+
+</style>
+</head>
+
 <body>
-  <h1>AI診断テストページ</h1>
-  <p>1. 読み込み状況: <span id="status">通信中...</span></p>
-  <input id="ai-input" placeholder="何か入力してください">
-  <button id="ai-ask-btn">AIに聞く</button>
-  <div id="ai-answer" style="border:1px solid #ccc; padding:10px; margin-top:10px;"></div>
+
+<div id="loading">
+  <div class="loader-inner">
+    <div class="spinner"></div>
+    <div class="loading-text">本棚整理中</div>
+  </div>
+</div>
+
+<div class="header">
+  <h1>物語の世界を、少しだけのぞいてみる</h1>
+  <p>気になる一冊が、きっと見つかる</p>
+</div>
+
+<div class="container">
+  <div class="search">
+    <input id="search" placeholder="本を検索...">
+  </div>
+
+  <div style="margin: 15px 0 10px;">
+    <button id="sortBtn" class="sort-btn">新しい順にする</button>
+  </div>
+
+  <div id="tags" class="tags"></div>
+  <div class="grid" id="grid"></div>
+</div>
 
 <script>
-let allData = [];
-let GEMINI_API_KEY = "";
-// あなたの最新のGAS URLに書き換えてください
 const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
 
-console.log("プログラム開始");
+let allData = [];
+let activeTag = null;
+let sortMode = "default";
 
-// データの読み込み
+// 🎨 タグカラー定義
+const tagColors = {
+  "恋愛小説": "#ffe0e6",
+  "海外文学": "#e0ecff",
+  "長編小説": "#e6f7e6",
+  "短編小説": "#fff4e0",
+  "エッセイ": "#f0e6ff"
+};
+
+// データの取得
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
-  console.log("GASからデータ受信:", data);
-  allData = data.books;
-  GEMINI_API_KEY = data.apiKey;
-  document.getElementById("status").innerText = "成功！本棚データを取得しました。";
+  // GASの形式変更に対応（data.booksがある場合とない場合の両方を考慮）
+  allData = data.books ? data.books : data;
+
+  renderTags(allData);
+  render(allData);
+
+  const loader = document.getElementById("loading");
+  loader.classList.add("fade-out");
+  setTimeout(() => { loader.style.display = "none"; }, 600);
 })
 .catch(err => {
-  console.error("エラー発生:", err);
-  document.getElementById("status").innerText = "失敗: " + err.message;
+  console.error("Fetch Error:", err);
 });
 
-// AIへの命令関数
-async function askGemini(userMessage, bookData) {
-  // 🔽 モデル名を /models/ から含める書き方に修正
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-  
-  const prompt = "テストです。OKと返してください。";
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }]
-    })
-  });
-  
-  const json = await response.json();
-  
-  if (json.candidates && json.candidates[0].content) {
-    return json.candidates[0].content.parts[0].text;
-  } else {
-    // 詳細なエラーを出すように調整
-    throw new Error(json.error ? json.error.message : "AIの応答を解析できませんでした");
+// ソート切り替え
+document.getElementById("sortBtn").onclick = () => {
+  sortMode = sortMode === "default" ? "new" : "default";
+  const btn = document.getElementById("sortBtn");
+  if(sortMode === "new"){
+    btn.textContent = "表示順に戻す";
+    btn.classList.add("active");
+  }else{
+    btn.textContent = "新しい順にする";
+    btn.classList.remove("active");
   }
-}
-// ボタン動作
-document.getElementById("ai-ask-btn").onclick = async () => {
-  const answerEl = document.getElementById("ai-answer");
-  answerEl.innerText = "AIが考えています...";
-  try {
-    const advice = await askGemini("テスト", allData.slice(0, 3));
-    answerEl.innerText = advice;
-  } catch (e) {
-    answerEl.innerText = "AIエラー: " + e.message;
-    console.error(e);
-  }
+  filter();
 };
+
+// 検索・フィルタリング
+document.getElementById("search").addEventListener("input", filter);
+
+function normalize(text){
+  return text.toLowerCase().replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60));
+}
+
+function renderTags(data){
+  const box = document.getElementById("tags");
+  box.innerHTML = "";
+  const set = new Set();
+  data.forEach(d => d.tags.forEach(t => set.add(t)));
+  set.forEach(tag => {
+    const el = document.createElement("span");
+    el.className = "tag";
+    el.textContent = tag;
+    el.onclick = ()=>{
+      activeTag = activeTag === tag ? null : tag;
+      document.querySelectorAll(".tag").forEach(t=>t.classList.remove("active"));
+      if(activeTag) el.classList.add("active");
+      filter();
+    };
+    box.appendChild(el);
+  });
+}
+
+function filter(){
+  const keyword = normalize(document.getElementById("search").value);
+  let filtered = allData.filter(item => {
+    const text = normalize(item.title + item.author);
+    const matchText = text.includes(keyword);
+    const matchTag = !activeTag || item.tags.includes(activeTag);
+    return matchText && matchTag;
+  });
+  if(sortMode === "new"){
+    filtered.sort((a,b)=> new Date(b.created) - new Date(a.created));
+  }else{
+    filtered.sort((a,b)=> a.order - b.order);
+  }
+  render(filtered);
+}
+
+function render(data){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  data.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    grid.appendChild(card);
+    createReelCard(card, item);
+  });
+}
+
+function createReelCard(card, item){
+  function showIntro(){
+    const isNew = item.created && ((Date.now() - new Date(item.created)) / (1000*60*60*24) <= 7);
+    const tagsHTML = item.tags.map(t => {
+      const color = tagColors[t] || "#eee";
+      return `<span class="card-tag" style="background:${color}">${t}</span>`;
+    }).join("");
+
+    card.innerHTML = `
+      ${isNew ? '<div class="new">New!</div>' : ''}
+      <img src="${item.image}" class="cover">
+      <div class="title">${item.title}</div>
+      <div class="author">${item.author}</div>
+      <div class="card-tags">${tagsHTML}</div>
+      <a href="${item.url}" target="_blank" class="button">感想記事を読む</a>
+      <div class="subbtn">▶ 短い紹介を見る</div>
+    `;
+    card.querySelector(".subbtn").onclick = startReel;
+  }
+
+  function startReel(){
+    const text = document.createElement("div");
+    text.className = "text";
+    const bg = document.createElement("div");
+    bg.className = "reel-bg";
+    const bgTypes = ["bg-light","bg-sky","bg-forest"];
+    const randomBg = bgTypes[Math.floor(Math.random()*bgTypes.length)];
+    bg.classList.add(randomBg);
+
+    card.innerHTML = "";
+    card.appendChild(bg);
+    card.appendChild(text);
+
+    let index = 0;
+    const reelArray = Array.isArray(item.reel) ? item.reel : [];
+    
+    function show(){
+      text.classList.remove("show");
+      setTimeout(()=>{
+        let content = reelArray[index] || "";
+        if(content && !content.includes("<br>")){
+          content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
+        }
+        text.innerHTML = content;
+        text.classList.add("show");
+        index++;
+        if(index >= reelArray.length){
+          clearInterval(interval);
+          setTimeout(showIntro, 2000);
+        }
+      },200);
+    }
+    show();
+    const interval = setInterval(show, 3500);
+  }
+  showIntro();
+}
 </script>
+
 </body>
 </html>
