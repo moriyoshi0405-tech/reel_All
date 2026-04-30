@@ -422,24 +422,28 @@ animation:forestLight 8s ease-in-out infinite;
 const GEMINI_API_KEY = "AIzaSyCjFv2CYSmiaf2zEM5CcPEPXiorkHztFFE"; // ここを差し替えてください
 
 async function askGemini(userMessage, bookData) {
-  // 1. APIのURL（ここはOKです）
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   
-  // 2. 本棚の情報を整理（ここもOKです）
-  const bookList = bookData.map(b => `・${b.title}（著者：${b.author}）`).join('\n');
+  // 🔽 ここがポイント：reel（紹介文）をAIにしっかり伝える
+  const bookList = bookData.map(b => {
+    const introduction = b.reel && b.reel.length > 0 ? b.reel.join(' ') : "（紹介文なし）";
+    return `・タイトル：${b.title}\n  著者：${b.author}\n  特徴：${introduction}\n  タグ：${b.tags.join(',')}`;
+  }).join('\n\n');
   
   const prompt = `
-    あなたは司書です。以下の【本棚リスト】から【リクエスト】に合う本を1〜2冊提案してください。
-    
+    あなたは私の読書記録を熟知している有能な司書です。
+    以下の【本棚リスト】には、私が過去に読んで感銘を受けた本のタイトルと、その時に感じた「紹介文（特徴）」が記されています。
+
     【本棚リスト】
     ${bookList}
-    
-    【リクエスト】
-    ${userMessage}
-    
-    【ルール】
-    ・リストにない本は絶対に出さない。
-    ・200文字以内で、優しく答える。
+
+    【ユーザーのリクエスト】
+    "${userMessage}"
+
+    【指示】
+    1. リクエストの「気分」や「悩み」に最も寄り添える本を、リストの中から1〜2冊選んでください。
+    2. 選んだ理由を、リストにある「特徴（紹介文）」の言葉を引用しながら説明してください。
+    3. 200文字程度で、温かみのある言葉で回答してください。
   `;
 
   // 3. 実行（少しだけ書き方を変えて安定させます）
