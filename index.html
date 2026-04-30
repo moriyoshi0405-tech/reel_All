@@ -518,11 +518,13 @@ document.getElementById("ai-ask-btn").onclick = async () => {
   answerEl.style.display = "block";
   answerEl.innerHTML = "AI司書が本棚を確認中...";
 
-  try {
-    const advice = await askGemini(input, allData);
+try {
+    // 🔽 ここを修正：allData をそのまま渡さず、最初の3冊に絞る
+    const testData = allData.slice(0, 3); 
+    const advice = await askGemini(input, testData);
+    
     answerEl.innerHTML = `<strong>AIの提案：</strong><br>${advice}`;
   } catch (e) {
-    // 🔽 ここを書き換えて、エラーの正体を表示します
     answerEl.innerHTML = `エラー詳細: ${e.message}`;
     console.error("詳細エラー:", e);
   }
