@@ -513,14 +513,13 @@ document.getElementById("ai-ask-btn").onclick = async () => {
   answerEl.innerHTML = "AI司書が本棚を確認中...";
 
   try {
-    // allData（既存のデータ変数）をそのままAIに渡します
     const advice = await askGemini(input, allData);
     answerEl.innerHTML = `<strong>AIの提案：</strong><br>${advice}`;
   } catch (e) {
-    answerEl.innerHTML = "すみません、うまく本棚を見つけられませんでした。";
-    console.error(e);
+    // 🔽 ここを書き換えて、エラーの正体を表示します
+    answerEl.innerHTML = `エラー詳細: ${e.message}`;
+    console.error("詳細エラー:", e);
   }
-};
 
 // ソート
 document.getElementById("sortBtn").onclick = () => {
