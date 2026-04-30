@@ -479,23 +479,21 @@ let allData = [];
 let activeTag = null;
 let sortMode = "default";
 
+let GEMINI_API_KEY = ""; // ここは空のままでOK（GASから届きます）
+
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
+  // GASから届いたデータを仕分ける
+  allData = data.books;     // 本のリスト
+  GEMINI_API_KEY = data.apiKey; // GASから届いた安全なAPIキー
 
-  allData = data;
+  renderTags(allData);
+  render(allData);
 
-  renderTags(data);
-  render(data);
-
-  // 🔽 ローディング非表示（変更）
   const loader = document.getElementById("loading");
   loader.classList.add("fade-out");
-  
-  setTimeout(()=>{
-    loader.style.display = "none";
-  },600);
-
+  setTimeout(() => { loader.style.display = "none"; }, 600);
 });
 
 
