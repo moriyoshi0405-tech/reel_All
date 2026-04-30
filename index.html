@@ -464,6 +464,10 @@ async function askGemini(userMessage, bookData) {
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
+
+// 🔽 ここを追加：GASから何が届いているかコンソール（F12キー）で確認
+  console.log("GASから届いたデータ:", data);
+  
   allData = data.books; // GAS側の修正に合わせた受け取り
   GEMINI_API_KEY = data.apiKey; 
 
