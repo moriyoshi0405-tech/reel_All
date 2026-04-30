@@ -417,43 +417,32 @@ animation:forestLight 8s ease-in-out infinite;
 </div>
 
 <script>
+// 1. 変数の準備
+let allData = [];
+let activeTag = null;
+let sortMode = "default";
+let GEMINI_API_KEY = ""; // GASから自動で届くので空でOK
 
-// Gemini APIの設定
-const GEMINI_API_KEY = "AIzaSyDfm2EU4Lf4FKqFELDBQnBjLth0tSg_5lA"; // ここを差し替えてください
+const API_URL = "https://script.google.com/macros/s/AKfycbzQ8_J-Pyj-qC5nq6GRl1VNVRUuGziXYCnPIGJAssycvoCEeIVtvOPlKWTtp6Svg_qd/exec";
 
+// 2. AIへの相談関数
 async function askGemini(userMessage, bookData) {
+  if (!GEMINI_API_KEY) throw new Error("APIキーが読み込まれていません。");
+  
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   
-  // 🔽 ここがポイント：reel（紹介文）をAIにしっかり伝える
   const bookList = bookData.map(b => {
     const introduction = b.reel && b.reel.length > 0 ? b.reel.join(' ') : "（紹介文なし）";
     return `・タイトル：${b.title}\n  著者：${b.author}\n  特徴：${introduction}\n  タグ：${b.tags.join(',')}`;
   }).join('\n\n');
   
-  const prompt = `
-    あなたは私の読書記録を熟知している有能な司書です。
-    以下の【本棚リスト】には、私が過去に読んで感銘を受けた本のタイトルと、その時に感じた「紹介文（特徴）」が記されています。
+  const prompt = `あなたは司書です。以下の【本棚リスト】から【リクエスト】に合う本を1〜2冊選び、優しく提案してください。\n\n【本棚リスト】\n${bookList}\n\n【リクエスト】\n${userMessage}`;
 
-    【本棚リスト】
-    ${bookList}
-
-    【ユーザーのリクエスト】
-    "${userMessage}"
-
-    【指示】
-    1. リクエストの「気分」や「悩み」に最も寄り添える本を、リストの中から1〜2冊選んでください。
-    2. 選んだ理由を、リストにある「特徴（紹介文）」の言葉を引用しながら説明してください。
-    3. 200文字程度で、温かみのある言葉で回答してください。
-  `;
-
-  // 3. 実行（少しだけ書き方を変えて安定させます）
-  // 🔽 ここが「body」部分を含む通信の設定です
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      // ✨安全フィルターを解除する設定（これがないと「空」になりやすいです）
       safetySettings: [
         { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
         { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
@@ -464,29 +453,19 @@ async function askGemini(userMessage, bookData) {
   });
   
   const data = await response.json();
-
   if (data.candidates && data.candidates[0] && data.candidates[0].content) {
     return data.candidates[0].content.parts[0].text;
   } else {
-    console.error("APIエラーの全容:", data);
-    throw new Error("AIが回答を拒否したか、準備ができていません。数分待って試してください。");
+    throw new Error("AIが回答を拒否したか、準備ができていません。");
   }
 }
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzQ8_J-Pyj-qC5nq6GRl1VNVRUuGziXYCnPIGJAssycvoCEeIVtvOPlKWTtp6Svg_qd/exec";
-
-let allData = [];
-let activeTag = null;
-let sortMode = "default";
-
-let GEMINI_API_KEY = ""; // ここは空のままでOK（GASから届きます）
-
+// 3. データの読み込み
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
-  // GASから届いたデータを仕分ける
-  allData = data.books;     // 本のリスト
-  GEMINI_API_KEY = data.apiKey; // GASから届いた安全なAPIキー
+  allData = data.books; // GAS側の修正に合わせた受け取り
+  GEMINI_API_KEY = data.apiKey; 
 
   renderTags(allData);
   render(allData);
@@ -494,9 +473,31 @@ fetch(API_URL)
   const loader = document.getElementById("loading");
   loader.classList.add("fade-out");
   setTimeout(() => { loader.style.display = "none"; }, 600);
+})
+.catch(err => {
+  console.error("データ取得エラー:", err);
+  document.getElementById("loading").innerText = "データの取得に失敗しました。";
 });
 
+// 4. AIボタンの動作
+document.getElementById("ai-ask-btn").onclick = async () => {
+  const input = document.getElementById("ai-input").value;
+  const answerEl = document.getElementById("ai-answer");
+  
+  if (!input) return alert("気分を入力してください！");
 
+  answerEl.style.display = "block";
+  answerEl.innerHTML = "AI司書が本棚を確認中...";
+
+  try {
+    const testData = allData.slice(0, 5); // 5冊に増やしてテスト
+    const advice = await askGemini(input, testData);
+    answerEl.innerHTML = `<strong>AIの提案：</strong><br>${advice}`;
+  } catch (e) {
+    answerEl.innerHTML = `エラー詳細: ${e.message}`;
+    console.error("詳細エラー:", e);
+  }
+}; // 👈 ここに閉じカッコが必要でした！
 
 // 🎨 タグカラー定義
 const tagColors = {
@@ -507,34 +508,11 @@ const tagColors = {
   "エッセイ": "#f0e6ff"
 };
 
-document.getElementById("ai-ask-btn").onclick = async () => {
-  const input = document.getElementById("ai-input").value;
-  const answerEl = document.getElementById("ai-answer");
-  
-  if (!input) return alert("気分を入力してください！");
+// --- 以下、ソートや検索などの既存機能（変更なし） ---
 
-  answerEl.style.display = "block";
-  answerEl.innerHTML = "AI司書が本棚を確認中...";
-
-try {
-    // 🔽 ここを修正：allData をそのまま渡さず、最初の3冊に絞る
-    const testData = allData.slice(0, 3); 
-    const advice = await askGemini(input, testData);
-    
-    answerEl.innerHTML = `<strong>AIの提案：</strong><br>${advice}`;
-  } catch (e) {
-    answerEl.innerHTML = `エラー詳細: ${e.message}`;
-    console.error("詳細エラー:", e);
-  }
-};
-
-// ソート
 document.getElementById("sortBtn").onclick = () => {
-
   sortMode = sortMode === "default" ? "new" : "default";
-
   const btn = document.getElementById("sortBtn");
-
   if(sortMode === "new"){
     btn.textContent = "表示順に戻す";
     btn.classList.add("active");
@@ -542,184 +520,115 @@ document.getElementById("sortBtn").onclick = () => {
     btn.textContent = "新しい順にする";
     btn.classList.remove("active");
   }
-
   filter();
 };
 
-// 検索
 document.getElementById("search").addEventListener("input", filter);
 
 function normalize(text){
-  return text.toLowerCase()
-    .replace(/[ァ-ン]/g, s =>
-      String.fromCharCode(s.charCodeAt(0) - 0x60)
-    );
+  return text.toLowerCase().replace(/[ァ-ン]/g, s => String.fromCharCode(s.charCodeAt(0) - 0x60));
 }
 
-// タグ生成
 function renderTags(data){
-
   const box = document.getElementById("tags");
+  box.innerHTML = "";
   const set = new Set();
-
   data.forEach(d => d.tags.forEach(t => set.add(t)));
-
   set.forEach(tag => {
-
     const el = document.createElement("span");
     el.className = "tag";
     el.textContent = tag;
-
     el.onclick = ()=>{
       activeTag = activeTag === tag ? null : tag;
-
       document.querySelectorAll(".tag").forEach(t=>t.classList.remove("active"));
       if(activeTag) el.classList.add("active");
-
       filter();
     };
-
     box.appendChild(el);
   });
 }
 
-// フィルター
 function filter(){
-
   const keyword = normalize(document.getElementById("search").value);
-
   let filtered = allData.filter(item => {
-
     const text = normalize(item.title + item.author);
-
     const matchText = text.includes(keyword);
     const matchTag = !activeTag || item.tags.includes(activeTag);
-
     return matchText && matchTag;
-
   });
-
   if(sortMode === "new"){
     filtered.sort((a,b)=> new Date(b.created) - new Date(a.created));
   }else{
     filtered.sort((a,b)=> a.order - b.order);
   }
-
   render(filtered);
-
 }
 
-// 描画
 function render(data){
-
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
-
   data.forEach(item => {
-
     const card = document.createElement("div");
     card.className = "card";
-
     grid.appendChild(card);
     createReelCard(card, item);
-
   });
-
 }
 
-// カード生成
 function createReelCard(card, item){
-
   function showIntro(){
-
-    const isNew = item.created &&
-      ((Date.now() - new Date(item.created)) / (1000*60*60*24) <= 7);
-
+    const isNew = item.created && ((Date.now() - new Date(item.created)) / (1000*60*60*24) <= 7);
     const tagsHTML = item.tags.map(t => {
-
       const color = tagColors[t] || "#eee";
-    
-      return `<span class="card-tag"
-                style="background:${color}">
-                ${t}
-              </span>`;
-    
+      return `<span class="card-tag" style="background:${color}">${t}</span>`;
     }).join("");
 
     card.innerHTML = `
       ${isNew ? '<div class="new">New!</div>' : ''}
-
       <img src="${item.image}" class="cover">
       <div class="title">${item.title}</div>
       <div class="author">${item.author}</div>
-
       <div class="card-tags">${tagsHTML}</div>
-
-      <a href="${item.url}" target="_blank" class="button">
-        感想記事を読む
-      </a>
-
+      <a href="${item.url}" target="_blank" class="button">感想記事を読む</a>
       <div class="subbtn">▶ 短い紹介を見る</div>
     `;
-
     card.querySelector(".subbtn").onclick = startReel;
   }
 
-function startReel(){
-
-  const text = document.createElement("div");
-  text.className = "text";
-
-  // 🔽 背景をランダム生成
-  const bg = document.createElement("div");
-  bg.className = "reel-bg";
-
-  const bgTypes = ["bg-light","bg-sky","bg-forest"];
-  const randomBg = bgTypes[Math.floor(Math.random()*bgTypes.length)];
-  bg.classList.add(randomBg);
-
-  card.innerHTML = "";
-  card.appendChild(bg);   // ← 背景
-  card.appendChild(text); // ← テキスト
-
-  let index = 0;
-
-  const reelArray = typeof item.reel === "string"
-    ? item.reel.split(",")
-    : item.reel;
-
-  function show(){
-
-    text.classList.remove("show");
-
-    setTimeout(()=>{
-
-      let content = reelArray[index] || "";
-
-      if(!content.includes("<br>")){
-        content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
-      }
-
-      text.innerHTML = content;
-      text.classList.add("show");
-
-      index++;
-
-      if(index >= reelArray.length){
-        clearInterval(interval);
-        setTimeout(showIntro, 2000);
-      }
-
-    },200);
-
+  function startReel(){
+    const text = document.createElement("div");
+    text.className = "text";
+    const bg = document.createElement("div");
+    bg.className = "reel-bg";
+    const bgTypes = ["bg-light","bg-sky","bg-forest"];
+    const randomBg = bgTypes[Math.floor(Math.random()*bgTypes.length)];
+    bg.classList.add(randomBg);
+    card.innerHTML = "";
+    card.appendChild(bg);
+    card.appendChild(text);
+    let index = 0;
+    const reelArray = typeof item.reel === "string" ? item.reel.split(",") : item.reel;
+    function show(){
+      text.classList.remove("show");
+      setTimeout(()=>{
+        let content = reelArray[index] || "";
+        if(!content.includes("<br>")){
+          content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
+        }
+        text.innerHTML = content;
+        text.classList.add("show");
+        index++;
+        if(index >= reelArray.length){
+          clearInterval(interval);
+          setTimeout(showIntro, 2000);
+        }
+      },200);
+    }
+    show();
+    const interval = setInterval(show, 3500);
   }
-
-  show();
-  const interval = setInterval(show, 3500);
-}
   showIntro();
 }
-
 </script>
 
 </body>
