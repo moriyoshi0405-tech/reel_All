@@ -452,6 +452,22 @@ function createReelCard(card, item){
   }
   showIntro();
 }
+
+// ===============================
+// 🤖 AI検索
+// ===============================
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("change", async () => {
+  const query = searchInput.value;
+  if (!query) return;
+
+  const res = await fetch(`${API_URL}?mode=search&q=${encodeURIComponent(query)}`);
+  const data = await res.json();
+
+  alert(data.answer); // とりあえず表示（後でUI化）
+});
+  
 </script>
 
 </body>
