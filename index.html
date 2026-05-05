@@ -286,12 +286,16 @@ border-radius:14px;
     <input id="search" placeholder="本を検索...">
   </div>
 
+    <!-- 👇 ここに追加 -->
+  <div id="aiResult" style="margin-top:30px;"></div>
+  
   <div style="margin: 15px 0 10px;">
     <button id="sortBtn" class="sort-btn">新しい順にする</button>
   </div>
 
   <div id="tags" class="tags"></div>
   <div class="grid" id="grid"></div>
+
 </div>
 
 <script>
@@ -311,7 +315,7 @@ const tagColors = {
 };
 
 // データの取得
-fetch(API_URL)
+fetch(API_URL + "?mode=books")
 .then(res => res.json())
 .then(data => {
   // GASの形式変更に対応（data.booksがある場合とない場合の両方を考慮）
@@ -353,7 +357,10 @@ function renderTags(data){
   const box = document.getElementById("tags");
   box.innerHTML = "";
   const set = new Set();
-  data.forEach(d => d.tags.forEach(t => set.add(t)));
+  data.forEach(d => {
+  if (!d.tags) return;
+  d.tags.forEach(t => set.add(t));
+  });  
   set.forEach(tag => {
     const el = document.createElement("span");
     el.className = "tag";
@@ -373,13 +380,16 @@ function filter(){
   let filtered = allData.filter(item => {
     const text = normalize(item.title + item.author);
     const matchText = text.includes(keyword);
-    const matchTag = !activeTag || item.tags.includes(activeTag);
+
+    const tags = item.tags || []; // ←ここ追加
+    const matchTag = !activeTag || tags.includes(activeTag); // ←ここ修正
+
     return matchText && matchTag;
   });
   if(sortMode === "new"){
     filtered.sort((a,b)=> new Date(b.created) - new Date(a.created));
   }else{
-    filtered.sort((a,b)=> a.order - b.order);
+    filtered.sort((a,b)=> (a.order || 0) - (b.order || 0));
   }
   render(filtered);
 }
@@ -398,9 +408,9 @@ function render(data){
 function createReelCard(card, item){
   function showIntro(){
     const isNew = item.created && ((Date.now() - new Date(item.created)) / (1000*60*60*24) <= 7);
-    const tagsHTML = item.tags.map(t => {
+      const tagsHTML = (item.tags || []).map(t => {
       const color = tagColors[t] || "#eee";
-      return `<span class="card-tag" style="background:${color}">${t}</span>`;
+    return `<span class="card-tag" style="background:${color}">${t}</span>`;
     }).join("");
 
     card.innerHTML = `
@@ -458,15 +468,51 @@ function createReelCard(card, item){
 // ===============================
 const searchInput = document.getElementById("search");
 
-searchInput.addEventListener("change", async () => {
+searchInput.addEventListener("keypress", async (e) => {
+  if (e.key !== "Enter") return;
+
+    e.preventDefault(); // ←追加（超重要）
+
   const query = searchInput.value;
-  if (!query) return;
 
   const res = await fetch(`${API_URL}?mode=search&q=${encodeURIComponent(query)}`);
   const data = await res.json();
 
-  alert(data.answer); // とりあえず表示（後でUI化）
+  renderAIResult(data);
+
+document.getElementById("aiResult").scrollIntoView({ behavior: "smooth" }); 
 });
+
+function renderAIResult(data) {
+  const box = document.getElementById("aiResult");
+
+  if (!data.candidates || data.candidates.length === 0) {
+    box.innerHTML = `<p>${data.answer}</p>`;
+    return;
+  }
+
+  const cards = data.candidates.map(b => `
+    <div style="
+      background:#fff;
+      padding:15px;
+      margin-bottom:10px;
+      border-radius:12px;
+      box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    ">
+      <div style="font-weight:bold">${b.title}</div>
+      <div style="font-size:12px;opacity:0.6">${b.author}</div>
+      <a href="${b.url}" target="_blank">レビューを見る</a>
+    </div>
+  `).join("");
+
+  box.innerHTML = `
+    <div style="margin-bottom:15px;">
+      <strong>AIのおすすめ</strong>
+      <p>${data.answer.replace(/\n/g,"<br>")}</p>
+    </div>
+    ${cards}
+  `;
+}
   
 </script>
 
