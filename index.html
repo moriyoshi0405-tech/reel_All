@@ -316,7 +316,10 @@ const tagColors = {
 
 // データの取得
 fetch(API_URL + "?mode=books")
-.then(res => res.json())
+.then(res => {
+  if (!res.ok) throw new Error("HTTPエラー");
+  return res.json();
+})
 .then(data => {
   // GASの形式変更に対応（data.booksがある場合とない場合の両方を考慮）
   allData = data.books ? data.books : data;
@@ -330,6 +333,15 @@ fetch(API_URL + "?mode=books")
 })
 .catch(err => {
   console.error("Fetch Error:", err);
+
+  // 👇これ追加
+  const loader = document.getElementById("loading");
+  loader.style.display = "none";
+
+  document.body.insertAdjacentHTML(
+    "afterbegin",
+    "<p style='text-align:center;margin-top:50px;'>データの取得に失敗しました</p>"
+  );
 });
 
 // ソート切り替え
