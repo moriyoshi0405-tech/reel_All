@@ -52,15 +52,21 @@
     .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap;}
     .button:hover { background: #555; }
 
-    /* 🔴追加：みんなのおすすめコーナーのデザイン */
+    /* みんなのおすすめコーナー */
     .reader-section { margin-top: 60px; padding: 40px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7;}
     .reader-section h2 { text-align: center; color: #d35400; font-size: 20px; margin-top: 0; margin-bottom: 25px;}
     .reader-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
     .reader-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column;}
     .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 30px; transform: rotate(-10deg);}
-    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80;}
+    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1;}
     .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px;}
     .reader-book-author { font-size: 12px; color: #777;}
+
+    /* 🔴追加：読みたいボタンのデザイン */
+    .like-btn { display: inline-block; margin-top: 15px; background: #fff; border: 1px solid #ff4757; color: #ff4757; border-radius: 20px; padding: 6px 15px; font-size: 12px; font-family: 'Zen Maru Gothic', sans-serif; font-weight: bold; cursor: pointer; transition: 0.2s; align-self: flex-start;}
+    .like-btn:hover { background: #ffe0e6; }
+    /* 押した後のデザイン */
+    .like-btn.liked { background: #ff4757; color: white; cursor: default; opacity: 0.9; }
 
     /* フローティングボタン */
     .floating-btn { position: fixed; bottom: 20px; right: 20px; background: #ff8c00; color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
@@ -91,7 +97,6 @@
       .button { font-size: 9px; padding: 5px 6px; border-radius: 12px; width: 85%; box-sizing: border-box; }
       .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
       .prompt-btn { font-size: 11px; padding: 6px 12px; }
-      /* 読者コーナーのスマホ対応 */
       .reader-grid { grid-template-columns: 1fr; }
       .reader-card { padding: 15px; }
     }
@@ -171,11 +176,10 @@
 
   <div id="grid" class="grid"></div>
 
-  <!-- 🔴追加：読者のおすすめ本を表示するエリア -->
   <div class="reader-section">
     <h2>💬 みんなのおすすめ本</h2>
     <div id="readerGrid" class="reader-grid">
-      <!-- ここに読者の投稿が自動生成されます -->
+      <!-- 読者の投稿 -->
     </div>
   </div>
 
@@ -186,24 +190,22 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let allData = [];
-  let readerData = []; // 読者のおすすめ本データ用
+  let readerData = []; 
   let activeTags = []; 
+
+  // ブラウザに保存されている「自分がいいねした本」のリストを取得
+  let likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
 
   window.onload = async () => {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
       allData = data.books;
-      
-      // 読者の投稿データを受け取る
       readerData = data.readerBooks || [];
       
       allData.sort((a, b) => new Date(b.updated) - new Date(a.updated));
-      
       generateFilterTags(allData);
       renderMainGrid(allData);
-      
-      // 読者の投稿を描画する
       renderReaderGrid(readerData);
       
       document.getElementById("loading").style.display = "none";
@@ -273,23 +275,50 @@
     document.getElementById("grid").innerHTML = books.map(book => generateCardHTML(book)).join("");
   }
 
-  // 🔴追加：読者のおすすめ本を描画する関数
+  // 🔴修正：読者のおすすめ本に「読みたい」ボタンを追加
   function renderReaderGrid(books) {
     const grid = document.getElementById("readerGrid");
-    
-    // まだ「公開」の投稿が1件もない場合
     if (books.length === 0) {
       grid.innerHTML = `<p style="text-align: center; color: #888; grid-column: 1 / -1; margin: 20px 0;">まだおすすめの投稿はありません。<br>右下のボタンから、あなたのお気に入りの一冊を教えてください！</p>`;
       return;
     }
 
-    grid.innerHTML = books.map(book => `
+    grid.innerHTML = books.map(book => {
+      // 自分がすでに「いいね」した本かどうかをチェック
+      const isLiked = likedBooks.includes(book.id);
+      const btnClass = isLiked ? "like-btn liked" : "like-btn";
+      const btnDisabled = isLiked ? "disabled" : "";
+
+      return `
       <div class="reader-card">
         <div class="reader-quote">${book.reason.replace(/\n/g, '<br>')}</div>
         <div class="reader-book-title">📖 ${book.title}</div>
         <div class="reader-book-author">✍️ ${book.author}</div>
+        <button id="likeBtn-${book.id}" class="${btnClass}" onclick="likeBook('${book.id}', ${book.likes})" ${btnDisabled}>
+          ❤️ 読みたい！ (${book.likes})
+        </button>
       </div>
-    `).join("");
+    `}).join("");
+  }
+
+  // 🔴追加：読みたいボタンを押した時の処理
+  function likeBook(pageId, currentLikes) {
+    const btn = document.getElementById(`likeBtn-${pageId}`);
+    
+    // UIをすぐに更新して「押した感」を出す
+    btn.textContent = `❤️ 読みたい！ (${currentLikes + 1})`;
+    btn.classList.add("liked");
+    btn.disabled = true;
+
+    // ローカルストレージに「この本はいいねした」と記録する
+    likedBooks.push(pageId);
+    localStorage.setItem('likedBooks', JSON.stringify(likedBooks));
+
+    // 裏側でGAS（Notion）に更新リクエストを送る
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "likeBook", pageId: pageId })
+    }).catch(e => console.error("いいねの送信に失敗しました", e));
   }
 
   function setAiPrompt(promptText) {
@@ -339,26 +368,18 @@
   document.getElementById("updateDbBtn").onclick = async () => {
     const pass = prompt("新しい本をAIに覚えさせるための「合言葉」を入力してください。");
     if (!pass) return; 
-
     const btn = document.getElementById("updateDbBtn");
     btn.textContent = "処理中（1〜2分かかります）...";
     btn.disabled = true;
-
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: pass }) });
       const data = await res.json();
       if (data.status === "success") {
         alert("AIが新しい本を覚えました！\nページをリロードして反映します。");
         location.reload(); 
-      } else {
-        alert("エラー: " + data.message);
-      }
-    } catch (e) {
-      alert("通信エラーが発生しました。");
-    } finally {
-      btn.textContent = "🔄 AIに本を覚えさせる";
-      btn.disabled = false;
-    }
+      } else { alert("エラー: " + data.message); }
+    } catch (e) { alert("通信エラーが発生しました。"); } 
+    finally { btn.textContent = "🔄 AIに本を覚えさせる"; btn.disabled = false; }
   };
 
   function openModal() { document.getElementById("submitModal").style.display = "flex"; }
@@ -369,10 +390,7 @@
     const author = document.getElementById("submitAuthor").value.trim();
     const reason = document.getElementById("submitReason").value.trim();
 
-    if (!title || !reason) {
-      alert("「書籍名」と「おすすめな理由」は必須です！");
-      return;
-    }
+    if (!title || !reason) { alert("「書籍名」と「おすすめな理由」は必須です！"); return; }
 
     const btn = document.getElementById("submitConfirmBtn");
     btn.textContent = "送信中...";
@@ -381,10 +399,7 @@
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ 
-          action: "submitBook", 
-          data: { title: title, author: author, reason: reason } 
-        })
+        body: JSON.stringify({ action: "submitBook", data: { title: title, author: author, reason: reason } })
       });
       const data = await res.json();
       
@@ -394,15 +409,9 @@
         document.getElementById("submitTitle").value = "";
         document.getElementById("submitAuthor").value = "";
         document.getElementById("submitReason").value = "";
-      } else {
-        alert("エラーが発生しました: " + data.message);
-      }
-    } catch (e) {
-      alert("通信エラーが発生しました。");
-    } finally {
-      btn.textContent = "管理人に送る";
-      btn.disabled = false;
-    }
+      } else { alert("エラーが発生しました: " + data.message); }
+    } catch (e) { alert("通信エラーが発生しました。"); } 
+    finally { btn.textContent = "管理人に送る"; btn.disabled = false; }
   }
 
 </script>
