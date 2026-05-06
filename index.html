@@ -6,26 +6,46 @@
   <title>AI Book Shelf</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* 既存のスタイルを継承・最適化 */
+    /* 全体設定 */
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; }
     .header { text-align: center; padding: 60px 20px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); }
     .container { max-width: 900px; margin: auto; padding: 20px; }
     
-    /* AIセクションの強化 */
+    /* 検索・タグフィルター */
+    .filter-section { margin-bottom: 25px; }
+    .search-bar { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Zen Maru Gothic', sans-serif;}
+    .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter-tag { padding: 6px 14px; border-radius: 20px; background: #eee; font-size: 12px; cursor: pointer; border: none; transition: 0.2s; color: #555;}
+    .filter-tag.active { background: #2f3e2f; color: white; }
+
+    /* AIセクション */
     .ai-section { background: #fff; border: 2px solid #e6f4ea; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .ai-input-group { display: flex; gap: 10px; margin-top: 10px; }
-    input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif;}
+    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap;}
     .ai-btn:disabled { background: #ccc; }
     #aiResult { margin-top: 15px; line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; }
 
-    /* グリッド表示 */
-    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-    .cover { width: 80px; height: 110px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
-    .title { font-weight: bold; font-size: 14px; margin: 5px 0; }
-    .author { font-size: 12px; color: #777; margin-bottom: 10px; }
-    .button { display: inline-block; padding: 8px 15px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; }
+    /* グリッドとカード */
+    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .card { background: white; border-radius: 12px; padding: 20px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
+    
+    /* NEWラベル */
+    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;}
+    
+    .cover { width: 90px; height: 130px; object-fit: cover; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4;}
+    .author { font-size: 12px; color: #777; margin-bottom: 8px; }
+    
+    /* 評価（★） */
+    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px;}
+    
+    /* カード内のタグ */
+    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; }
+    .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
+    
+    .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s;}
+    .button:hover { background: #555; }
 
     /* ローディング */
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
@@ -37,7 +57,7 @@
 
 <div id="loading">
   <div class="spinner"></div>
-  <p>本棚を整頓中...</p>
+  <p style="margin-top: 15px; color: #555; font-size: 14px;">本棚を整頓中...</p>
 </div>
 
 <div class="header">
@@ -46,6 +66,7 @@
 </div>
 
 <div class="container">
+
   <!-- AI相談窓口 -->
   <div class="ai-section">
     <strong>🤖 AIに本を相談する</strong>
@@ -56,14 +77,24 @@
     <div id="aiResult"></div>
   </div>
 
+  <!-- 検索とタグフィルター -->
+  <div class="filter-section">
+    <input type="text" id="searchBar" class="search-bar" placeholder="本のタイトルや著者名で検索...">
+    <div id="tagsContainer" class="tags-container">
+      <!-- ここにタグボタンが自動生成されます -->
+    </div>
+  </div>
+
   <!-- 本棚表示 -->
   <div id="grid" class="grid"></div>
 </div>
 
 <script>
-  // 🔴 あなたのデプロイしたGASのURLに書き換えてください
-  const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
+  // 🔴 ここをご自身のGASのWebアプリURLに書き換えてください
+  const API_URL = "https://script.google.com/macros/s/.../exec"; 
+  
   let allData = [];
+  let activeTags = []; // 選択中のタグを保存する配列
 
   // 初期データ読み込み
   window.onload = async () => {
@@ -71,7 +102,14 @@
       const res = await fetch(API_URL);
       const data = await res.json();
       allData = data.books;
+      
+      // ① デフォルトで新着順（更新日の降順）に並び替え
+      allData.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+      
+      // ② タグボタンの生成と、本の表示
+      generateFilterTags(allData);
       render(allData);
+      
       document.getElementById("loading").style.display = "none";
     } catch (e) {
       console.error("読み込みエラー:", e);
@@ -79,20 +117,97 @@
     }
   };
 
-  // 本の表示
-  function render(books) {
-    const grid = document.getElementById("grid");
-    grid.innerHTML = books.map(book => `
-      <div class="card">
-        <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x110?text=No+Image'">
-        <div class="title">${book.title}</div>
-        <div class="author">${book.author}</div>
-        <a href="${book.url}" target="_blank" class="button">感想を見る</a>
-      </div>
-    `).join("");
+  // --- タグボタンを生成する関数 ---
+  function generateFilterTags(books) {
+    const container = document.getElementById("tagsContainer");
+    const uniqueTags = new Set();
+    
+    // 全ての本からタグを抽出して重複をなくす
+    books.forEach(book => book.tags.forEach(tag => uniqueTags.add(tag)));
+    
+    uniqueTags.forEach(tag => {
+      const btn = document.createElement("button");
+      btn.className = "filter-tag";
+      btn.textContent = tag;
+      
+      // タグがクリックされたときの処理
+      btn.onclick = () => {
+        btn.classList.toggle("active"); // 色を切り替え
+        
+        // activeTags配列の追加・削除
+        if (activeTags.includes(tag)) {
+          activeTags = activeTags.filter(t => t !== tag);
+        } else {
+          activeTags.push(tag);
+        }
+        
+        filterBooks(); // 絞り込みを実行
+      };
+      container.appendChild(btn);
+    });
   }
 
-  // AI相談ロジック
+  // --- 文字入力の検索処理 ---
+  document.getElementById("searchBar").addEventListener("input", filterBooks);
+
+  // --- 本を絞り込む関数 ---
+  function filterBooks() {
+    const searchText = document.getElementById("searchBar").value.toLowerCase();
+    
+    const filtered = allData.filter(book => {
+      // 検索窓の条件
+      const matchText = (book.title + book.author).toLowerCase().includes(searchText);
+      
+      // タグの条件（選択したタグを「すべて」含んでいる本だけ表示するAND検索）
+      const matchTags = activeTags.every(activeTag => book.tags.includes(activeTag));
+      
+      return matchText && matchTags;
+    });
+
+    render(filtered);
+  }
+
+  // --- 本を表示する関数 ---
+  function render(books) {
+    const grid = document.getElementById("grid");
+    const now = new Date();
+    
+    grid.innerHTML = books.map(book => {
+      
+      // ① 更新日から「1週間以内」かを判定してNewラベルを作る
+      const updatedDate = new Date(book.updated);
+      const diffDays = (now - updatedDate) / (1000 * 60 * 60 * 24); // 日数差を計算
+      const newBadgeHtml = diffDays <= 7 ? `<div class="new-badge">New!</div>` : '';
+
+      // ② 評価（★）のHTMLを作る
+      // ※もしNotion側が「5」という数値だった場合、「★★★★★」に変換する処理を入れます
+      let ratingDisplay = book.rating;
+      if (!isNaN(book.rating) && book.rating !== "") {
+          const stars = Math.min(Math.max(parseInt(book.rating), 0), 5); // 0〜5の範囲に
+          ratingDisplay = "★".repeat(stars) + "☆".repeat(5 - stars);
+      }
+      const ratingHtml = ratingDisplay ? `<div class="rating">${ratingDisplay}</div>` : '';
+
+      // ③ タグのHTMLを作る
+      const tagsHtml = `<div class="card-tags">` + 
+        book.tags.map(t => `<span class="card-tag">${t}</span>`).join("") + 
+      `</div>`;
+
+      return `
+        <div class="card">
+          ${newBadgeHtml}
+          <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x130?text=No+Image'">
+          <div class="title">${book.title}</div>
+          <div class="author">${book.author}</div>
+          ${ratingHtml}
+          ${tagsHtml}
+          <a href="${book.url}" target="_blank" class="button">感想を見る</a>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // --- AI相談ロジック ---
   document.getElementById("aiBtn").onclick = async () => {
     const query = document.getElementById("aiQuery").value;
     if (!query) return;
