@@ -25,7 +25,7 @@
     .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap;}
     .ai-btn:disabled { background: #ccc; }
     
-    /* リセットボタン（最初は非表示） */
+    /* リセットボタン */
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
     .reset-btn:hover { background: #f0f0f0; }
 
@@ -33,26 +33,57 @@
     #aiResultArea { display: none; margin-top: 20px; }
     .ai-text { line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px;}
     
-    /* グリッドとカード（メインとAI結果で共用） */
+    /* =========================================
+       グリッドとカード（PC・タブレット用基本設定）
+       ========================================= */
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
     .card { background: white; border-radius: 12px; padding: 20px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
     
-    /* NEWラベル */
     .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;}
     
     .cover { width: 90px; height: 130px; object-fit: cover; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
     .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4;}
     .author { font-size: 12px; color: #777; margin-bottom: 8px; }
     
-    /* 評価（★） */
     .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px;}
     
-    /* カード内のタグ */
     .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; }
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
     
-    .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s;}
+    .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap;}
     .button:hover { background: #555; }
+
+    /* =========================================
+       📱 スマホ用レスポンシブ設定（ここを追加）
+       ========================================= */
+    @media (max-width: 767px) {
+      .grid { 
+        /* 強制的に3列にし、隙間を狭くする */
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
+      }
+      .card { 
+        /* カード内の余白を減らす */
+        padding: 10px 5px; 
+        border-radius: 8px;
+      }
+      .cover { 
+        /* 画像をカード幅に合わせて自動縮小 */
+        width: 100%; 
+        max-width: 70px; /* 大きくなりすぎないよう制限 */
+        height: auto;
+        aspect-ratio: 2 / 3; /* 本の縦横比をキープ */
+        margin-bottom: 8px;
+      }
+      /* 文字やボタンのサイズをスマホの3列に合わせて極小化 */
+      .title { font-size: 10px; margin-bottom: 2px; }
+      .author { font-size: 8px; margin-bottom: 4px; }
+      .rating { font-size: 9px; margin-bottom: 4px; letter-spacing: 0; }
+      .card-tags { margin-bottom: 8px; gap: 2px;}
+      .card-tag { font-size: 7px; padding: 2px 4px; }
+      .button { font-size: 9px; padding: 5px 6px; border-radius: 12px; width: 85%; box-sizing: border-box; }
+      .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
+    }
 
     /* ローディング */
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
@@ -83,7 +114,7 @@
       <button id="resetBtn" class="reset-btn">リセット</button>
     </div>
     
-    <!-- AIの回答とおすすめ本の表示エリア（最初は非表示） -->
+    <!-- AIの回答とおすすめ本の表示エリア -->
     <div id="aiResultArea">
       <div id="aiText" class="ai-text"></div>
       <div id="aiBooksGrid" class="grid"></div>
@@ -107,7 +138,6 @@
   let allData = [];
   let activeTags = []; 
 
-  // 初期データ読み込み
   window.onload = async () => {
     try {
       const res = await fetch(API_URL);
@@ -164,7 +194,6 @@
     renderMainGrid(filtered);
   }
 
-  // --- カードのHTMLを生成する共通関数（メインもAI結果もこれを使う） ---
   function generateCardHTML(book) {
     const now = new Date();
     const updatedDate = new Date(book.updated);
@@ -195,13 +224,11 @@
     `;
   }
 
-  // メインの本棚を描画する
   function renderMainGrid(books) {
     const grid = document.getElementById("grid");
     grid.innerHTML = books.map(book => generateCardHTML(book)).join("");
   }
 
-  // --- AI相談ロジック ---
   document.getElementById("aiBtn").onclick = async () => {
     const query = document.getElementById("aiQuery").value;
     if (!query) return;
@@ -215,7 +242,6 @@
     btn.disabled = true;
     btn.textContent = "考え中...";
     
-    // 取得中はテキストだけ表示し、カードエリアは空にする
     resultArea.style.display = "block";
     aiText.innerHTML = "本棚から探しています。少々お待ちください...";
     aiBooksGrid.innerHTML = "";
@@ -228,15 +254,12 @@
       });
       const data = await res.json();
       
-      // 1. AIのテキスト回答を表示
       aiText.innerHTML = data.result.replace(/\n/g, "<br>");
       
-      // 2. おすすめされた本のカードを描画
       if (data.recommendedBooks && data.recommendedBooks.length > 0) {
         aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book)).join("");
       }
 
-      // 3. リセットボタンを表示
       resetBtn.style.display = "inline-block";
 
     } catch (e) {
@@ -247,11 +270,10 @@
     }
   };
 
-  // --- リセットボタンの処理 ---
   document.getElementById("resetBtn").onclick = () => {
-    document.getElementById("aiQuery").value = ""; // 入力欄を空に
-    document.getElementById("aiResultArea").style.display = "none"; // 回答エリアを隠す
-    document.getElementById("resetBtn").style.display = "none"; // リセットボタンを隠す
+    document.getElementById("aiQuery").value = ""; 
+    document.getElementById("aiResultArea").style.display = "none"; 
+    document.getElementById("resetBtn").style.display = "none"; 
   };
 
 </script>
