@@ -3,534 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Shelf</title>
+  <title>AI Book Shelf</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
-  
   <style>
-    /* 🌿 全体設定 */
-    body {
-      margin: 0;
-      font-family: 'Zen Maru Gothic', sans-serif;
-      background: #ffffff;
-      color: #333;
-    }
+    /* 既存のスタイルを継承・最適化 */
+    body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; }
+    .header { text-align: center; padding: 60px 20px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    
+    /* AIセクションの強化 */
+    .ai-section { background: #fff; border: 2px solid #e6f4ea; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .ai-input-group { display: flex; gap: 10px; margin-top: 10px; }
+    input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+    .ai-btn:disabled { background: #ccc; }
+    #aiResult { margin-top: 15px; line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; }
 
-    /* 🌿 ローディング画面 */
-    #loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      z-index: 999;
-    }
+    /* グリッド表示 */
+    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+    .cover { width: 80px; height: 110px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
+    .title { font-weight: bold; font-size: 14px; margin: 5px 0; }
+    .author { font-size: 12px; color: #777; margin-bottom: 10px; }
+    .button { display: inline-block; padding: 8px 15px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; }
 
-    #loading.fade-out {
-      opacity: 0;
-      transition: opacity .6s ease;
-      pointer-events: none;
-    }
-
-    .loader-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #eee;
-      border-top: 4px solid #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .loading-text {
-      font-size: 13px;
-      color: #555;
-      letter-spacing: 1px;
-      animation: fadeText 1.8s ease-in-out infinite;
-    }
-
-    @keyframes fadeText {
-      0%, 100% { opacity: .3; }
-      50% { opacity: 1; }
-    }
-
-    /* 🌿 ヘッダー */
-    .header {
-      text-align: center;
-      padding: 80px 20px 60px;
-      color: #2f3e2f;
-      background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0;
-    }
-
-    .header p {
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: 0.7;
-    }
-
-    /* 🌿 メインコンテンツ */
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    /* 🔍 検索・ソート */
-    .search input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
-    }
-
-    .sort-btn {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 20px;
-      background: #eee;
-      cursor: pointer;
-      font-size: 11px;
-    }
-
-    .sort-btn.active {
-      background: #222;
-      color: #fff;
-    }
-
-    /* 🏷 タグフィルタ */
-    .tags {
-      margin: 10px 0;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 4px 8px;
-      margin: 3px;
-      border-radius: 12px;
-      background: #eee;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    .tag.active {
-      background: #222;
-      color: #fff;
-    }
-
-    /* 🌿 グリッドレイアウト */
-    .grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    @media (max-width: 767px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (min-width: 768px) {
-      .grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    /* 🌿 カードデザイン */
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-      height: 200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .new {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: #ff4d4d;
-      color: #fff;
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      z-index: 2;
-    }
-
-    .cover {
-      width: 60px;
-      border-radius: 6px;
-      margin-bottom: 6px;
-    }
-
-    .title {
-      font-size: 10px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .author {
-      font-size: 9px;
-      opacity: .6;
-      margin-bottom: 4px;
-    }
-
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 4px;
-      max-height: 32px;
-      overflow: hidden;
-      margin-bottom: 4px;
-    }
-
-    .card-tag {
-      font-size: 8px;
-      padding: 2px 6px;
-      border-radius: 10px;
-      color: #333;
-      white-space: nowrap;
-    }
-
-    .button {
-      font-size: 9px;
-      padding: 5px 8px;
-      border-radius: 20px;
-      background: #222;
-      color: white;
-      text-decoration: none;
-      margin-top: auto;
-    }
-
-    .subbtn {
-      font-size: 9px;
-      margin-top: 6px;
-      cursor: pointer;
-      opacity: .6;
-    }
-
-    /* 🌿 紹介リール（テキストアニメーション） */
-    .text {
-      font-size: 11px;
-      line-height: 1.4;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: .5s;
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      height: 100%;
-      padding: 0 10px;
-    }
-
-    .text.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* 🌿 リール背景共通 */
-    .reel-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      overflow: hidden;
-      border-radius: 14px;
-    }
-
-    .bg-light { background: linear-gradient(120deg, #e6f4ea, #ffffff); }
-    .bg-sky { background: linear-gradient(#dbeafe, #ffffff); }
-    .bg-forest { background: linear-gradient(#e6f4ea, #fdfdfd); }
+    /* ローディング */
+    #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2f3e2f; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
-
 <body>
 
-  <!-- ローディング -->
-  <div id="loading">
-    <div class="loader-inner">
-      <div class="spinner"></div>
-      <div class="loading-text">本棚整理中</div>
+<div id="loading">
+  <div class="spinner"></div>
+  <p>本棚を整頓中...</p>
+</div>
+
+<div class="header">
+  <h1>AI Book Shelf</h1>
+  <p>あなたの気分に合わせた一冊を、私の本棚から探します</p>
+</div>
+
+<div class="container">
+  <!-- AI相談窓口 -->
+  <div class="ai-section">
+    <strong>🤖 AIに本を相談する</strong>
+    <div class="ai-input-group">
+      <input type="text" id="aiQuery" placeholder="例：泣ける恋愛小説が読みたい、元気が出る本は？">
+      <button id="aiBtn" class="ai-btn">相談する</button>
     </div>
+    <div id="aiResult"></div>
   </div>
 
-  <!-- ヘッダー -->
-  <div class="header">
-    <h1>物語の世界を、少しだけのぞいてみる</h1>
-    <p>気になる一冊が、きっと見つかる</p>
-  </div>
+  <!-- 本棚表示 -->
+  <div id="grid" class="grid"></div>
+</div>
 
-  <!-- メイン -->
-  <div class="container">
-    <div class="search">
-      <input id="search" placeholder="本を検索...">
-    </div>
-    <div style="margin:10px 0;">
-      <button id="aiBtn" class="sort-btn">🤖 AIおすすめ</button>
-    </div>
+<script>
+  // 🔴 あなたのデプロイしたGASのURLに書き換えてください
+  const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
+  let allData = [];
 
-    <div style="margin: 15px 0 10px;">
-      <button id="sortBtn" class="sort-btn">新しい順にする</button>
-    </div>
-
-    <div id="tags" class="tags"></div>
-    <div id="aiResult" style="margin-top:20px;"></div>
-    <div class="grid" id="grid"></div>
-  </div>
-
-  <div style="margin:10px 0;">
-    <button id="aiBtn" class="sort-btn">🤖 AIおすすめ</button>
-  </div>
-
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
-    let allData = [];
-    let activeTag = null;
-    let sortMode = "default";
-
-    // 🎨 タグカラー定義
-    const tagColors = {
-      "恋愛小説": "#ffe0e6",
-      "海外文学": "#e0ecff",
-      "長編小説": "#e6f7e6",
-      "短編小説": "#fff4e0",
-      "エッセイ": "#f0e6ff"
-    };
-
-    // --- 1. データの取得 ---
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        allData = data.books ? data.books : data;
-        renderTags(allData);
-        render(allData);
-
-        // ローダーを消す
-        const loader = document.getElementById("loading");
-        loader.classList.add("fade-out");
-        setTimeout(() => {
-          loader.style.display = "none";
-        }, 600);
-      })
-      .catch(err => console.error("Fetch Error:", err));
-
-    // --- 2. ソート切り替え ---
-    document.getElementById("sortBtn").onclick = () => {
-      sortMode = (sortMode === "default") ? "new" : "default";
-      const btn = document.getElementById("sortBtn");
-
-      if (sortMode === "new") {
-        btn.textContent = "表示順に戻す";
-        btn.classList.add("active");
-      } else {
-        btn.textContent = "新しい順にする";
-        btn.classList.remove("active");
-      }
-      filter();
-    };
-
-    // --- 3. 検索・フィルタリング ---
-    document.getElementById("search").addEventListener("input", filter);
-
-    function normalize(text) {
-      return text.toLowerCase().replace(/[ァ-ン]/g, s =>
-        String.fromCharCode(s.charCodeAt(0) - 0x60)
-      );
+  // 初期データ読み込み
+  window.onload = async () => {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      allData = data.books;
+      render(allData);
+      document.getElementById("loading").style.display = "none";
+    } catch (e) {
+      console.error("読み込みエラー:", e);
+      alert("データの取得に失敗しました。GASの公開設定を確認してください。");
     }
+  };
 
-    function filter() {
-      const keyword = normalize(document.getElementById("search").value);
+  // 本の表示
+  function render(books) {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = books.map(book => `
+      <div class="card">
+        <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x110?text=No+Image'">
+        <div class="title">${book.title}</div>
+        <div class="author">${book.author}</div>
+        <a href="${book.url}" target="_blank" class="button">感想を見る</a>
+      </div>
+    `).join("");
+  }
 
-      let filtered = allData.filter(item => {
-        const text = normalize(item.title + item.author);
-        const matchText = text.includes(keyword);
-        const matchTag = !activeTag || item.tags.includes(activeTag);
-        return matchText && matchTag;
+  // AI相談ロジック
+  document.getElementById("aiBtn").onclick = async () => {
+    const query = document.getElementById("aiQuery").value;
+    if (!query) return;
+
+    const btn = document.getElementById("aiBtn");
+    const resultDiv = document.getElementById("aiResult");
+
+    btn.disabled = true;
+    btn.textContent = "考え中...";
+    resultDiv.innerHTML = "本棚から探しています。少々お待ちください...";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ message: query })
       });
-
-      if (sortMode === "new") {
-        filtered.sort((a, b) => new Date(b.created) - new Date(a.created));
-      } else {
-        filtered.sort((a, b) => a.order - b.order);
-      }
-
-      render(filtered);
+      const data = await res.json();
+      resultDiv.innerHTML = data.result.replace(/\n/g, "<br>");
+    } catch (e) {
+      resultDiv.innerHTML = "エラーが起きました。もう一度試してください。";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "相談する";
     }
-
-    // --- 4. レンダリング ---
-    function renderTags(data) {
-      const box = document.getElementById("tags");
-      box.innerHTML = "";
-      const set = new Set();
-      data.forEach(d => d.tags.forEach(t => set.add(t)));
-
-      set.forEach(tag => {
-        const el = document.createElement("span");
-        el.className = "tag";
-        el.textContent = tag;
-        el.onclick = () => {
-          activeTag = (activeTag === tag) ? null : tag;
-          document.querySelectorAll(".tag").forEach(t => t.classList.remove("active"));
-          if (activeTag) el.classList.add("active");
-          filter();
-        };
-        box.appendChild(el);
-      });
-    }
-
-    function render(data) {
-      const grid = document.getElementById("grid");
-      grid.innerHTML = "";
-      data.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card";
-        grid.appendChild(card);
-        createReelCard(card, item);
-      });
-    }
-
-    // --- 5. カード詳細生成 ---
-    function createReelCard(card, item) {
-      // 通常表示
-      function showIntro() {
-        const isNew = item.created && ((Date.now() - new Date(item.created)) / (1000 * 60 * 60 * 24) <= 7);
-        const tagsHTML = item.tags.map(t => {
-          const color = tagColors[t] || "#eee";
-          return `<span class="card-tag" style="background:${color}">${t}</span>`;
-        }).join("");
-
-        card.innerHTML = `
-          ${isNew ? '<div class="new">New!</div>' : ''}
-          <img src="${item.image}" class="cover">
-          <div class="title">${item.title}</div>
-          <div class="author">${item.author}</div>
-          <div class="card-tags">${tagsHTML}</div>
-          <a href="${item.url}" target="_blank" class="button">感想記事を読む</a>
-          <div class="subbtn">▶ 短い紹介を見る</div>
-        `;
-
-        card.querySelector(".subbtn").onclick = startReel;
-      }
-
-      // リール（紹介文）表示
-      function startReel() {
-        const text = document.createElement("div");
-        text.className = "text";
-
-        const bg = document.createElement("div");
-        bg.className = "reel-bg";
-        const bgTypes = ["bg-light", "bg-sky", "bg-forest"];
-        const randomBg = bgTypes[Math.floor(Math.random() * bgTypes.length)];
-        bg.classList.add(randomBg);
-
-        card.innerHTML = "";
-        card.appendChild(bg);
-        card.appendChild(text);
-
-        let index = 0;
-        const reelArray = Array.isArray(item.reel) ? item.reel : [];
-
-        function show() {
-          text.classList.remove("show");
-
-          setTimeout(() => {
-            let content = reelArray[index] || "";
-            if (content && !content.includes("<br>")) {
-              content = `<div style="font-size:16px;font-weight:bold">${content}</div>`;
-            }
-            text.innerHTML = content;
-            text.classList.add("show");
-
-            index++;
-            if (index >= reelArray.length) {
-              clearInterval(interval);
-              setTimeout(showIntro, 2000);
-            }
-          }, 200);
-        }
-
-        show();
-        const interval = setInterval(show, 3500);
-      }
-
-      showIntro();
-    }
-
-document.getElementById("aiBtn").onclick = async () => {
-
-  const btn = document.getElementById("aiBtn");
-  btn.textContent = "考え中...";
-  btn.disabled = true;
-
-  const prompt = `
-あなたは優秀な読書アドバイザーです。
-
-以下の本リストから、ユーザーに最適な本を2〜3冊選んでください。
-
-【ルール】
-・必ずリストの中から選ぶ
-・理由も簡潔に
-・恋愛/気分/テーマを考慮
-
-【本リスト】
-${allData.map(b =>
-  `タイトル:${b.title} / 著者:${b.author} / 内容:${b.summary} / レビュー:${b.review}`
-).join("\n")}
-
-【出力形式】
-・タイトル
-・理由（1〜2行）
-`;
-
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      type: "aiRecommend",
-      message: prompt
-    })
-  });
-
-  const data = await res.json();
-
-  document.getElementById("aiResult").innerHTML =
-    `<div style="padding:12px;border:1px solid #ddd;border-radius:10px;">
-      ${data.result.replace(/\n/g,"<br>")}
-    </div>`;
-
-  btn.textContent = "🤖 AIおすすめ";
-  btn.disabled = false;
-};
-  </script>
+  };
+</script>
 </body>
 </html>
