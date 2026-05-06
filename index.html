@@ -8,11 +8,11 @@
   <style>
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #f9fbfb; color: #333; }
     
-    /* 🔴修正：背景動画のスタイル */
-    .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;}
-    /* 動画を背景として完全に敷き詰める */
-    .header-video { position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vw; min-height: 100vh; min-width: 100vh; transform: translate(-50%, -50%); object-fit: cover; z-index: 0; }
-    .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); z-index: 1; }
+    /* 🔴修正：背景を動画から、絶対に表示される「動くグラデーション」に変更 */
+    .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; background: linear-gradient(-45deg, #2c3e50, #000000, #4ca1af, #2c3e50); background-size: 400% 400%; animation: gradientBG 15s ease infinite;}
+    @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    
+    .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); z-index: 1; }
     .header-content { position: relative; z-index: 2; }
     .header h1 { font-size: 34px; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px;}
     .header p { font-size: 15px; margin: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); opacity: 0.9;}
@@ -89,10 +89,6 @@
       background: white; border-radius: 15px; padding: 20px 15px; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; position: relative; 
       display: flex; flex-direction: column; align-items: center; 
-      
-      /* 🚨 はみ出したバッジが消えないように hidden を削除しました 🚨 */
-      /* overflow: hidden; */ 
-
       opacity: 0; transform: translateY(40px); 
       transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
@@ -100,40 +96,34 @@
     .card.show, .reader-card.show { opacity: 1; transform: translateY(0); }
     .card:hover, .reader-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
     
-    /* 🔴修正：キラッと光るエフェクトの仕組みを変更 */
-    /* overflow:hidden が使えないため、カードの中身（画像・文字）のさらに後ろを光らせるのではなく、
-       カード全体を覆う「光の層」を一番手前に重ねて透明度を調整する方式に変更します。 */
+    /* 🔴修正：カードの表面を光らせるエフェクトのz-indexを下げ、バッジ類を確実に前面へ */
     .card::after, .reader-card::after {
       content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      border-radius: 15px; /* カードと同じ角丸 */
+      border-radius: 15px; 
       background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.7) 25%, transparent 30%);
-      background-size: 300% 300%;
-      background-position: 150% 0;
-      transition: background-position 0.7s ease-out;
-      pointer-events: none; /* クリックの邪魔にならないように */
-      z-index: 100; /* バッジより手前に来てもOK（透明なので問題なし） */
+      background-size: 300% 300%; background-position: 150% 0;
+      transition: background-position 0.7s ease-out; pointer-events: none; 
+      z-index: 10; /* 光の層の順番を10に下げる */
     }
-    .card:hover::after, .reader-card:hover::after {
-      background-position: -50% 0;
-    }
+    .card:hover::after, .reader-card:hover::after { background-position: -50% 0; }
 
-    /* バッジ類（はみ出してもOKになります） */
-    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 50;}
-    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 50; font-family: 'Zen Maru Gothic', sans-serif;}
+    /* 🔴修正：バッジ類のz-indexを上げて、絶対に光の層より手前に表示させる */
+    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100;}
+    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100; font-family: 'Zen Maru Gothic', sans-serif;}
     .rank-1 { background: linear-gradient(135deg, #ffd700, #daa520); } 
     .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color: #333; } 
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); } 
 
-    .cover { width: 95px; height: 135px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; box-shadow: 3px 3px 10px rgba(0,0,0,0.15); transition: 0.3s;}
+    .cover { width: 95px; height: 135px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; box-shadow: 3px 3px 10px rgba(0,0,0,0.15); transition: 0.3s; z-index: 20;}
     .card:hover .cover { transform: scale(1.05); }
 
-    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4; z-index: 2;}
-    .author { font-size: 12px; color: #777; margin-bottom: 8px; z-index: 2;}
-    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; z-index: 2;}
-    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; z-index: 2;}
+    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4; z-index: 20;}
+    .author { font-size: 12px; color: #777; margin-bottom: 8px; z-index: 20;}
+    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; z-index: 20;}
+    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; z-index: 20;}
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
     
-    .button-area { width: 100%; margin-top: auto; z-index: 2; position: relative;}
+    .button-area { width: 100%; margin-top: auto; z-index: 20; position: relative;}
     .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; transition: 0.2s; white-space: nowrap; width: 100%; box-sizing: border-box; margin-bottom: 8px; font-weight: bold;}
     .button:hover { background: #555; box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
     .like-btn { width: 100%; display: inline-block; background: #fff; border: 1px solid #ff4757; color: #ff4757; border-radius: 20px; padding: 6px 15px; font-size: 12px; font-family: 'Zen Maru Gothic', sans-serif; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box;}
@@ -145,13 +135,13 @@
     .reader-section h2 { text-align: center; color: #d35400; font-size: 22px; margin-top: 0; margin-bottom: 30px;}
     .reader-grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
     
-    /* 🔴修正：吹き出しアイコンのはみ出し対応 */
-    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 50;}
+    /* 🔴修正：吹き出しアイコンを確実に一番手前に出す */
+    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 100;}
     
-    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #fdfbf7; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1; z-index: 2; position: relative;}
-    .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px; z-index: 2; position: relative;}
-    .reader-book-author { font-size: 12px; color: #777; z-index: 2; position: relative;}
-    .reader-like-btn-wrap { margin-top: 15px; z-index: 2; position: relative;}
+    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #fdfbf7; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1; z-index: 20; position: relative;}
+    .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px; z-index: 20; position: relative;}
+    .reader-book-author { font-size: 12px; color: #777; z-index: 20; position: relative;}
+    .reader-like-btn-wrap { margin-top: 15px; z-index: 20; position: relative;}
 
     .floating-btn { position: fixed; bottom: 25px; right: 25px; background: #ff8c00; color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 14px; box-shadow: 0 6px 20px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
     .floating-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4); }
@@ -257,13 +247,8 @@
   </div>
 </div>
 
-<!-- 🔴修正：絶対に表示される安全なVimeoの無料動画に差し替え -->
 <div class="header">
-  <video autoplay loop muted playsinline class="header-video">
-    <source src="https://player.vimeo.com/external/498801569.sd.mp4?s=34015664a37f59d4c72ec1eb900762a4d33ebc18&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
-  </video>
   <div class="header-overlay"></div>
-  
   <div class="header-content">
     <div class="admin-tools">
       <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
