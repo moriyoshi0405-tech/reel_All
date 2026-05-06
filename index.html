@@ -8,65 +8,56 @@
   <style>
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #f9fbfb; color: #333; }
     
-    /* ヘッダー背景（動くグラデーション） */
+    /* ヘッダー背景 */
     .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; background: linear-gradient(-45deg, #2c3e50, #000000, #4ca1af, #2c3e50); background-size: 400% 400%; animation: gradientBG 15s ease infinite;}
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     
     .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); z-index: 1; }
-    .header-content { position: relative; z-index: 2; }
+    .header-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
     .header h1 { font-size: 34px; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px;}
 
-    /* AIの空気感（トレンドワード） */
-    .shelf-mood { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); display: inline-block; padding: 8px 20px; border-radius: 30px; font-size: 13px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.3); max-width: 85%; }
+    /* AIアバター共通スタイル */
+    .ai-avatar-circle {
+      width: 70px; height: 70px; border-radius: 50%; border: 3px solid white;
+      object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      background: #eee; transition: opacity 0.3s ease;
+    }
+    .header .ai-avatar-circle { width: 50px; height: 50px; margin-bottom: 10px; border-width: 2px;}
+
+    /* AIの空気感 */
+    .shelf-mood-container { display: flex; align-items: center; gap: 12px; margin-top: 15px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); padding: 5px 20px 5px 10px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.3); max-width: 85%; }
+    .shelf-mood { font-size: 13px; text-align: left; line-height: 1.4; }
     
-    /* 管理者ボタン（左上） */
+    /* 管理者ボタン */
     .admin-tools { position: absolute; top: 10px; left: 10px; z-index: 3;}
     .update-db-btn { font-size: 10px; padding: 5px 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; color: white; transition: 0.3s; backdrop-filter: blur(4px);}
     .update-db-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: white;}
     
     .container { max-width: 900px; margin: auto; padding: 20px; }
 
-    /* ガチャセクション */
+    /* ガチャ */
     .gacha-section { text-align: center; margin-top: -40px; margin-bottom: 40px; position: relative; z-index: 10; }
     .gacha-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e53); color: white; font-size: 16px; font-weight: bold; padding: 15px 40px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); transition: transform 0.2s, box-shadow 0.2s; animation: pulseGacha 2s infinite; font-family: 'Zen Maru Gothic', sans-serif; letter-spacing: 1px;}
     .gacha-btn:hover { transform: scale(1.05); box-shadow: 0 12px 25px rgba(255, 107, 107, 0.6); }
     @keyframes pulseGacha { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 
-    /* AI本の処方箋セクション */
-    .prescription-section { background: #fff; border-radius: 20px; padding: 30px; margin-bottom: 30px; border: 1px solid #e1f5fe; box-shadow: 0 10px 30px rgba(1, 87, 155, 0.05); text-align: center;}
-    .prescription-title { font-size: 20px; font-weight: bold; color: #01579b; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;}
-    .prescription-input-group { display: flex; gap: 10px; margin-top: 20px; }
-    .prescribe-btn { background: #01579b; color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(1, 87, 155, 0.2);}
-    .prescribe-btn:hover { transform: translateY(-2px); background: #0277bd; }
+    /* 処方箋セクション */
+    .prescription-section { background: #fff; border-radius: 20px; padding: 30px; margin-bottom: 30px; border: 1px solid #e1f5fe; box-shadow: 0 10px 30px rgba(1, 87, 155, 0.05); }
+    .prescription-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px;}
+    .prescription-title { font-size: 20px; font-weight: bold; color: #01579b; margin: 0; }
+    .prescription-input-group { display: flex; gap: 10px; margin-top: 15px; }
+    .prescribe-btn { background: #01579b; color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(1, 87, 155, 0.2); white-space: nowrap;}
     
     #prescriptionResultArea { display: none; margin-top: 25px; animation: fadeIn 0.5s ease; }
     .prescription-card { background: #f1f8ff; border: 2px dashed #0288d1; border-radius: 15px; padding: 25px; position: relative; margin: auto; max-width: 600px; text-align: left;}
-    .prescription-card::before { content: "処方箋"; position: absolute; top: -12px; right: 20px; background: white; padding: 0 10px; color: #0288d1; font-weight: bold; font-size: 12px;}
     .prescription-book-box { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 10px;}
     .prescription-cover { width: 60px; height: 85px; border-radius: 4px; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
     
-    /* ガチャモーダル */
-    .gacha-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
-    .gacha-content { background: #fff; padding: 40px 30px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;}
-    .gacha-content::before { content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 60%); animation: spinGlow 8s linear infinite; z-index: 0; display: none;}
-    .gacha-content.result-mode::before { display: block; }
-    @keyframes spinGlow { 100% { transform: rotate(360deg); } }
-    .gacha-title { font-size: 20px; font-weight: bold; color: #333; z-index: 1; position: relative; line-height: 1.5; min-height: 60px;}
-    .gacha-slot { width: 140px; height: 200px; margin: 20px auto; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1; position: relative; background:#eee;}
-    .gacha-slot img { width: 100%; height: 100%; object-fit: cover;}
-    .gacha-desc { font-size: 14px; color: #555; margin-bottom: 25px; z-index: 1; position: relative; min-height: 40px;}
-    .gacha-actions { display: flex; gap: 10px; justify-content: center; z-index: 1; position: relative;}
-    .gacha-action-btn { padding: 12px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; font-family: 'Zen Maru Gothic', sans-serif; font-size: 14px; width: 100%;}
-    .gacha-action-btn.primary { background: #ff8c00; color: white; box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);}
-    .gacha-action-btn.secondary { background: #eee; color: #555; }
-    @keyframes flashResult { 0% { filter: brightness(1); transform: scale(1); } 40% { filter: brightness(1.5); transform: scale(1.15) rotate(2deg); box-shadow: 0 0 50px rgba(255, 215, 0, 1); } 100% { filter: brightness(1); transform: scale(1); } }
-    .flash-anim { animation: flashResult 0.8s ease-out forwards; }
-
-    /* AIセクション */
+    /* AI相談セクション */
     .ai-section { background: #fff; border: 1px solid #e0f2e9; padding: 25px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
-    .ai-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;}
+    .ai-top-row { display: flex; align-items: flex-end; gap: 20px; margin-bottom: 20px; }
+    .ai-header { flex: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
     .diagnose-btn { background: #e0f7fa; color: #00796b; border: 1px solid #b2ebf2; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: 'Zen Maru Gothic', sans-serif;}
-    .diagnose-btn:hover { background: #b2ebf2; transform: translateY(-2px);}
 
     .ai-input-group { display: flex; gap: 10px; flex-wrap: wrap;}
     .persona-select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif; background: #fff; cursor: pointer; outline: none;}
@@ -74,13 +65,10 @@
     .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; font-weight: bold;}
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; display: none; font-weight: bold;}
 
-    .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-    .prompt-btn { font-size: 11px; padding: 8px 15px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; font-family: 'Zen Maru Gothic', sans-serif;}
-
     #aiResultArea { display: none; margin-top: 25px; border-top: 1px dashed #ddd; padding-top: 25px;}
     .ai-text { line-height: 1.8; font-size: 14.5px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px; background: #fafdfb; padding: 15px; border-radius: 0 10px 10px 0;}
     
-    /* フィルターとソート */
+    /* フィルター・ソート */
     .filter-section { margin-bottom: 30px; }
     .search-bar { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Zen Maru Gothic', sans-serif; outline: none;}
     .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -93,7 +81,7 @@
     .my-shelf-btn { background: #fff5e6; color: #d35400; border: 1px solid #ffcc80; }
     .my-shelf-btn.active { background: #d35400; color: white; }
 
-    /* カード・グリッド */
+    /* グリッド */
     .grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
     .card, .reader-card { 
       background: white; border-radius: 15px; padding: 20px 15px; 
@@ -105,7 +93,6 @@
     .card.show, .reader-card.show { opacity: 1; transform: translateY(0); }
     .card:hover, .reader-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
     
-    /* キラッと反射エフェクト */
     .card::after, .reader-card::after {
       content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       border-radius: 15px; background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.7) 25%, transparent 30%);
@@ -114,7 +101,6 @@
     }
     .card:hover::after, .reader-card:hover::after { background-position: -50% 0; }
 
-    /* ラベル・バッジ */
     .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100;}
     .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100;}
     .rank-1 { background: linear-gradient(135deg, #ffd700, #daa520); } 
@@ -122,14 +108,12 @@
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); } 
 
     .cover { width: 95px; height: 135px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; box-shadow: 3px 3px 10px rgba(0,0,0,0.15); transition: 0.3s; z-index: 20;}
-
     .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4; z-index: 20;}
     .author { font-size: 12px; color: #777; margin-bottom: 8px; z-index: 20;}
     .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; z-index: 20;}
     .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; z-index: 20;}
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
     
-    /* ボタンエリア */
     .button-area { width: 100%; margin-top: auto; z-index: 20; display: flex; flex-direction: column; gap: 6px;}
     .primary-buttons { display: flex; gap: 5px; }
     .button { flex: 1; padding: 10px 5px; background: #333; color: #fff; text-decoration: none; border-radius: 15px; font-size: 10px; transition: 0.2s; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-family: inherit;}
@@ -158,18 +142,13 @@
     .admin-name { margin: 0 0 8px 0; font-size: 18px; color: #2f3e2f; display: flex; align-items: center; gap: 8px;}
     .admin-bio { margin: 0; font-size: 13.5px; color: #555; line-height: 1.7; }
 
-    /* 読者おすすめコーナー */
+    /* 読者コーナー */
     .reader-section { margin-top: 60px; padding: 50px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7;}
     .reader-section h2 { text-align: center; color: #d35400; font-size: 22px; margin-top: 0; margin-bottom: 30px;}
     .reader-grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
     .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 100;}
     .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #fdfbf7; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1; z-index: 20; position: relative;}
     .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px; z-index: 20; position: relative;}
-
-    /* アニメーション */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .confetti { position: fixed; width: 10px; height: 10px; background: #ffc0cb; z-index: 4000; pointer-events: none; border-radius: 50%; opacity: 0.8; }
-    @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
     /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px);}
@@ -182,14 +161,13 @@
     .floating-btn { position: fixed; bottom: 25px; right: 25px; background: #ff8c00; color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 6px 20px rgba(255, 140, 0, 0.3); cursor: pointer; z-index: 100; border: none; font-family: 'Zen Maru Gothic';}
 
     @media (max-width: 767px) {
-      .header { padding: 50px 20px 60px; }
-      .header h1 { font-size: 28px; padding-top: 15px; }
+      .header h1 { font-size: 28px; }
       .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
       .card { padding: 12px 8px; }
-      .cover { width: 100%; max-width: 80px; height: auto; aspect-ratio: 2/3; margin-bottom: 8px;}
-      .title { font-size: 11px; line-height: 1.3; }
-      .button { font-size: 8px; padding: 8px 2px; }
+      .cover { width: 100%; max-width: 80px; }
+      .button { font-size: 8px; }
       .prescription-input-group { flex-direction: column; }
+      .ai-top-row { flex-direction: column; align-items: center; text-align: center; }
     }
 
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
@@ -273,59 +251,62 @@
     <div class="admin-tools">
       <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
     </div>
+    <!-- 🔴キャラ：本棚の番人 -->
+    <img id="keeperAvatar" class="ai-avatar-circle" src="" alt="Keeper">
     <h1>AI Book Shelf</h1>
-    <div id="shelfMood" class="shelf-mood">本棚を読み込み中...</div>
+    <div class="shelf-mood-container">
+      <div id="shelfMood" class="shelf-mood">本棚を読み込み中...</div>
+    </div>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- 🔴追加：AI本の処方箋 -->
+  <!-- 🔴キャラ：不思議な薬局の司書 -->
   <div class="prescription-section">
-    <div class="prescription-title">💊 AI本の処方箋（お悩み相談室）</div>
-    <p style="font-size:13px; color:#555; margin:0;">今の悩みや本音を教えてください。あなたに効く一冊を処方します。</p>
+    <div class="prescription-header">
+      <img id="pharmacistAvatar" class="ai-avatar-circle" src="" alt="Pharmacist">
+      <div>
+        <div class="prescription-title">💊 AI本の処方箋（お悩み相談室）</div>
+        <p style="font-size:12px; color:#555; margin:0;">あなたに効く一冊を処方します。</p>
+      </div>
+    </div>
     <div class="prescription-input-group">
-      <input type="text" id="worryInput" placeholder="例：仕事に疲れた、新しいことに挑戦したい、美味しいものが食べたい..." style="flex:1; padding:12px; border:1px solid #ddd; border-radius:30px; outline:none; font-family:inherit;">
+      <input type="text" id="worryInput" placeholder="例：仕事に疲れた、新しいことに挑戦したい..." style="flex:1; padding:12px; border:1px solid #ddd; border-radius:30px; outline:none; font-family:inherit;">
       <button id="prescribeBtn" class="prescribe-btn">処方箋をもらう</button>
     </div>
     
     <div id="prescriptionResultArea">
       <div class="prescription-card">
-        <div class="prescription-book-box" id="prescribedBookBox">
-          <!-- ここに本が表示される -->
-        </div>
+        <div class="prescription-book-box" id="prescribedBookBox"></div>
         <div id="prescriptionText" style="line-height:1.8; font-size:14px; color:#333;"></div>
       </div>
       <button class="cancel-btn" style="margin-top:15px; font-size:11px;" onclick="resetPrescription()">もう一度相談する</button>
     </div>
   </div>
 
-  <!-- ガチャボタン -->
   <div class="gacha-section">
     <button class="gacha-btn" onclick="playGacha()">🎲 運命の一冊ガチャを回す</button>
   </div>
 
-  <!-- AI相談セクション -->
+  <!-- 🔴キャラ：相談相手（動的に切り替え） -->
   <div class="ai-section">
-    <div class="ai-header">
-      <strong>🤖 AIに本を相談する</strong>
-      <button class="diagnose-btn" onclick="openDiagnoseModal()">🩺 読書カルテ診断を作る</button>
+    <div class="ai-top-row">
+      <img id="aiChatAvatar" class="ai-avatar-circle" src="" alt="AI Avatar">
+      <div class="ai-header">
+        <strong>🤖 AIに本を相談する</strong>
+        <button class="diagnose-btn" onclick="openDiagnoseModal()">🩺 読書カルテ診断を作る</button>
+      </div>
     </div>
     
     <div class="ai-input-group">
-      <select id="aiPersona" class="persona-select">
+      <select id="aiPersona" class="persona-select" onchange="updateChatAvatar('normal')">
         <option value="normal">👓 丁寧な司書さん</option>
         <option value="hot">🔥 熱血カリスマ書店員</option>
         <option value="cat">🐱 気まぐれな猫</option>
       </select>
       <input type="text" id="aiQuery" placeholder="今の気分や、読みたい本を教えてください...">
       <button id="aiBtn" class="ai-btn">相談する</button>
-    </div>
-    
-    <div class="prompt-suggestions">
-      <button class="prompt-btn" onclick="setAiPrompt('☕ 休日にのんびり読めるエッセイ')">☕ のんびり</button>
-      <button class="prompt-btn" onclick="setAiPrompt('😭 思いっきり泣ける恋愛小説')">😭 泣きたい</button>
-      <button class="prompt-btn" onclick="setAiPrompt('🚀 明日からの活力が湧いてくる本')">🚀 元気がほしい</button>
     </div>
     
     <div id="aiResultArea">
@@ -335,11 +316,9 @@
     </div>
   </div>
 
-  <!-- フィルター・ソート -->
   <div class="filter-section">
     <input type="text" id="searchBar" class="search-bar" placeholder="本のタイトルや著者名で検索...">
     <div id="tagsContainer" class="tags-container"></div>
-    
     <div class="sort-options">
       <button id="sortNewBtn" class="sort-btn active" onclick="changeSortMode('new')">📅 新着順</button>
       <button id="sortLikeBtn" class="sort-btn" onclick="changeSortMode('like')">❤️ 人気順</button>
@@ -347,10 +326,8 @@
     </div>
   </div>
 
-  <!-- 本棚グリッド -->
   <div id="grid" class="grid"></div>
 
-  <!-- 管理人プロフィール -->
   <div class="admin-profile-section">
     <div class="admin-profile-card">
       <img src="ChatGPT Image 2026年5月6日 19_04_17.png" alt="管理人" class="admin-avatar">
@@ -358,14 +335,12 @@
         <h3 class="admin-name">💼 管理人：s h o t a</h3>
         <p class="admin-bio">
           恋愛小説、海外文学、エッセイを中心に、日々さまざまな物語を読んでいます。<br>
-          年末に「その年のベスト5」を選ぶのが密かな楽しみです！<br>
-          この本棚が、あなたの新しい一冊との出会いの場になれば嬉しいです。
+          年末に「その年のベスト5」を選ぶのが密かな楽しみです！
         </p>
       </div>
     </div>
   </div>
 
-  <!-- 読者コーナー -->
   <div class="reader-section">
     <h2>👑 みんなのおすすめ人気ランキング</h2>
     <div id="readerGrid" class="reader-grid"></div>
@@ -378,69 +353,98 @@
 <script>
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
-  let allData = [], readerData = [], gachaPool = [], activeTags = [], currentSortMode = 'new', isMyShelfMode = false;
+  // 🔴アバター画像設定エリア（URLをご自身のものに差し替えてください）
+  const AI_AVATARS = {
+    normal: { // 丁寧な司書さん
+      normal: "https://via.placeholder.com/150?text=Librarian_Normal",
+      searching: "https://via.placeholder.com/150?text=Librarian_Searching"
+    },
+    hot: { // 熱血カリスマ書店員さん
+      normal: "https://via.placeholder.com/150?text=HotSeller_Normal",
+      searching: "https://via.placeholder.com/150?text=HotSeller_Searching"
+    },
+    cat: { // 気まぐれな猫
+      normal: "https://via.placeholder.com/150?text=Cat_Normal",
+      searching: "https://via.placeholder.com/150?text=Cat_Searching"
+    },
+    keeper: { // 本棚の番人
+      normal: "https://via.placeholder.com/150?text=Keeper_Normal",
+      searching: "https://via.placeholder.com/150?text=Keeper_Searching"
+    },
+    pharmacist: { // 不思議な薬局の司書
+      normal: "https://via.placeholder.com/150?text=Pharmacist_Normal",
+      searching: "https://via.placeholder.com/150?text=Pharmacist_Searching"
+    }
+  };
 
+  let allData = [], readerData = [], gachaPool = [], activeTags = [], currentSortMode = 'new', isMyShelfMode = false;
   let likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
   let readBooks = JSON.parse(localStorage.getItem('readBooks')) || [];
   let savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
 
   window.onload = async () => {
+    // 初回アバターセット
+    updateChatAvatar('normal');
+    document.getElementById('keeperAvatar').src = AI_AVATARS.keeper.normal;
+    document.getElementById('pharmacistAvatar').src = AI_AVATARS.pharmacist.normal;
+
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
       allData = data.books;
       readerData = data.readerBooks || [];
-      
       generateFilterTags(allData);
       renderAll();
       fetchMood();
-      
       gachaPool = [
         ...allData.map(b => ({ ...b, type: 'admin' })),
         ...readerData.map(b => ({ ...b, type: 'reader', image: 'https://via.placeholder.com/150/ffebd6/ff8c00?text=Reader+Book' }))
       ];
-
       document.getElementById("loading").style.display = "none";
     } catch (e) {
       console.error("読み込みエラー:", e);
-      alert("データの取得に失敗しました。URLと公開設定を確認してください。");
+      alert("データの取得に失敗しました。");
     }
   };
 
+  // 🔴アバター更新ヘルパー
+  function updateChatAvatar(state) {
+    const persona = document.getElementById('aiPersona').value;
+    const img = document.getElementById('aiChatAvatar');
+    img.style.opacity = 0;
+    setTimeout(() => {
+      img.src = AI_AVATARS[persona][state];
+      img.style.opacity = 1;
+    }, 200);
+  }
+
   async function fetchMood() {
+    const img = document.getElementById('keeperAvatar');
+    img.src = AI_AVATARS.keeper.searching;
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getMood" }) });
       const data = await res.json();
       document.getElementById("shelfMood").textContent = "✨ " + data.mood;
     } catch(e) {
       document.getElementById("shelfMood").textContent = "✨ 今日も素敵な本が揃っています。";
+    } finally {
+      img.src = AI_AVATARS.keeper.normal;
     }
-  }
-
-  function toggleMyShelf() {
-    isMyShelfMode = !isMyShelfMode;
-    document.getElementById("myShelfBtn").classList.toggle("active");
-    renderAll();
   }
 
   function renderAll() {
     const searchText = document.getElementById("searchBar").value.toLowerCase();
-    
     let filtered = allData.filter(book => {
       const matchText = (book.title + book.author).toLowerCase().includes(searchText);
       const matchTags = activeTags.every(t => book.tags.includes(t));
       const matchSave = isMyShelfMode ? savedBooks.includes(book.id) : true;
       return matchText && matchTags && matchSave;
     });
-
     if (currentSortMode === 'new') filtered.sort((a, b) => new Date(b.updated) - new Date(a.updated));
     else if (currentSortMode === 'like') filtered.sort((a, b) => b.likes - a.likes);
-
     document.getElementById("grid").innerHTML = filtered.map((book, i) => generateCardHTML(book, i)).join("");
-    
     const sortedReader = [...readerData].sort((a,b) => b.likes - a.likes);
     document.getElementById("readerGrid").innerHTML = sortedReader.map((book, i) => generateReaderCardHTML(book, i)).join("");
-    
     setTimeout(observeCards, 100);
   }
 
@@ -449,18 +453,12 @@
     const now = new Date();
     const diffDays = (now - new Date(book.updated)) / (1000 * 60 * 60 * 24);
     const newBadge = diffDays <= 7 ? `<div class="new-badge">New!</div>` : '';
-    
-    let badgeHtml = "";
-    if (currentSortMode === 'like' && index <= 2 && book.likes > 0) {
-      badgeHtml = `<div class="rank-badge rank-${index+1}">${index+1}位</div>`;
-    }
-
+    let badgeHtml = (currentSortMode === 'like' && index <= 2 && book.likes > 0) ? `<div class="rank-badge rank-${index+1}">${index+1}位</div>` : "";
     let stars = "";
     if (!isNaN(book.rating) && book.rating !== "") {
       const s = parseInt(book.rating);
       stars = `<div class="rating">${"★".repeat(s)}${"☆".repeat(5-s)}</div>`;
     }
-
     return `
       <div class="card">
         ${newBadge}${badgeHtml}
@@ -475,15 +473,9 @@
             <button onclick="showSummary('${book.id}')" class="button ai-summary-btn">📖 内容を聞く</button>
           </div>
           <div class="action-row">
-            <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">
-              <span>❤️</span>${book.likes}<br>いいね
-            </button>
-            <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">
-              <span>✅</span>${book.reads || 0}<br>読了
-            </button>
-            <button onclick="toggleSave('${book.id}')" class="save-btn ${isSaved?'saved':''}">
-              <span>🔖</span><br>${isSaved?'保存中':'保存'}
-            </button>
+            <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}"><span>❤️</span>${book.likes}<br>いいね</button>
+            <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}"><span>✅</span>${book.reads || 0}<br>読了</button>
+            <button onclick="toggleSave('${book.id}')" class="save-btn ${isSaved?'saved':''}"><span>🔖</span><br>${isSaved?'保存中':'保存'}</button>
           </div>
         </div>
       </div>`;
@@ -492,7 +484,6 @@
   function generateReaderCardHTML(book, index) {
     const isLiked = likedBooks.includes(book.id), isRead = readBooks.includes(book.id);
     let badgeHtml = index <= 2 && book.likes > 0 ? `<div class="rank-badge rank-${index+1}">${index+1}位</div>` : "";
-    
     return `
       <div class="reader-card">
         ${badgeHtml}
@@ -500,54 +491,74 @@
         <div class="reader-book-title">📖 ${book.title}</div>
         <div class="reader-book-author">✍️ ${book.author}</div>
         <div class="action-row" style="margin-top:15px;">
-          <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">
-            <span>❤️</span>${book.likes}<br>いいね
-          </button>
-          <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">
-            <span>✅</span>${book.reads || 0}<br>読了
-          </button>
+          <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}"><span>❤️</span>${book.likes}<br>いいね</button>
+          <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}"><span>✅</span>${book.reads || 0}<br>読了</button>
         </div>
       </div>`;
   }
 
-  // 🔴処方箋アクション
+  // 🔴処方箋：表情切り替えあり
   document.getElementById("prescribeBtn").onclick = async () => {
     const worry = document.getElementById("worryInput").value.trim();
     if (!worry) return alert("お悩みを入力してください");
-    
     const btn = document.getElementById("prescribeBtn"), resultArea = document.getElementById("prescriptionResultArea");
-    btn.disabled = true; btn.textContent = "処方中...";
+    const avatar = document.getElementById("pharmacistAvatar");
     
+    btn.disabled = true; btn.textContent = "処方中...";
+    avatar.src = AI_AVATARS.pharmacist.searching;
+
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "prescribe", message: worry }) });
       const data = await res.json();
-      
-      // 画像鮮度を保つためのマッチング
       const freshBook = [...allData, ...readerData].find(f => f.id === data.recommendedBook.id) || data.recommendedBook;
-      
       document.getElementById("prescribedBookBox").innerHTML = `
         <img src="${freshBook.image}" class="prescription-cover" onerror="this.src='https://via.placeholder.com/60x85?text=No+Img'">
         <div>
-          <div style="font-weight:bold; font-size:15px; color:#01579b;">薬：『${freshBook.title}』</div>
-          <div style="font-size:12px; color:#666;">著者：${freshBook.author}</div>
-          <button onclick="showSummary('${freshBook.id}')" style="margin-top:8px; font-size:10px; border:none; background:#e1f5fe; color:#01579b; padding:4px 10px; border-radius:10px; cursor:pointer; font-weight:bold;">この本の効能（サマリー）を見る</button>
+          <div style="font-weight:bold; font-size:14px; color:#01579b;">薬：『${freshBook.title}』</div>
+          <button onclick="showSummary('${freshBook.id}')" style="margin-top:5px; font-size:10px; border:none; background:#e1f5fe; color:#01579b; padding:4px 8px; border-radius:10px; cursor:pointer; font-weight:bold;">この本の効能を見る</button>
         </div>
       `;
       document.getElementById("prescriptionText").innerHTML = data.prescription.replace(/\n/g, "<br>");
       resultArea.style.display = "block";
-    } catch(e) {
-      alert("処方に失敗しました");
-    } finally {
+    } catch(e) { alert("処方に失敗しました"); } 
+    finally { 
       btn.disabled = false; btn.textContent = "処方箋をもらう";
+      avatar.src = AI_AVATARS.pharmacist.normal;
     }
   };
-  function resetPrescription() { document.getElementById("worryInput").value = ""; document.getElementById("prescriptionResultArea").style.display = "none"; }
+
+  // 🔴AI相談：表情切り替えあり
+  document.getElementById("aiBtn").onclick = async () => {
+    const query = document.getElementById("aiQuery").value;
+    if (!query) return;
+    const btn = document.getElementById("aiBtn"), resultArea = document.getElementById("aiResultArea"),
+          aiText = document.getElementById("aiText"), aiGrid = document.getElementById("aiBooksGrid");
+    
+    btn.disabled = true; btn.textContent = "考え中...";
+    updateChatAvatar('searching');
+    resultArea.style.display = "block";
+    aiText.innerHTML = "本棚から探しています..."; aiGrid.innerHTML = "";
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ message: query, persona: document.getElementById("aiPersona").value }) });
+      const data = await res.json();
+      aiText.innerHTML = data.result.replace(/\n/g, "<br>");
+      if (data.recommendedBooks) {
+        const fresh = [...allData, ...readerData];
+        const updated = data.recommendedBooks.map(aib => fresh.find(f => f.id === aib.id) || aib);
+        aiGrid.innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
+        setTimeout(observeCards, 100);
+      }
+    } catch (e) { aiText.innerHTML = "エラーが発生しました。"; } 
+    finally { 
+      btn.disabled = false; btn.textContent = "相談する"; 
+      updateChatAvatar('normal');
+    }
+  };
 
   async function showSummary(id) {
     const book = [...allData, ...readerData].find(b => b.id === id);
     if (!book) return;
     document.getElementById("summaryBookTitle").textContent = "📖 AI司書の解説：" + book.title;
-    document.getElementById("summaryText").innerHTML = "司書が本を読み込み中...";
     document.getElementById("summaryModal").style.display = "flex";
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getSummary", bookData: book }) });
@@ -555,8 +566,11 @@
       document.getElementById("summaryText").innerHTML = data.summary.replace(/\n/g, "<br>");
     } catch (e) { document.getElementById("summaryText").innerHTML = "要約に失敗しました。"; }
   }
-  function closeSummaryModal() { document.getElementById("summaryModal").style.display = "none"; }
 
+  // 共通系
+  function closeSummaryModal() { document.getElementById("summaryModal").style.display = "none"; }
+  function toggleMyShelf() { isMyShelfMode = !isMyShelfMode; document.getElementById("myShelfBtn").classList.toggle("active"); renderAll(); }
+  function resetPrescription() { document.getElementById("worryInput").value = ""; document.getElementById("prescriptionResultArea").style.display = "none"; }
   async function handleAction(pageId, action) {
     const list = action === 'likeBook' ? likedBooks : readBooks;
     if (list.includes(pageId)) return;
@@ -566,14 +580,12 @@
     renderAll();
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: action, pageId: pageId }) }).catch(e => console.error(e));
   }
-
   function toggleSave(id) {
     if (savedBooks.includes(id)) savedBooks = savedBooks.filter(i => i !== id);
     else savedBooks.push(id);
     localStorage.setItem('savedBooks', JSON.stringify(savedBooks));
     renderAll();
   }
-
   function spawnConfetti() {
     for (let i = 0; i < 40; i++) {
       const c = document.createElement('div');
@@ -581,48 +593,54 @@
       c.style.left = Math.random() * 100 + 'vw';
       c.style.backgroundColor = ['#ffc0cb', '#ffb6c1', '#ff69b4', '#fff0f5'][Math.floor(Math.random()*4)];
       c.style.animation = `fall ${Math.random()*3+2}s linear forwards`;
-      c.style.width = Math.random() * 10 + 5 + 'px';
-      c.style.height = c.style.width;
+      c.style.width = Math.random() * 10 + 5 + 'px'; c.style.height = c.style.width;
       document.body.appendChild(c);
       setTimeout(() => c.remove(), 5000);
     }
   }
-
   function observeCards() {
     const cards = document.querySelectorAll('.card:not(.show), .reader-card:not(.show)');
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setTimeout(() => { entry.target.classList.add('show'); }, 50); 
-          observer.unobserve(entry.target);
-        }
-      });
+      entries.forEach(entry => { if (entry.isIntersecting) { setTimeout(() => { entry.target.classList.add('show'); }, 50); observer.unobserve(entry.target); } });
     }, { threshold: 0.1 });
     cards.forEach(c => observer.observe(c));
   }
-
-  document.getElementById("aiBtn").onclick = async () => {
-    const query = document.getElementById("aiQuery").value;
-    if (!query) return;
-    const btn = document.getElementById("aiBtn"), resultArea = document.getElementById("aiResultArea"),
-          aiText = document.getElementById("aiText"), aiGrid = document.getElementById("aiBooksGrid"),
-          persona = document.getElementById("aiPersona").value;
-    btn.disabled = true; btn.textContent = "考え中...";
-    resultArea.style.display = "block";
-    aiText.innerHTML = "本棚から探しています..."; aiGrid.innerHTML = "";
+  function changeSortMode(m) { currentSortMode = m; document.getElementById("sortNewBtn").classList.toggle("active", m === 'new'); document.getElementById("sortLikeBtn").classList.toggle("active", m === 'like'); renderAll(); }
+  function generateFilterTags(books) {
+    const container = document.getElementById("tagsContainer");
+    const uniqueTags = new Set();
+    books.forEach(b => b.tags.forEach(t => uniqueTags.add(t)));
+    uniqueTags.forEach(tag => {
+      const btn = document.createElement("button");
+      btn.className = "filter-tag"; btn.textContent = tag;
+      btn.onclick = () => { btn.classList.toggle("active"); if (activeTags.includes(tag)) activeTags = activeTags.filter(t => t !== tag); else activeTags.push(tag); renderAll(); };
+      container.appendChild(btn);
+    });
+  }
+  document.getElementById("searchBar").oninput = renderAll;
+  function resetAi() { document.getElementById("aiQuery").value = ""; document.getElementById("aiResultArea").style.display = "none"; }
+  function setAiPrompt(p) { document.getElementById("aiQuery").value = p; document.getElementById("aiBtn").click(); }
+  function openModal() { document.getElementById("submitModal").style.display = "flex"; }
+  function closeModal() { document.getElementById("submitModal").style.display = "none"; }
+  function openDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "flex"; }
+  function closeDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "none"; }
+  function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
+  async function submitBook() {
+    const title = document.getElementById("submitTitle").value.trim(), reason = document.getElementById("submitReason").value.trim(),
+          author = document.getElementById("submitAuthor").value.trim(), btn = document.getElementById("submitConfirmBtn");
+    if (!title || !reason) return alert("必須項目を埋めてください");
+    btn.disabled = true; btn.textContent = "送信中...";
+    try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "submitBook", data: { title, author, reason } }) }); alert("送信しました！"); closeModal(); } 
+    catch (e) { alert("失敗しました"); } finally { btn.disabled = false; btn.textContent = "管理人に送る"; }
+  }
+  document.getElementById("updateDbBtn").onclick = async () => {
+    const pass = prompt("合言葉を入力してください"); if (!pass) return;
+    const btn = document.getElementById("updateDbBtn"); btn.disabled = true; btn.textContent = "更新中...";
     try {
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ message: query, persona: persona }) });
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: pass }) });
       const data = await res.json();
-      aiText.innerHTML = data.result.replace(/\n/g, "<br>");
-      if (data.recommendedBooks) {
-        const fresh = [...allData, ...readerData];
-        const updated = data.recommendedBooks.map(aib => fresh.find(f => f.id === aib.id) || aib);
-        aiGrid.innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
-        setTimeout(observeCards, 100);
-      }
-      document.getElementById("resetBtn").style.display = "inline-block";
-    } catch (e) { aiText.innerHTML = "エラーが発生しました。"; } 
-    finally { btn.disabled = false; btn.textContent = "相談する"; }
+      if (data.status === "success") { alert("更新完了！"); location.reload(); } else { alert(data.message); }
+    } catch (e) { alert("エラー"); } finally { btn.disabled = false; btn.textContent = "🔄 AIに本を覚えさせる"; }
   };
 
   async function runDiagnose() {
@@ -641,7 +659,6 @@
         aiGrid.innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
         setTimeout(observeCards, 100);
       }
-      document.getElementById("resetBtn").style.display = "inline-block";
     } catch (e) { aiText.innerHTML = "分析に失敗しました。"; }
   }
 
@@ -659,11 +676,9 @@
       if (++counter > 25) {
         clearInterval(interval);
         const winner = gachaPool[Math.floor(Math.random() * gachaPool.length)];
-        slotImg.src = winner.image;
-        slotImg.classList.add('flash-anim');
-        content.classList.add('result-mode');
+        slotImg.src = winner.image; slotImg.classList.add('flash-anim'); content.classList.add('result-mode');
         titleEl.innerHTML = "✨ 運命の一冊はコレだ！ ✨<br><span style='color:#d35400;'>" + winner.title + "</span>";
-        descEl.innerHTML = `<strong>${winner.type==='admin'?'👑 管理人':'💬 読者'}のおすすめ</strong><br>著：${winner.author}`;
+        descEl.innerHTML = `<strong>著：${winner.author}</strong>`;
         if (winner.type === 'admin' && winner.url !== "#") {
           document.getElementById('gachaLinkBtn').onclick = () => window.open(winner.url, '_blank');
           document.getElementById('gachaLinkBtn').style.display = 'block';
@@ -672,59 +687,6 @@
       }
     }, 100);
   }
-
-  function changeSortMode(m) {
-    currentSortMode = m;
-    document.getElementById("sortNewBtn").classList.toggle("active", m === 'new');
-    document.getElementById("sortLikeBtn").classList.toggle("active", m === 'like');
-    renderAll();
-  }
-  function generateFilterTags(books) {
-    const container = document.getElementById("tagsContainer");
-    const uniqueTags = new Set();
-    books.forEach(b => b.tags.forEach(t => uniqueTags.add(t)));
-    uniqueTags.forEach(tag => {
-      const btn = document.createElement("button");
-      btn.className = "filter-tag"; btn.textContent = tag;
-      btn.onclick = () => {
-        btn.classList.toggle("active");
-        if (activeTags.includes(tag)) activeTags = activeTags.filter(t => t !== tag);
-        else activeTags.push(tag);
-        renderAll();
-      };
-      container.appendChild(btn);
-    });
-  }
-  document.getElementById("searchBar").oninput = renderAll;
-  function resetAi() { document.getElementById("aiQuery").value = ""; document.getElementById("aiResultArea").style.display = "none"; }
-  function setAiPrompt(p) { document.getElementById("aiQuery").value = p; document.getElementById("aiBtn").click(); }
-  function openModal() { document.getElementById("submitModal").style.display = "flex"; }
-  function closeModal() { document.getElementById("submitModal").style.display = "none"; }
-  function openDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "flex"; }
-  function closeDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "none"; }
-  function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
-
-  async function submitBook() {
-    const title = document.getElementById("submitTitle").value.trim(), reason = document.getElementById("submitReason").value.trim(),
-          author = document.getElementById("submitAuthor").value.trim(), btn = document.getElementById("submitConfirmBtn");
-    if (!title || !reason) return alert("必須項目を埋めてください");
-    btn.disabled = true; btn.textContent = "送信中...";
-    try {
-      await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "submitBook", data: { title, author, reason } }) });
-      alert("送信しました！"); closeModal();
-    } catch (e) { alert("失敗しました"); } finally { btn.disabled = false; btn.textContent = "管理人に送る"; }
-  }
-  document.getElementById("updateDbBtn").onclick = async () => {
-    const pass = prompt("合言葉を入力してください");
-    if (!pass) return;
-    const btn = document.getElementById("updateDbBtn");
-    btn.disabled = true; btn.textContent = "更新中...";
-    try {
-      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: pass }) });
-      const data = await res.json();
-      if (data.status === "success") { alert("更新完了！"); location.reload(); } else { alert(data.message); }
-    } catch (e) { alert("エラー"); } finally { btn.disabled = false; btn.textContent = "🔄 AIに本を覚えさせる"; }
-  };
 </script>
 </body>
 </html>
