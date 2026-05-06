@@ -8,9 +8,10 @@
   <style>
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #f9fbfb; color: #333; }
     
-    /* 🔴演出1：ヘッダーの背景動画化＆エモいデザイン */
-    .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
-    .header-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    /* 🔴修正：背景動画のスタイル */
+    .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;}
+    /* 動画を背景として完全に敷き詰める */
+    .header-video { position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vw; min-height: 100vh; min-width: 100vh; transform: translate(-50%, -50%); object-fit: cover; z-index: 0; }
     .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); z-index: 1; }
     .header-content { position: relative; z-index: 2; }
     .header h1 { font-size: 34px; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px;}
@@ -59,7 +60,6 @@
     .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; font-weight: bold;}
     .ai-btn:hover { background: #4a5c4a; transform: translateY(-2px);}
     .ai-btn:disabled { background: #ccc; transform: none;}
-    
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none; font-weight: bold;}
     .reset-btn:hover { background: #f0f0f0; }
 
@@ -83,34 +83,43 @@
     .sort-btn:hover { background: #f9f9f9; }
     .sort-btn.active { background: #2f3e2f; color: white; border-color: #2f3e2f; box-shadow: 0 4px 8px rgba(47,62,47,0.2);}
 
-    /* 🔴演出2＆3：カードの浮き上がりアニメーションとキラッと反射 */
+    /* 🔴修正：カード本体の設定 */
     .grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
     .card, .reader-card { 
       background: white; border-radius: 15px; padding: 20px 15px; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; position: relative; 
-      display: flex; flex-direction: column; align-items: center; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; 
       
-      /* スクロール連動用の初期状態 */
+      /* 🚨 はみ出したバッジが消えないように hidden を削除しました 🚨 */
+      /* overflow: hidden; */ 
+
       opacity: 0; transform: translateY(40px); 
       transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     
-    /* 画面に入った時に付与されるクラス */
     .card.show, .reader-card.show { opacity: 1; transform: translateY(0); }
-
-    /* ホバー時の3D浮き上がり */
     .card:hover, .reader-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
     
-    /* キラッと光る反射エフェクト（::afterで作る） */
+    /* 🔴修正：キラッと光るエフェクトの仕組みを変更 */
+    /* overflow:hidden が使えないため、カードの中身（画像・文字）のさらに後ろを光らせるのではなく、
+       カード全体を覆う「光の層」を一番手前に重ねて透明度を調整する方式に変更します。 */
     .card::after, .reader-card::after {
-      content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
-      transform: skewX(-25deg); transition: 0.7s; z-index: 20; pointer-events: none;
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: 15px; /* カードと同じ角丸 */
+      background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.7) 25%, transparent 30%);
+      background-size: 300% 300%;
+      background-position: 150% 0;
+      transition: background-position 0.7s ease-out;
+      pointer-events: none; /* クリックの邪魔にならないように */
+      z-index: 100; /* バッジより手前に来てもOK（透明なので問題なし） */
     }
-    .card:hover::after, .reader-card:hover::after { left: 200%; }
+    .card:hover::after, .reader-card:hover::after {
+      background-position: -50% 0;
+    }
 
-    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;}
-    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 10; font-family: 'Zen Maru Gothic', sans-serif;}
+    /* バッジ類（はみ出してもOKになります） */
+    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 50;}
+    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 50; font-family: 'Zen Maru Gothic', sans-serif;}
     .rank-1 { background: linear-gradient(135deg, #ffd700, #daa520); } 
     .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color: #333; } 
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); } 
@@ -135,7 +144,10 @@
     .reader-section { margin-top: 60px; padding: 50px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);}
     .reader-section h2 { text-align: center; color: #d35400; font-size: 22px; margin-top: 0; margin-bottom: 30px;}
     .reader-grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 5;}
+    
+    /* 🔴修正：吹き出しアイコンのはみ出し対応 */
+    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 50;}
+    
     .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #fdfbf7; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1; z-index: 2; position: relative;}
     .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px; z-index: 2; position: relative;}
     .reader-book-author { font-size: 12px; color: #777; z-index: 2; position: relative;}
@@ -245,13 +257,12 @@
   </div>
 </div>
 
-<!-- 🔴演出1：ヘッダーの背景動画 -->
+<!-- 🔴修正：絶対に表示される安全なVimeoの無料動画に差し替え -->
 <div class="header">
-  <!-- 無料のオシャレな「コーヒーと本」の動画を流しています。srcを変えれば好きな動画にできます -->
   <video autoplay loop muted playsinline class="header-video">
-    <source src="https://cdn.pixabay.com/video/2021/08/04/83864-584724080_large.mp4" type="video/mp4">
+    <source src="https://player.vimeo.com/external/498801569.sd.mp4?s=34015664a37f59d4c72ec1eb900762a4d33ebc18&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
   </video>
-  <div class="header-overlay"></div> <!-- 動画の上の暗いフィルター -->
+  <div class="header-overlay"></div>
   
   <div class="header-content">
     <div class="admin-tools">
@@ -351,7 +362,6 @@
 
       document.getElementById("loading").style.display = "none";
       
-      // 🔴演出2：初期読み込み後にスクロール監視をスタート
       observeCards();
     } catch (e) {
       console.error("読み込みエラー:", e);
@@ -359,21 +369,16 @@
     }
   };
 
-  // 🔴演出2：スクロール連動アニメーションの監視機能
   function observeCards() {
     const cards = document.querySelectorAll('.card:not(.show), .reader-card:not(.show)');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          // 画面に入ったら少し遅れてフワッと表示
-          setTimeout(() => {
-            entry.target.classList.add('show');
-          }, 50); 
+          setTimeout(() => { entry.target.classList.add('show'); }, 50); 
           observer.unobserve(entry.target);
         }
       });
     }, { threshold: 0.1 });
-    
     cards.forEach(card => observer.observe(card));
   }
 
@@ -516,7 +521,6 @@
 
   function renderMainGrid(books) { 
     document.getElementById("grid").innerHTML = books.map((book, index) => generateCardHTML(book, index)).join(""); 
-    // 描画した後にアニメーションを付与
     setTimeout(observeCards, 100);
   }
 
@@ -545,7 +549,6 @@
         </div>
       </div>
     `}).join("");
-    // 描画した後にアニメーションを付与
     setTimeout(observeCards, 100);
   }
 
@@ -581,7 +584,7 @@
       aiText.innerHTML = data.result.replace(/\n/g, "<br>");
       if (data.recommendedBooks && data.recommendedBooks.length > 0) {
         aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book, -1)).join("");
-        setTimeout(observeCards, 100); // AIが生成したカードにもアニメーションを付与
+        setTimeout(observeCards, 100); 
       }
       resetBtn.style.display = "inline-block";
     } catch (e) { aiText.innerHTML = "エラーが起きました。もう一度試してください。"; } 
