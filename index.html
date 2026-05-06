@@ -8,10 +8,8 @@
   <style>
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; }
     
-    /* ヘッダー周り */
     .header { text-align: center; padding: 40px 20px 60px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); position: relative;}
     
-    /* 🔴追加：DB更新ボタン（右上に配置） */
     .admin-tools { position: absolute; top: 15px; right: 15px; }
     .update-db-btn { font-size: 11px; padding: 6px 12px; background: rgba(255, 255, 255, 0.7); border: 1px solid #ddd; border-radius: 6px; cursor: pointer; color: #555; transition: 0.2s;}
     .update-db-btn:hover { background: #fff; border-color: #aaa;}
@@ -33,7 +31,12 @@
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
     .reset-btn:hover { background: #f0f0f0; }
 
-    #aiResultArea { display: none; margin-top: 20px; }
+    /* 🔴追加：ワンタップボタンのデザイン */
+    .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+    .prompt-btn { font-size: 12px; padding: 8px 14px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; white-space: nowrap; font-family: 'Zen Maru Gothic', sans-serif;}
+    .prompt-btn:hover { background: #e6f4ea; transform: translateY(-1px); }
+
+    #aiResultArea { display: none; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px;}
     .ai-text { line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px;}
     
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
@@ -64,6 +67,9 @@
       .card-tag { font-size: 7px; padding: 2px 4px; }
       .button { font-size: 9px; padding: 5px 6px; border-radius: 12px; width: 85%; box-sizing: border-box; }
       .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
+      
+      /* スマホ時のボタンサイズ微調整 */
+      .prompt-btn { font-size: 11px; padding: 6px 12px; }
     }
 
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
@@ -79,7 +85,6 @@
 </div>
 
 <div class="header">
-  <!-- 🔴追加：管理者用のDB更新ボタン -->
   <div class="admin-tools">
     <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
   </div>
@@ -96,6 +101,15 @@
       <input type="text" id="aiQuery" placeholder="例：泣ける恋愛小説が読みたい、元気が出る本は？">
       <button id="aiBtn" class="ai-btn">相談する</button>
       <button id="resetBtn" class="reset-btn">リセット</button>
+    </div>
+    
+    <!-- 🔴追加：ワンタップで相談できるサジェストボタン -->
+    <div class="prompt-suggestions">
+      <button class="prompt-btn" onclick="setAiPrompt('☕ 休日にのんびり読めるエッセイ')">☕ 休日にのんびり</button>
+      <button class="prompt-btn" onclick="setAiPrompt('😭 思いっきり泣ける切ない恋愛小説')">😭 思いっきり泣きたい</button>
+      <button class="prompt-btn" onclick="setAiPrompt('🌙 寝る前にサクッと読める短編')">🌙 寝る前にサクッと</button>
+      <button class="prompt-btn" onclick="setAiPrompt('🚀 明日からの活力が湧いてくる本')">🚀 活力が湧いてくる</button>
+      <button class="prompt-btn" onclick="setAiPrompt('🕵️‍♂️ ページをめくる手が止まらないミステリー')">🕵️‍♂️ ドキドキしたい</button>
     </div>
     
     <div id="aiResultArea">
@@ -210,6 +224,14 @@
     grid.innerHTML = books.map(book => generateCardHTML(book)).join("");
   }
 
+  // 🔴追加：ワンタップボタンが押されたときの処理
+  function setAiPrompt(promptText) {
+    // ①入力欄にテキストをセット
+    document.getElementById("aiQuery").value = promptText;
+    // ②「相談する」ボタンを自動でクリックさせる
+    document.getElementById("aiBtn").click();
+  }
+
   document.getElementById("aiBtn").onclick = async () => {
     const query = document.getElementById("aiQuery").value;
     if (!query) return;
@@ -257,10 +279,9 @@
     document.getElementById("resetBtn").style.display = "none"; 
   };
 
-  // 🔴追加：DB更新ボタンの処理
   document.getElementById("updateDbBtn").onclick = async () => {
     const pass = prompt("新しい本をAIに覚えさせるための「合言葉」を入力してください。");
-    if (!pass) return; // キャンセルした場合は何もしない
+    if (!pass) return; 
 
     const btn = document.getElementById("updateDbBtn");
     btn.textContent = "処理中（1〜2分かかります）...";
@@ -275,7 +296,7 @@
       
       if (data.status === "success") {
         alert("AIが新しい本を覚えました！\nページをリロードして反映します。");
-        location.reload(); // 成功したら画面をリロード
+        location.reload(); 
       } else {
         alert("エラー: " + data.message);
       }
