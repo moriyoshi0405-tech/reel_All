@@ -20,13 +20,20 @@
 
     /* AIセクション */
     .ai-section { background: #fff; border: 2px solid #e6f4ea; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .ai-input-group { display: flex; gap: 10px; margin-top: 10px; }
-    input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif;}
+    .ai-input-group { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;}
+    input[type="text"] { flex: 1; min-width: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif;}
     .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap;}
     .ai-btn:disabled { background: #ccc; }
-    #aiResult { margin-top: 15px; line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; }
+    
+    /* リセットボタン（最初は非表示） */
+    .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
+    .reset-btn:hover { background: #f0f0f0; }
 
-    /* グリッドとカード */
+    /* AIの回答表示エリア */
+    #aiResultArea { display: none; margin-top: 20px; }
+    .ai-text { line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px;}
+    
+    /* グリッドとカード（メインとAI結果で共用） */
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
     .card { background: white; border-radius: 12px; padding: 20px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
     
@@ -73,16 +80,20 @@
     <div class="ai-input-group">
       <input type="text" id="aiQuery" placeholder="例：泣ける恋愛小説が読みたい、元気が出る本は？">
       <button id="aiBtn" class="ai-btn">相談する</button>
+      <button id="resetBtn" class="reset-btn">リセット</button>
     </div>
-    <div id="aiResult"></div>
+    
+    <!-- AIの回答とおすすめ本の表示エリア（最初は非表示） -->
+    <div id="aiResultArea">
+      <div id="aiText" class="ai-text"></div>
+      <div id="aiBooksGrid" class="grid"></div>
+    </div>
   </div>
 
   <!-- 検索とタグフィルター -->
   <div class="filter-section">
     <input type="text" id="searchBar" class="search-bar" placeholder="本のタイトルや著者名で検索...">
-    <div id="tagsContainer" class="tags-container">
-      <!-- ここにタグボタンが自動生成されます -->
-    </div>
+    <div id="tagsContainer" class="tags-container"></div>
   </div>
 
   <!-- 本棚表示 -->
@@ -94,7 +105,7 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let allData = [];
-  let activeTags = []; // 選択中のタグを保存する配列
+  let activeTags = []; 
 
   // 初期データ読み込み
   window.onload = async () => {
@@ -103,12 +114,10 @@
       const data = await res.json();
       allData = data.books;
       
-      // ① デフォルトで新着順（更新日の降順）に並び替え
       allData.sort((a, b) => new Date(b.updated) - new Date(a.updated));
       
-      // ② タグボタンの生成と、本の表示
       generateFilterTags(allData);
-      render(allData);
+      renderMainGrid(allData);
       
       document.getElementById("loading").style.display = "none";
     } catch (e) {
@@ -117,12 +126,10 @@
     }
   };
 
-  // --- タグボタンを生成する関数 ---
   function generateFilterTags(books) {
     const container = document.getElementById("tagsContainer");
     const uniqueTags = new Set();
     
-    // 全ての本からタグを抽出して重複をなくす
     books.forEach(book => book.tags.forEach(tag => uniqueTags.add(tag)));
     
     uniqueTags.forEach(tag => {
@@ -130,81 +137,68 @@
       btn.className = "filter-tag";
       btn.textContent = tag;
       
-      // タグがクリックされたときの処理
       btn.onclick = () => {
-        btn.classList.toggle("active"); // 色を切り替え
-        
-        // activeTags配列の追加・削除
+        btn.classList.toggle("active"); 
         if (activeTags.includes(tag)) {
           activeTags = activeTags.filter(t => t !== tag);
         } else {
           activeTags.push(tag);
         }
-        
-        filterBooks(); // 絞り込みを実行
+        filterBooks(); 
       };
       container.appendChild(btn);
     });
   }
 
-  // --- 文字入力の検索処理 ---
   document.getElementById("searchBar").addEventListener("input", filterBooks);
 
-  // --- 本を絞り込む関数 ---
   function filterBooks() {
     const searchText = document.getElementById("searchBar").value.toLowerCase();
     
     const filtered = allData.filter(book => {
-      // 検索窓の条件
       const matchText = (book.title + book.author).toLowerCase().includes(searchText);
-      
-      // タグの条件（選択したタグを「すべて」含んでいる本だけ表示するAND検索）
       const matchTags = activeTags.every(activeTag => book.tags.includes(activeTag));
-      
       return matchText && matchTags;
     });
 
-    render(filtered);
+    renderMainGrid(filtered);
   }
 
-  // --- 本を表示する関数 ---
-  function render(books) {
-    const grid = document.getElementById("grid");
+  // --- カードのHTMLを生成する共通関数（メインもAI結果もこれを使う） ---
+  function generateCardHTML(book) {
     const now = new Date();
-    
-    grid.innerHTML = books.map(book => {
-      
-      // ① 更新日から「1週間以内」かを判定してNewラベルを作る
-      const updatedDate = new Date(book.updated);
-      const diffDays = (now - updatedDate) / (1000 * 60 * 60 * 24); // 日数差を計算
-      const newBadgeHtml = diffDays <= 7 ? `<div class="new-badge">New!</div>` : '';
+    const updatedDate = new Date(book.updated);
+    const diffDays = (now - updatedDate) / (1000 * 60 * 60 * 24); 
+    const newBadgeHtml = diffDays <= 7 ? `<div class="new-badge">New!</div>` : '';
 
-      // ② 評価（★）のHTMLを作る
-      // ※もしNotion側が「5」という数値だった場合、「★★★★★」に変換する処理を入れます
-      let ratingDisplay = book.rating;
-      if (!isNaN(book.rating) && book.rating !== "") {
-          const stars = Math.min(Math.max(parseInt(book.rating), 0), 5); // 0〜5の範囲に
-          ratingDisplay = "★".repeat(stars) + "☆".repeat(5 - stars);
-      }
-      const ratingHtml = ratingDisplay ? `<div class="rating">${ratingDisplay}</div>` : '';
+    let ratingDisplay = book.rating;
+    if (!isNaN(book.rating) && book.rating !== "") {
+        const stars = Math.min(Math.max(parseInt(book.rating), 0), 5); 
+        ratingDisplay = "★".repeat(stars) + "☆".repeat(5 - stars);
+    }
+    const ratingHtml = ratingDisplay ? `<div class="rating">${ratingDisplay}</div>` : '';
 
-      // ③ タグのHTMLを作る
-      const tagsHtml = `<div class="card-tags">` + 
-        book.tags.map(t => `<span class="card-tag">${t}</span>`).join("") + 
-      `</div>`;
+    const tagsHtml = `<div class="card-tags">` + 
+      book.tags.map(t => `<span class="card-tag">${t}</span>`).join("") + 
+    `</div>`;
 
-      return `
-        <div class="card">
-          ${newBadgeHtml}
-          <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x130?text=No+Image'">
-          <div class="title">${book.title}</div>
-          <div class="author">${book.author}</div>
-          ${ratingHtml}
-          ${tagsHtml}
-          <a href="${book.url}" target="_blank" class="button">感想を見る</a>
-        </div>
-      `;
-    }).join("");
+    return `
+      <div class="card">
+        ${newBadgeHtml}
+        <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x130?text=No+Image'">
+        <div class="title">${book.title}</div>
+        <div class="author">${book.author}</div>
+        ${ratingHtml}
+        ${tagsHtml}
+        <a href="${book.url}" target="_blank" class="button">感想を見る</a>
+      </div>
+    `;
+  }
+
+  // メインの本棚を描画する
+  function renderMainGrid(books) {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = books.map(book => generateCardHTML(book)).join("");
   }
 
   // --- AI相談ロジック ---
@@ -213,11 +207,19 @@
     if (!query) return;
 
     const btn = document.getElementById("aiBtn");
-    const resultDiv = document.getElementById("aiResult");
+    const resultArea = document.getElementById("aiResultArea");
+    const aiText = document.getElementById("aiText");
+    const aiBooksGrid = document.getElementById("aiBooksGrid");
+    const resetBtn = document.getElementById("resetBtn");
 
     btn.disabled = true;
     btn.textContent = "考え中...";
-    resultDiv.innerHTML = "本棚から探しています。少々お待ちください...";
+    
+    // 取得中はテキストだけ表示し、カードエリアは空にする
+    resultArea.style.display = "block";
+    aiText.innerHTML = "本棚から探しています。少々お待ちください...";
+    aiBooksGrid.innerHTML = "";
+    resetBtn.style.display = "none";
 
     try {
       const res = await fetch(API_URL, {
@@ -225,14 +227,33 @@
         body: JSON.stringify({ message: query })
       });
       const data = await res.json();
-      resultDiv.innerHTML = data.result.replace(/\n/g, "<br>");
+      
+      // 1. AIのテキスト回答を表示
+      aiText.innerHTML = data.result.replace(/\n/g, "<br>");
+      
+      // 2. おすすめされた本のカードを描画
+      if (data.recommendedBooks && data.recommendedBooks.length > 0) {
+        aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book)).join("");
+      }
+
+      // 3. リセットボタンを表示
+      resetBtn.style.display = "inline-block";
+
     } catch (e) {
-      resultDiv.innerHTML = "エラーが起きました。もう一度試してください。";
+      aiText.innerHTML = "エラーが起きました。もう一度試してください。";
     } finally {
       btn.disabled = false;
       btn.textContent = "相談する";
     }
   };
+
+  // --- リセットボタンの処理 ---
+  document.getElementById("resetBtn").onclick = () => {
+    document.getElementById("aiQuery").value = ""; // 入力欄を空に
+    document.getElementById("aiResultArea").style.display = "none"; // 回答エリアを隠す
+    document.getElementById("resetBtn").style.display = "none"; // リセットボタンを隠す
+  };
+
 </script>
 </body>
 </html>
