@@ -295,13 +295,21 @@
     <div class="search">
       <input id="search" placeholder="本を検索...">
     </div>
+    <div style="margin:10px 0;">
+      <button id="aiBtn" class="sort-btn">🤖 AIおすすめ</button>
+    </div>
 
     <div style="margin: 15px 0 10px;">
       <button id="sortBtn" class="sort-btn">新しい順にする</button>
     </div>
 
     <div id="tags" class="tags"></div>
+    <div id="aiResult" style="margin-top:20px;"></div>
     <div class="grid" id="grid"></div>
+  </div>
+
+  <div style="margin:10px 0;">
+    <button id="aiBtn" class="sort-btn">🤖 AIおすすめ</button>
   </div>
 
   <script>
@@ -477,6 +485,52 @@
 
       showIntro();
     }
+
+document.getElementById("aiBtn").onclick = async () => {
+
+  const btn = document.getElementById("aiBtn");
+  btn.textContent = "考え中...";
+  btn.disabled = true;
+
+  const prompt = `
+あなたは優秀な読書アドバイザーです。
+
+以下の本リストから、ユーザーに最適な本を2〜3冊選んでください。
+
+【ルール】
+・必ずリストの中から選ぶ
+・理由も簡潔に
+・恋愛/気分/テーマを考慮
+
+【本リスト】
+${allData.map(b =>
+  `タイトル:${b.title} / 著者:${b.author} / 内容:${b.summary} / レビュー:${b.review}`
+).join("\n")}
+
+【出力形式】
+・タイトル
+・理由（1〜2行）
+`;
+
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      type: "aiRecommend",
+      message: prompt
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("aiResult").innerHTML =
+    `<div style="padding:12px;border:1px solid #ddd;border-radius:10px;">
+      ${data.result.replace(/\n/g,"<br>")}
+    </div>`;
+
+  btn.textContent = "🤖 AIおすすめ";
+  btn.disabled = false;
+};
   </script>
 </body>
 </html>
