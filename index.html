@@ -46,20 +46,27 @@
     .cover { width: 90px; height: 130px; object-fit: cover; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
     .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4;}
     .author { font-size: 12px; color: #777; margin-bottom: 8px; }
-    
     .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px;}
-    
     .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; }
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
-    
     .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap;}
     .button:hover { background: #555; }
 
-    /* 🔴追加：フローティングボタン（画面右下に固定） */
+    /* 🔴追加：みんなのおすすめコーナーのデザイン */
+    .reader-section { margin-top: 60px; padding: 40px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7;}
+    .reader-section h2 { text-align: center; color: #d35400; font-size: 20px; margin-top: 0; margin-bottom: 25px;}
+    .reader-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .reader-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column;}
+    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 30px; transform: rotate(-10deg);}
+    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80;}
+    .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px;}
+    .reader-book-author { font-size: 12px; color: #777;}
+
+    /* フローティングボタン */
     .floating-btn { position: fixed; bottom: 20px; right: 20px; background: #ff8c00; color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
     .floating-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4); }
 
-    /* 🔴追加：投稿フォーム（モーダル） */
+    /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     .modal-content h3 { margin-top: 0; margin-bottom: 15px; color: #2f3e2f; text-align: center;}
@@ -84,6 +91,9 @@
       .button { font-size: 9px; padding: 5px 6px; border-radius: 12px; width: 85%; box-sizing: border-box; }
       .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
       .prompt-btn { font-size: 11px; padding: 6px 12px; }
+      /* 読者コーナーのスマホ対応 */
+      .reader-grid { grid-template-columns: 1fr; }
+      .reader-card { padding: 15px; }
     }
 
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
@@ -98,10 +108,8 @@
   <p style="margin-top: 15px; color: #555; font-size: 14px;">本棚を整頓中...</p>
 </div>
 
-<!-- 🔴追加：フローティングボタン -->
 <button class="floating-btn" onclick="openModal()">💡 おすすめ本を教える</button>
 
-<!-- 🔴追加：投稿フォームのモーダルウィンドウ -->
 <div id="submitModal" class="modal-overlay">
   <div class="modal-content">
     <h3>あなたのおすすめ本を教えてください</h3>
@@ -128,7 +136,6 @@
   <div class="admin-tools">
     <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
   </div>
-  
   <h1>AI Book Shelf</h1>
   <p>あなたの気分に合わせた一冊を、私の本棚から探します</p>
 </div>
@@ -163,6 +170,15 @@
   </div>
 
   <div id="grid" class="grid"></div>
+
+  <!-- 🔴追加：読者のおすすめ本を表示するエリア -->
+  <div class="reader-section">
+    <h2>💬 みんなのおすすめ本</h2>
+    <div id="readerGrid" class="reader-grid">
+      <!-- ここに読者の投稿が自動生成されます -->
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -170,6 +186,7 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let allData = [];
+  let readerData = []; // 読者のおすすめ本データ用
   let activeTags = []; 
 
   window.onload = async () => {
@@ -177,9 +194,18 @@
       const res = await fetch(API_URL);
       const data = await res.json();
       allData = data.books;
+      
+      // 読者の投稿データを受け取る
+      readerData = data.readerBooks || [];
+      
       allData.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+      
       generateFilterTags(allData);
       renderMainGrid(allData);
+      
+      // 読者の投稿を描画する
+      renderReaderGrid(readerData);
+      
       document.getElementById("loading").style.display = "none";
     } catch (e) {
       console.error("読み込みエラー:", e);
@@ -228,7 +254,6 @@
         ratingDisplay = "★".repeat(stars) + "☆".repeat(5 - stars);
     }
     const ratingHtml = ratingDisplay ? `<div class="rating">${ratingDisplay}</div>` : '';
-
     const tagsHtml = `<div class="card-tags">${book.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}</div>`;
 
     return `
@@ -246,6 +271,25 @@
 
   function renderMainGrid(books) {
     document.getElementById("grid").innerHTML = books.map(book => generateCardHTML(book)).join("");
+  }
+
+  // 🔴追加：読者のおすすめ本を描画する関数
+  function renderReaderGrid(books) {
+    const grid = document.getElementById("readerGrid");
+    
+    // まだ「公開」の投稿が1件もない場合
+    if (books.length === 0) {
+      grid.innerHTML = `<p style="text-align: center; color: #888; grid-column: 1 / -1; margin: 20px 0;">まだおすすめの投稿はありません。<br>右下のボタンから、あなたのお気に入りの一冊を教えてください！</p>`;
+      return;
+    }
+
+    grid.innerHTML = books.map(book => `
+      <div class="reader-card">
+        <div class="reader-quote">${book.reason.replace(/\n/g, '<br>')}</div>
+        <div class="reader-book-title">📖 ${book.title}</div>
+        <div class="reader-book-author">✍️ ${book.author}</div>
+      </div>
+    `).join("");
   }
 
   function setAiPrompt(promptText) {
@@ -317,7 +361,6 @@
     }
   };
 
-  // 🔴追加：モーダルの開閉・送信処理
   function openModal() { document.getElementById("submitModal").style.display = "flex"; }
   function closeModal() { document.getElementById("submitModal").style.display = "none"; }
 
@@ -348,7 +391,6 @@
       if (data.status === "success") {
         alert("おすすめ本を送信しました！ありがとうございます。");
         closeModal();
-        // フォームを空にする
         document.getElementById("submitTitle").value = "";
         document.getElementById("submitAuthor").value = "";
         document.getElementById("submitReason").value = "";
