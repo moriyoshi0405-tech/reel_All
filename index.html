@@ -6,21 +6,29 @@
   <title>AI Book Shelf</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; }
+    body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #f9fbfb; color: #333; }
     
-    .header { text-align: center; padding: 40px 20px 60px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); position: relative;}
+    /* 🔴演出1：ヘッダーの背景動画化＆エモいデザイン */
+    .header { text-align: center; padding: 70px 20px 80px; position: relative; color: white; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    .header-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.45); z-index: 1; }
+    .header-content { position: relative; z-index: 2; }
+    .header h1 { font-size: 34px; margin: 0 0 10px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px;}
+    .header p { font-size: 15px; margin: 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); opacity: 0.9;}
     
-    .admin-tools { position: absolute; top: 15px; right: 15px; }
-    .update-db-btn { font-size: 11px; padding: 6px 12px; background: rgba(255, 255, 255, 0.7); border: 1px solid #ddd; border-radius: 6px; cursor: pointer; color: #555; transition: 0.2s;}
-    .update-db-btn:hover { background: #fff; border-color: #aaa;}
+    .admin-tools { position: absolute; top: 15px; right: 15px; z-index: 3;}
+    .update-db-btn { font-size: 11px; padding: 6px 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; cursor: pointer; color: white; transition: 0.3s;}
+    .update-db-btn:hover { background: rgba(255, 255, 255, 0.2); border-color: white;}
     
     .container { max-width: 900px; margin: auto; padding: 20px; }
 
-    .gacha-section { text-align: center; margin-top: -30px; margin-bottom: 40px; position: relative; z-index: 10; }
+    /* ガチャボタン */
+    .gacha-section { text-align: center; margin-top: -40px; margin-bottom: 40px; position: relative; z-index: 10; }
     .gacha-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e53); color: white; font-size: 16px; font-weight: bold; padding: 15px 40px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); transition: transform 0.2s, box-shadow 0.2s; animation: pulseGacha 2s infinite; font-family: 'Zen Maru Gothic', sans-serif; letter-spacing: 1px;}
     .gacha-btn:hover { transform: scale(1.05); box-shadow: 0 12px 25px rgba(255, 107, 107, 0.6); }
     @keyframes pulseGacha { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
+    /* ガチャモーダル */
     .gacha-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px);}
     .gacha-content { background: #fff; padding: 40px 30px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;}
     .gacha-content::before { content:""; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 60%); animation: spinGlow 8s linear infinite; z-index: 0; display: none;}
@@ -38,89 +46,125 @@
     @keyframes flashResult { 0% { filter: brightness(1); transform: scale(1); } 40% { filter: brightness(1.5); transform: scale(1.15) rotate(2deg); box-shadow: 0 0 50px rgba(255, 215, 0, 1); } 100% { filter: brightness(1); transform: scale(1); box-shadow: 0 10px 25px rgba(0,0,0,0.3); } }
     .flash-anim { animation: flashResult 0.8s ease-out forwards; }
 
-    .ai-section { background: #fff; border: 2px solid #e6f4ea; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    
-    /* 🔴追加：AIヘッダー周り（カルテボタン配置用） */
-    .ai-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;}
-    .diagnose-btn { background: #e0f7fa; color: #00796b; border: 1px solid #b2ebf2; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: 'Zen Maru Gothic', sans-serif;}
-    .diagnose-btn:hover { background: #b2ebf2; }
+    /* AIセクション */
+    .ai-section { background: #fff; border: 1px solid #e0f2e9; padding: 25px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
+    .ai-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;}
+    .diagnose-btn { background: #e0f7fa; color: #00796b; border: 1px solid #b2ebf2; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: 'Zen Maru Gothic', sans-serif;}
+    .diagnose-btn:hover { background: #b2ebf2; transform: translateY(-2px);}
 
     .ai-input-group { display: flex; gap: 10px; flex-wrap: wrap;}
+    .persona-select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif; background: #fff; cursor: pointer; outline: none;}
+    input[type="text"] { flex: 1; min-width: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif; outline: none; transition: 0.3s;}
+    input[type="text"]:focus { border-color: #2f3e2f; box-shadow: 0 0 8px rgba(47,62,47,0.1); }
+    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; font-weight: bold;}
+    .ai-btn:hover { background: #4a5c4a; transform: translateY(-2px);}
+    .ai-btn:disabled { background: #ccc; transform: none;}
     
-    /* 🔴追加：キャラ選択用セレクトボックス */
-    .persona-select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif; background: #fff; cursor: pointer;}
-    
-    input[type="text"] { flex: 1; min-width: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif;}
-    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap;}
-    .ai-btn:disabled { background: #ccc; }
-    .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
+    .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none; font-weight: bold;}
     .reset-btn:hover { background: #f0f0f0; }
 
     .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-    .prompt-btn { font-size: 12px; padding: 8px 14px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; white-space: nowrap; font-family: 'Zen Maru Gothic', sans-serif;}
-    .prompt-btn:hover { background: #e6f4ea; transform: translateY(-1px); }
+    .prompt-btn { font-size: 12px; padding: 8px 15px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; white-space: nowrap; font-family: 'Zen Maru Gothic', sans-serif;}
+    .prompt-btn:hover { background: #e6f4ea; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05);}
 
-    #aiResultArea { display: none; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px;}
-    .ai-text { line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px;}
+    #aiResultArea { display: none; margin-top: 25px; border-top: 1px dashed #ddd; padding-top: 25px;}
+    .ai-text { line-height: 1.8; font-size: 14.5px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px; background: #fafdfb; padding: 15px; border-radius: 0 10px 10px 0;}
     
-    .filter-section { margin-bottom: 25px; }
-    .search-bar { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Zen Maru Gothic', sans-serif;}
+    .filter-section { margin-bottom: 30px; }
+    .search-bar { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Zen Maru Gothic', sans-serif; transition: 0.3s; outline: none;}
+    .search-bar:focus { border-color: #2f3e2f; box-shadow: 0 0 8px rgba(47,62,47,0.1); }
     .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
-    .filter-tag { padding: 6px 14px; border-radius: 20px; background: #eee; font-size: 12px; cursor: pointer; border: none; transition: 0.2s; color: #555;}
-    .filter-tag.active { background: #2f3e2f; color: white; }
-    .sort-options { margin-top: 15px; margin-bottom: 15px; display: flex; gap: 10px; }
-    .sort-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: white; font-family: 'Zen Maru Gothic', sans-serif; font-size: 12px; cursor: pointer; transition: 0.2s; color: #555;}
-    .sort-btn.active { background: #2f3e2f; color: white; border-color: #2f3e2f;}
+    .filter-tag { padding: 6px 14px; border-radius: 20px; background: #fff; border: 1px solid #ddd; font-size: 12px; cursor: pointer; transition: 0.2s; color: #555;}
+    .filter-tag:hover { background: #f0f0f0; }
+    .filter-tag.active { background: #2f3e2f; color: white; border-color: #2f3e2f; box-shadow: 0 4px 8px rgba(47,62,47,0.2);}
+    
+    .sort-options { margin-top: 20px; margin-bottom: 15px; display: flex; gap: 10px; }
+    .sort-btn { padding: 8px 18px; border-radius: 20px; border: 1px solid #ddd; background: white; font-family: 'Zen Maru Gothic', sans-serif; font-size: 12px; cursor: pointer; transition: 0.2s; color: #555; font-weight: bold;}
+    .sort-btn:hover { background: #f9f9f9; }
+    .sort-btn.active { background: #2f3e2f; color: white; border-color: #2f3e2f; box-shadow: 0 4px 8px rgba(47,62,47,0.2);}
 
-    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-    .card { background: white; border-radius: 12px; padding: 20px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
-    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;}
+    /* 🔴演出2＆3：カードの浮き上がりアニメーションとキラッと反射 */
+    .grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .card, .reader-card { 
+      background: white; border-radius: 15px; padding: 20px 15px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; position: relative; 
+      display: flex; flex-direction: column; align-items: center; overflow: hidden;
+      
+      /* スクロール連動用の初期状態 */
+      opacity: 0; transform: translateY(40px); 
+      transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    /* 画面に入った時に付与されるクラス */
+    .card.show, .reader-card.show { opacity: 1; transform: translateY(0); }
+
+    /* ホバー時の3D浮き上がり */
+    .card:hover, .reader-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+    
+    /* キラッと光る反射エフェクト（::afterで作る） */
+    .card::after, .reader-card::after {
+      content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+      transform: skewX(-25deg); transition: 0.7s; z-index: 20; pointer-events: none;
+    }
+    .card:hover::after, .reader-card:hover::after { left: 200%; }
+
+    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 10;}
     .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 10; font-family: 'Zen Maru Gothic', sans-serif;}
     .rank-1 { background: linear-gradient(135deg, #ffd700, #daa520); } 
     .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color: #333; } 
     .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); } 
 
-    .cover { width: 90px; height: 130px; object-fit: cover; border-radius: 4px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
-    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4;}
-    .author { font-size: 12px; color: #777; margin-bottom: 8px; }
-    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px;}
-    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; }
+    .cover { width: 95px; height: 135px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; box-shadow: 3px 3px 10px rgba(0,0,0,0.15); transition: 0.3s;}
+    .card:hover .cover { transform: scale(1.05); }
+
+    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4; z-index: 2;}
+    .author { font-size: 12px; color: #777; margin-bottom: 8px; z-index: 2;}
+    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; z-index: 2;}
+    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; z-index: 2;}
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
-    .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap; width: 100%; box-sizing: border-box; margin-bottom: 8px;}
-    .button:hover { background: #555; }
+    
+    .button-area { width: 100%; margin-top: auto; z-index: 2; position: relative;}
+    .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; transition: 0.2s; white-space: nowrap; width: 100%; box-sizing: border-box; margin-bottom: 8px; font-weight: bold;}
+    .button:hover { background: #555; box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
     .like-btn { width: 100%; display: inline-block; background: #fff; border: 1px solid #ff4757; color: #ff4757; border-radius: 20px; padding: 6px 15px; font-size: 12px; font-family: 'Zen Maru Gothic', sans-serif; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box;}
-    .like-btn:hover { background: #ffe0e6; }
-    .like-btn.liked { background: #ff4757; color: white; cursor: default; opacity: 0.9; }
+    .like-btn:hover { background: #ffe0e6; box-shadow: 0 4px 8px rgba(255,71,87,0.2);}
+    .like-btn.liked { background: #ff4757; color: white; cursor: default; opacity: 0.9; box-shadow: none;}
 
-    .reader-section { margin-top: 60px; padding: 40px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7;}
-    .reader-section h2 { text-align: center; color: #d35400; font-size: 20px; margin-top: 0; margin-bottom: 25px;}
-    .reader-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-    .reader-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column;}
-    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 30px; transform: rotate(-10deg);}
-    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #f9f9f9; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1;}
-    .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px;}
-    .reader-book-author { font-size: 12px; color: #777;}
-    .reader-like-btn-wrap { margin-top: 15px; }
+    /* みんなのおすすめコーナー */
+    .reader-section { margin-top: 60px; padding: 50px 20px; background: #fffaf0; border-radius: 20px; border: 2px solid #faebd7; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);}
+    .reader-section h2 { text-align: center; color: #d35400; font-size: 22px; margin-top: 0; margin-bottom: 30px;}
+    .reader-grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+    .reader-card::before { content: "💬"; position: absolute; top: -15px; left: -10px; font-size: 35px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 5;}
+    .reader-quote { font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 15px; background: #fdfbf7; padding: 15px; border-radius: 10px; border-left: 4px solid #ffcc80; flex-grow: 1; z-index: 2; position: relative;}
+    .reader-book-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px; z-index: 2; position: relative;}
+    .reader-book-author { font-size: 12px; color: #777; z-index: 2; position: relative;}
+    .reader-like-btn-wrap { margin-top: 15px; z-index: 2; position: relative;}
 
-    .floating-btn { position: fixed; bottom: 20px; right: 20px; background: #ff8c00; color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
-    .floating-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4); }
+    .floating-btn { position: fixed; bottom: 25px; right: 25px; background: #ff8c00; color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 14px; box-shadow: 0 6px 20px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
+    .floating-btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4); }
 
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px);}
+    .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: popModal 0.3s ease-out;}
+    @keyframes popModal { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .modal-content h3 { margin-top: 0; margin-bottom: 15px; color: #2f3e2f; text-align: center;}
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #555;}
-    .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: 'Zen Maru Gothic', sans-serif; font-size: 14px;}
-    .form-group textarea { height: 80px; resize: none; }
-    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;}
-    .cancel-btn { background: #eee; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
-    .submit-btn { background: #2f3e2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;}
-    .submit-btn:disabled { background: #ccc; }
+    .form-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #555; font-weight: bold;}
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Zen Maru Gothic', sans-serif; font-size: 14px; outline: none; transition: 0.2s;}
+    .form-group input:focus, .form-group textarea:focus { border-color: #2f3e2f; background: #fdfdfd;}
+    .form-group textarea { height: 90px; resize: none; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;}
+    .cancel-btn { background: #eee; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .cancel-btn:hover { background: #e0e0e0;}
+    .submit-btn { background: #2f3e2f; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .submit-btn:hover { background: #4a5c4a; transform: translateY(-2px);}
+    .submit-btn:disabled { background: #ccc; transform: none;}
 
     @media (max-width: 767px) {
+      .header { padding: 50px 20px 60px; }
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .card { padding: 10px 5px; border-radius: 8px;}
-      .cover { width: 100%; max-width: 70px; height: auto; aspect-ratio: 2 / 3; margin-bottom: 8px;}
+      .card { padding: 10px 5px; border-radius: 10px;}
+      .cover { width: 100%; max-width: 70px; height: auto; aspect-ratio: 2 / 3; margin-bottom: 8px; box-shadow: 2px 2px 6px rgba(0,0,0,0.15);}
       .title { font-size: 10px; margin-bottom: 2px; }
       .author { font-size: 8px; margin-bottom: 4px; }
       .rating { font-size: 9px; margin-bottom: 4px; letter-spacing: 0; }
@@ -134,6 +178,7 @@
       .sort-options { flex-wrap: wrap; }
       .gacha-btn { font-size: 14px; padding: 12px 30px;}
       .persona-select { width: 100%; margin-bottom: 5px;}
+      .floating-btn { bottom: 15px; right: 15px; padding: 12px 18px; font-size: 13px; }
     }
 
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
@@ -145,7 +190,7 @@
 
 <div id="loading">
   <div class="spinner"></div>
-  <p style="margin-top: 15px; color: #555; font-size: 14px;">本棚を整頓中...</p>
+  <p style="margin-top: 15px; color: #555; font-size: 14px; font-weight:bold;">本棚を整頓中...</p>
 </div>
 
 <div id="gachaModal" class="gacha-overlay">
@@ -186,7 +231,6 @@
   </div>
 </div>
 
-<!-- 🔴追加：読書カルテ診断用のモーダル -->
 <div id="diagnoseModal" class="modal-overlay">
   <div class="modal-content">
     <h3>🩺 あなたの読書カルテ診断</h3>
@@ -201,12 +245,21 @@
   </div>
 </div>
 
+<!-- 🔴演出1：ヘッダーの背景動画 -->
 <div class="header">
-  <div class="admin-tools">
-    <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
+  <!-- 無料のオシャレな「コーヒーと本」の動画を流しています。srcを変えれば好きな動画にできます -->
+  <video autoplay loop muted playsinline class="header-video">
+    <source src="https://cdn.pixabay.com/video/2021/08/04/83864-584724080_large.mp4" type="video/mp4">
+  </video>
+  <div class="header-overlay"></div> <!-- 動画の上の暗いフィルター -->
+  
+  <div class="header-content">
+    <div class="admin-tools">
+      <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
+    </div>
+    <h1>AI Book Shelf</h1>
+    <p>あなたの気分に合わせた一冊を、私の本棚から探します</p>
   </div>
-  <h1>AI Book Shelf</h1>
-  <p>あなたの気分に合わせた一冊を、私の本棚から探します</p>
 </div>
 
 <div class="container">
@@ -216,14 +269,12 @@
   </div>
 
   <div class="ai-section">
-    <!-- 🔴追加：カルテ診断ボタンをヘッダーに配置 -->
     <div class="ai-header">
       <strong>🤖 AIに本を相談する</strong>
       <button class="diagnose-btn" onclick="openDiagnoseModal()">🩺 あなたの読書カルテを作る</button>
     </div>
     
     <div class="ai-input-group">
-      <!-- 🔴追加：AIのキャラ選択ドロップダウン -->
       <select id="aiPersona" class="persona-select">
         <option value="normal">👓 丁寧な司書さん</option>
         <option value="hot">🔥 熱血カリスマ書店員</option>
@@ -299,11 +350,32 @@
       ];
 
       document.getElementById("loading").style.display = "none";
+      
+      // 🔴演出2：初期読み込み後にスクロール監視をスタート
+      observeCards();
     } catch (e) {
       console.error("読み込みエラー:", e);
       alert("データの取得に失敗しました。GASの公開設定を確認してください。");
     }
   };
+
+  // 🔴演出2：スクロール連動アニメーションの監視機能
+  function observeCards() {
+    const cards = document.querySelectorAll('.card:not(.show), .reader-card:not(.show)');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // 画面に入ったら少し遅れてフワッと表示
+          setTimeout(() => {
+            entry.target.classList.add('show');
+          }, 50); 
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    cards.forEach(card => observer.observe(card));
+  }
 
   function playGacha() {
     if (gachaPool.length === 0) return alert("まだ本棚に本がありません！");
@@ -432,7 +504,7 @@
         <div class="author">${book.author}</div>
         ${ratingHtml}
         ${tagsHtml}
-        <div style="width: 100%; margin-top: auto;">
+        <div class="button-area">
           <a href="${book.url}" target="_blank" class="button">感想を見る</a>
           <button id="likeBtn-${book.id}" class="${btnClass}" onclick="likeBook('${book.id}', ${book.likes})" ${btnDisabled}>
             ❤️ 読みたい！ (${book.likes})
@@ -442,7 +514,11 @@
     `;
   }
 
-  function renderMainGrid(books) { document.getElementById("grid").innerHTML = books.map((book, index) => generateCardHTML(book, index)).join(""); }
+  function renderMainGrid(books) { 
+    document.getElementById("grid").innerHTML = books.map((book, index) => generateCardHTML(book, index)).join(""); 
+    // 描画した後にアニメーションを付与
+    setTimeout(observeCards, 100);
+  }
 
   function renderReaderGrid(books) {
     const grid = document.getElementById("readerGrid");
@@ -469,6 +545,8 @@
         </div>
       </div>
     `}).join("");
+    // 描画した後にアニメーションを付与
+    setTimeout(observeCards, 100);
   }
 
   function likeBook(pageId, currentLikes) {
@@ -481,13 +559,11 @@
 
   function setAiPrompt(promptText) { document.getElementById("aiQuery").value = promptText; document.getElementById("aiBtn").click(); }
 
-  // 🔴修正：AI相談時に選ばれたキャラ（persona）も送信する
   document.getElementById("aiBtn").onclick = async () => {
     const query = document.getElementById("aiQuery").value;
     if (!query) return;
 
-    const persona = document.getElementById("aiPersona").value; // キャラクター取得
-
+    const persona = document.getElementById("aiPersona").value; 
     const btn = document.getElementById("aiBtn");
     const resultArea = document.getElementById("aiResultArea");
     const aiText = document.getElementById("aiText");
@@ -503,7 +579,10 @@
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ message: query, persona: persona }) });
       const data = await res.json();
       aiText.innerHTML = data.result.replace(/\n/g, "<br>");
-      if (data.recommendedBooks && data.recommendedBooks.length > 0) aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book, -1)).join("");
+      if (data.recommendedBooks && data.recommendedBooks.length > 0) {
+        aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book, -1)).join("");
+        setTimeout(observeCards, 100); // AIが生成したカードにもアニメーションを付与
+      }
       resetBtn.style.display = "inline-block";
     } catch (e) { aiText.innerHTML = "エラーが起きました。もう一度試してください。"; } 
     finally { btn.disabled = false; btn.textContent = "相談する"; }
@@ -553,7 +632,6 @@
     finally { btn.textContent = "管理人に送る"; btn.disabled = false; }
   }
 
-  // 🔴追加：読書カルテ診断機能のロジック
   function openDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "flex"; }
   function closeDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "none"; }
 
@@ -564,7 +642,6 @@
     const btn = document.getElementById("diagnoseSubmitBtn");
     btn.textContent = "分析中..."; btn.disabled = true;
 
-    // 診断結果は通常のAI相談エリアに表示するため、表示を切り替える
     closeDiagnoseModal();
     const resultArea = document.getElementById("aiResultArea");
     const aiText = document.getElementById("aiText");
@@ -577,20 +654,20 @@
     resetBtn.style.display = "none";
 
     try {
-      // action: "diagnose" で特別な分析リクエストを送る
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "diagnose", message: input }) });
       const data = await res.json();
       
       aiText.innerHTML = "<h4 style='margin-top:0; color:#00796b;'>🩺 あなたの読書カルテ</h4>" + data.result.replace(/\n/g, "<br>");
       if (data.recommendedBooks && data.recommendedBooks.length > 0) {
         aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book, -1)).join("");
+        setTimeout(observeCards, 100);
       }
       resetBtn.style.display = "inline-block";
     } catch (e) {
       aiText.innerHTML = "エラーが起きました。もう一度試してください。";
     } finally {
       btn.textContent = "分析する"; btn.disabled = false;
-      document.getElementById("diagnoseInput").value = ""; // 入力欄をリセット
+      document.getElementById("diagnoseInput").value = ""; 
     }
   }
 
