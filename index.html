@@ -116,15 +116,41 @@
     .card-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 15px; z-index: 20;}
     .card-tag { font-size: 10px; background: #f0f0f0; padding: 3px 8px; border-radius: 10px; color: #666; }
     
-    /* 🔴ボタンエリア・アクションボタン */
+    /* ボタンエリア・アクションボタン（テキスト付きアップデート） */
     .button-area { width: 100%; margin-top: auto; z-index: 20; display: flex; flex-direction: column; gap: 8px;}
-    .button { display: block; padding: 8px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 11px; transition: 0.2s; white-space: nowrap; width: 100%; box-sizing: border-box; font-weight: bold; text-align: center;}
-    .action-row { display: flex; gap: 5px; width: 100%; }
-    .action-row button { flex: 1; padding: 8px 5px; border-radius: 15px; font-size: 10px; border: 1px solid #ddd; background: white; cursor: pointer; font-family: 'Zen Maru Gothic'; font-weight: bold; transition: 0.2s;}
+    .button { display: block; padding: 10px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 11px; transition: 0.2s; white-space: nowrap; width: 100%; box-sizing: border-box; font-weight: bold; text-align: center; letter-spacing: 1px;}
     
-    .like-btn.liked { background: #ff4757; color: white; border-color: #ff4757; }
-    .read-btn.read { background: #4ca1af; color: white; border-color: #4ca1af; }
-    .save-btn.saved { background: #d35400; color: white; border-color: #d35400; }
+    .action-row { display: flex; gap: 6px; width: 100%; }
+    .action-row button { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 2px; 
+      border-radius: 12px; 
+      font-size: 9px; 
+      border: 1px solid #eee; 
+      background: #fdfdfd; 
+      cursor: pointer; 
+      font-family: 'Zen Maru Gothic'; 
+      font-weight: bold; 
+      transition: all 0.2s ease;
+      color: #666;
+    }
+    .action-row button span { font-size: 14px; margin-bottom: 1px; }
+
+    .like-btn.liked { background: #fff1f2; color: #ff4757; border-color: #ff4757; }
+    .read-btn.read { background: #f0f9fa; color: #4ca1af; border-color: #4ca1af; }
+    .save-btn.saved { background: #fff7ed; color: #d35400; border-color: #d35400; }
+
+    @media (min-width: 768px) {
+      .action-row button:hover { background: #f5f5f5; transform: translateY(-2px); }
+      .like-btn:hover { border-color: #ff4757; color: #ff4757; }
+      .read-btn:hover { border-color: #4ca1af; color: #4ca1af; }
+      .save-btn:hover { border-color: #d35400; color: #d35400; }
+    }
 
     /* 管理人プロフィール */
     .admin-profile-section { margin-top: 60px; margin-bottom: 20px; padding: 0 10px; }
@@ -163,12 +189,13 @@
     @media (max-width: 767px) {
       .header { padding: 50px 20px 60px; }
       .header h1 { font-size: 28px; padding-top: 15px; }
-      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      .card { padding: 10px 5px; }
-      .cover { width: 100%; max-width: 70px; height: auto; aspect-ratio: 2/3; margin-bottom: 8px;}
-      .title { font-size: 9px; line-height: 1.2; margin-bottom: 3px;}
-      .author, .rating, .card-tags { display: none; } /* スマホでは情報を絞る */
-      .button, .action-row button { font-size: 8px; padding: 5px 2px; border-radius: 10px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .card { padding: 12px 8px; }
+      .cover { width: 100%; max-width: 80px; height: auto; aspect-ratio: 2/3; margin-bottom: 8px;}
+      .title { font-size: 11px; line-height: 1.3; }
+      .author, .rating, .card-tags { display: none; }
+      .action-row button { font-size: 8px; padding: 5px 2px; border-radius: 10px; }
+      .action-row button span { font-size: 12px; }
       .admin-profile-card { flex-direction: column; text-align: center; padding: 20px; }
       .admin-info { text-align: center; }
       .admin-name { justify-content: center; }
@@ -327,12 +354,10 @@
 <button class="floating-btn" onclick="openModal()">💡 おすすめ本を教える</button>
 
 <script>
-  // 🔴 ここをご自身のGASのWebアプリURLに書き換えてください
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let allData = [], readerData = [], gachaPool = [], activeTags = [], currentSortMode = 'new', isMyShelfMode = false;
 
-  // LocalStorage
   let likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
   let readBooks = JSON.parse(localStorage.getItem('readBooks')) || [];
   let savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
@@ -360,7 +385,6 @@
     }
   };
 
-  // 🔴空気感（Trend）取得
   async function fetchMood() {
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getMood" }) });
@@ -371,7 +395,6 @@
     }
   }
 
-  // 🔴あとで読む（マイ本棚）切り替え
   function toggleMyShelf() {
     isMyShelfMode = !isMyShelfMode;
     document.getElementById("myShelfBtn").classList.toggle("active");
@@ -381,7 +404,6 @@
   function renderAll() {
     const searchText = document.getElementById("searchBar").value.toLowerCase();
     
-    // メイン本棚のフィルタリング
     let filtered = allData.filter(book => {
       const matchText = (book.title + book.author).toLowerCase().includes(searchText);
       const matchTags = activeTags.every(t => book.tags.includes(t));
@@ -394,14 +416,12 @@
 
     document.getElementById("grid").innerHTML = filtered.map((book, i) => generateCardHTML(book, i)).join("");
     
-    // 読者コーナー
     const sortedReader = [...readerData].sort((a,b) => b.likes - a.likes);
     document.getElementById("readerGrid").innerHTML = sortedReader.map((book, i) => generateReaderCardHTML(book, i)).join("");
     
     setTimeout(observeCards, 100);
   }
 
-  // カード生成（メイン）
   function generateCardHTML(book, index) {
     const isLiked = likedBooks.includes(book.id), isRead = readBooks.includes(book.id), isSaved = savedBooks.includes(book.id);
     const now = new Date();
@@ -430,15 +450,20 @@
         <div class="button-area">
           <a href="${book.url}" target="_blank" class="button">感想を見る</a>
           <div class="action-row">
-            <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">❤️ ${book.likes}</button>
-            <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">✅ ${book.reads || 0}</button>
-            <button onclick="toggleSave('${book.id}')" class="save-btn ${isSaved?'saved':''}">🔖</button>
+            <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">
+              <span>❤️</span>${book.likes}<br>いいね
+            </button>
+            <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">
+              <span>✅</span>${book.reads || 0}<br>読了
+            </button>
+            <button onclick="toggleSave('${book.id}')" class="save-btn ${isSaved?'saved':''}">
+              <span>🔖</span><br>${isSaved?'保存中':'保存'}
+            </button>
           </div>
         </div>
       </div>`;
   }
 
-  // カード生成（読者）
   function generateReaderCardHTML(book, index) {
     const isLiked = likedBooks.includes(book.id), isRead = readBooks.includes(book.id);
     let badgeHtml = index <= 2 && book.likes > 0 ? `<div class="rank-badge rank-${index+1}">${index+1}位</div>` : "";
@@ -450,13 +475,16 @@
         <div class="reader-book-title">📖 ${book.title}</div>
         <div class="reader-book-author">✍️ ${book.author}</div>
         <div class="action-row" style="margin-top:15px;">
-          <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">❤️ ${book.likes}</button>
-          <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">✅ ${book.reads || 0}</button>
+          <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isLiked?'liked':''}">
+            <span>❤️</span>${book.likes}<br>いいね
+          </button>
+          <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isRead?'read':''}">
+            <span>✅</span>${book.reads || 0}<br>読了
+          </button>
         </div>
       </div>`;
   }
 
-  // 🔴いいね・読了アクション
   async function handleAction(pageId, action) {
     const list = action === 'likeBook' ? likedBooks : readBooks;
     if (list.includes(pageId)) return;
@@ -464,18 +492,14 @@
     list.push(pageId);
     localStorage.setItem(action === 'likeBook' ? 'likedBooks' : 'readBooks', JSON.stringify(list));
     
-    if (action === 'readBook') spawnConfetti(); // 桜吹雪
-    
-    // UIを即時反映（簡易）
+    if (action === 'readBook') spawnConfetti();
     renderAll();
 
-    // 背景でGASへ送信
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: action, pageId: pageId }) })
     .then(() => { console.log("Success"); })
     .catch(e => console.error(e));
   }
 
-  // 🔴あとで読む（保存）
   function toggleSave(id) {
     if (savedBooks.includes(id)) savedBooks = savedBooks.filter(i => i !== id);
     else savedBooks.push(id);
@@ -483,7 +507,6 @@
     renderAll();
   }
 
-  // 桜吹雪エフェクト
   function spawnConfetti() {
     for (let i = 0; i < 40; i++) {
       const c = document.createElement('div');
@@ -498,7 +521,6 @@
     }
   }
 
-  // スクロール連動
   function observeCards() {
     const cards = document.querySelectorAll('.card:not(.show), .reader-card:not(.show)');
     const observer = new IntersectionObserver((entries) => {
@@ -512,7 +534,6 @@
     cards.forEach(c => observer.observe(c));
   }
 
-  // AI相談
   document.getElementById("aiBtn").onclick = async () => {
     const query = document.getElementById("aiQuery").value;
     if (!query) return;
@@ -529,7 +550,6 @@
       const data = await res.json();
       aiText.innerHTML = data.result.replace(/\n/g, "<br>");
       if (data.recommendedBooks) {
-        // 画像URLの鮮度を保つために最新データと照合
         const fresh = [...allData, ...readerData];
         const updated = data.recommendedBooks.map(aib => fresh.find(f => f.id === aib.id) || aib);
         aiGrid.innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
@@ -540,7 +560,6 @@
     finally { btn.disabled = false; btn.textContent = "相談する"; }
   };
 
-  // 読書カルテ診断
   async function runDiagnose() {
     const input = document.getElementById("diagnoseInput").value.trim();
     if (!input) return alert("入力してください");
@@ -562,7 +581,6 @@
     } catch (e) { aiText.innerHTML = "分析に失敗しました。"; }
   }
 
-  // ガチャ
   function playGacha() {
     if (gachaPool.length === 0) return;
     const modal = document.getElementById('gachaModal'), slotImg = document.getElementById('gachaSlotImg'),
@@ -593,7 +611,6 @@
     }, 100);
   }
 
-  // ヘルパー関数
   function changeSortMode(m) {
     currentSortMode = m;
     document.getElementById("sortNewBtn").classList.toggle("active", m === 'new');
@@ -625,7 +642,6 @@
   function closeDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "none"; }
   function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
 
-  // 送信・DB更新
   async function submitBook() {
     const title = document.getElementById("submitTitle").value.trim(), reason = document.getElementById("submitReason").value.trim(),
           author = document.getElementById("submitAuthor").value.trim(), btn = document.getElementById("submitConfirmBtn");
