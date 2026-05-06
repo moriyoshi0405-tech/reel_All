@@ -31,7 +31,6 @@
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
     .reset-btn:hover { background: #f0f0f0; }
 
-    /* 🔴追加：ワンタップボタンのデザイン */
     .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
     .prompt-btn { font-size: 12px; padding: 8px 14px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; white-space: nowrap; font-family: 'Zen Maru Gothic', sans-serif;}
     .prompt-btn:hover { background: #e6f4ea; transform: translateY(-1px); }
@@ -56,6 +55,23 @@
     .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap;}
     .button:hover { background: #555; }
 
+    /* 🔴追加：フローティングボタン（画面右下に固定） */
+    .floating-btn { position: fixed; bottom: 20px; right: 20px; background: #ff8c00; color: white; padding: 12px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3); cursor: pointer; transition: 0.3s; z-index: 100; border: none; font-family: 'Zen Maru Gothic', sans-serif;}
+    .floating-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4); }
+
+    /* 🔴追加：投稿フォーム（モーダル） */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-content h3 { margin-top: 0; margin-bottom: 15px; color: #2f3e2f; text-align: center;}
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #555;}
+    .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: 'Zen Maru Gothic', sans-serif; font-size: 14px;}
+    .form-group textarea { height: 80px; resize: none; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;}
+    .cancel-btn { background: #eee; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+    .submit-btn { background: #2f3e2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+    .submit-btn:disabled { background: #ccc; }
+
     @media (max-width: 767px) {
       .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
       .card { padding: 10px 5px; border-radius: 8px;}
@@ -67,12 +83,10 @@
       .card-tag { font-size: 7px; padding: 2px 4px; }
       .button { font-size: 9px; padding: 5px 6px; border-radius: 12px; width: 85%; box-sizing: border-box; }
       .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
-      
-      /* スマホ時のボタンサイズ微調整 */
       .prompt-btn { font-size: 11px; padding: 6px 12px; }
     }
 
-    #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+    #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
     .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2f3e2f; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
@@ -82,6 +96,32 @@
 <div id="loading">
   <div class="spinner"></div>
   <p style="margin-top: 15px; color: #555; font-size: 14px;">本棚を整頓中...</p>
+</div>
+
+<!-- 🔴追加：フローティングボタン -->
+<button class="floating-btn" onclick="openModal()">💡 おすすめ本を教える</button>
+
+<!-- 🔴追加：投稿フォームのモーダルウィンドウ -->
+<div id="submitModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>あなたのおすすめ本を教えてください</h3>
+    <div class="form-group">
+      <label>書籍名（必須）</label>
+      <input type="text" id="submitTitle" placeholder="例：星の王子さま">
+    </div>
+    <div class="form-group">
+      <label>著者（任意）</label>
+      <input type="text" id="submitAuthor" placeholder="例：サン＝テグジュペリ">
+    </div>
+    <div class="form-group">
+      <label>おすすめな理由・感想（必須）</label>
+      <textarea id="submitReason" placeholder="例：読むたびに新しい発見があります。疲れた時におすすめです！"></textarea>
+    </div>
+    <div class="modal-buttons">
+      <button class="cancel-btn" onclick="closeModal()">キャンセル</button>
+      <button id="submitConfirmBtn" class="submit-btn" onclick="submitBook()">管理人に送る</button>
+    </div>
+  </div>
 </div>
 
 <div class="header">
@@ -103,7 +143,6 @@
       <button id="resetBtn" class="reset-btn">リセット</button>
     </div>
     
-    <!-- 🔴追加：ワンタップで相談できるサジェストボタン -->
     <div class="prompt-suggestions">
       <button class="prompt-btn" onclick="setAiPrompt('☕ 休日にのんびり読めるエッセイ')">☕ 休日にのんびり</button>
       <button class="prompt-btn" onclick="setAiPrompt('😭 思いっきり泣ける切ない恋愛小説')">😭 思いっきり泣きたい</button>
@@ -138,12 +177,9 @@
       const res = await fetch(API_URL);
       const data = await res.json();
       allData = data.books;
-      
       allData.sort((a, b) => new Date(b.updated) - new Date(a.updated));
-      
       generateFilterTags(allData);
       renderMainGrid(allData);
-      
       document.getElementById("loading").style.display = "none";
     } catch (e) {
       console.error("読み込みエラー:", e);
@@ -154,21 +190,15 @@
   function generateFilterTags(books) {
     const container = document.getElementById("tagsContainer");
     const uniqueTags = new Set();
-    
     books.forEach(book => book.tags.forEach(tag => uniqueTags.add(tag)));
-    
     uniqueTags.forEach(tag => {
       const btn = document.createElement("button");
       btn.className = "filter-tag";
       btn.textContent = tag;
-      
       btn.onclick = () => {
         btn.classList.toggle("active"); 
-        if (activeTags.includes(tag)) {
-          activeTags = activeTags.filter(t => t !== tag);
-        } else {
-          activeTags.push(tag);
-        }
+        if (activeTags.includes(tag)) activeTags = activeTags.filter(t => t !== tag);
+        else activeTags.push(tag);
         filterBooks(); 
       };
       container.appendChild(btn);
@@ -179,20 +209,17 @@
 
   function filterBooks() {
     const searchText = document.getElementById("searchBar").value.toLowerCase();
-    
     const filtered = allData.filter(book => {
       const matchText = (book.title + book.author).toLowerCase().includes(searchText);
       const matchTags = activeTags.every(activeTag => book.tags.includes(activeTag));
       return matchText && matchTags;
     });
-
     renderMainGrid(filtered);
   }
 
   function generateCardHTML(book) {
     const now = new Date();
-    const updatedDate = new Date(book.updated);
-    const diffDays = (now - updatedDate) / (1000 * 60 * 60 * 24); 
+    const diffDays = (now - new Date(book.updated)) / (1000 * 60 * 60 * 24); 
     const newBadgeHtml = diffDays <= 7 ? `<div class="new-badge">New!</div>` : '';
 
     let ratingDisplay = book.rating;
@@ -202,9 +229,7 @@
     }
     const ratingHtml = ratingDisplay ? `<div class="rating">${ratingDisplay}</div>` : '';
 
-    const tagsHtml = `<div class="card-tags">` + 
-      book.tags.map(t => `<span class="card-tag">${t}</span>`).join("") + 
-    `</div>`;
+    const tagsHtml = `<div class="card-tags">${book.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}</div>`;
 
     return `
       <div class="card">
@@ -220,15 +245,11 @@
   }
 
   function renderMainGrid(books) {
-    const grid = document.getElementById("grid");
-    grid.innerHTML = books.map(book => generateCardHTML(book)).join("");
+    document.getElementById("grid").innerHTML = books.map(book => generateCardHTML(book)).join("");
   }
 
-  // 🔴追加：ワンタップボタンが押されたときの処理
   function setAiPrompt(promptText) {
-    // ①入力欄にテキストをセット
     document.getElementById("aiQuery").value = promptText;
-    // ②「相談する」ボタンを自動でクリックさせる
     document.getElementById("aiBtn").click();
   }
 
@@ -244,27 +265,19 @@
 
     btn.disabled = true;
     btn.textContent = "考え中...";
-    
     resultArea.style.display = "block";
     aiText.innerHTML = "本棚から探しています。少々お待ちください...";
     aiBooksGrid.innerHTML = "";
     resetBtn.style.display = "none";
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ message: query })
-      });
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ message: query }) });
       const data = await res.json();
-      
       aiText.innerHTML = data.result.replace(/\n/g, "<br>");
-      
       if (data.recommendedBooks && data.recommendedBooks.length > 0) {
         aiBooksGrid.innerHTML = data.recommendedBooks.map(book => generateCardHTML(book)).join("");
       }
-
       resetBtn.style.display = "inline-block";
-
     } catch (e) {
       aiText.innerHTML = "エラーが起きました。もう一度試してください。";
     } finally {
@@ -288,12 +301,8 @@
     btn.disabled = true;
 
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "updateDB", password: pass })
-      });
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: pass }) });
       const data = await res.json();
-      
       if (data.status === "success") {
         alert("AIが新しい本を覚えました！\nページをリロードして反映します。");
         location.reload(); 
@@ -307,6 +316,52 @@
       btn.disabled = false;
     }
   };
+
+  // 🔴追加：モーダルの開閉・送信処理
+  function openModal() { document.getElementById("submitModal").style.display = "flex"; }
+  function closeModal() { document.getElementById("submitModal").style.display = "none"; }
+
+  async function submitBook() {
+    const title = document.getElementById("submitTitle").value.trim();
+    const author = document.getElementById("submitAuthor").value.trim();
+    const reason = document.getElementById("submitReason").value.trim();
+
+    if (!title || !reason) {
+      alert("「書籍名」と「おすすめな理由」は必須です！");
+      return;
+    }
+
+    const btn = document.getElementById("submitConfirmBtn");
+    btn.textContent = "送信中...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ 
+          action: "submitBook", 
+          data: { title: title, author: author, reason: reason } 
+        })
+      });
+      const data = await res.json();
+      
+      if (data.status === "success") {
+        alert("おすすめ本を送信しました！ありがとうございます。");
+        closeModal();
+        // フォームを空にする
+        document.getElementById("submitTitle").value = "";
+        document.getElementById("submitAuthor").value = "";
+        document.getElementById("submitReason").value = "";
+      } else {
+        alert("エラーが発生しました: " + data.message);
+      }
+    } catch (e) {
+      alert("通信エラーが発生しました。");
+    } finally {
+      btn.textContent = "管理人に送る";
+      btn.disabled = false;
+    }
+  }
 
 </script>
 </body>
