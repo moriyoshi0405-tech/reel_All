@@ -6,36 +6,36 @@
   <title>AI Book Shelf</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* 全体設定 */
     body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; }
-    .header { text-align: center; padding: 60px 20px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); }
+    
+    /* ヘッダー周り */
+    .header { text-align: center; padding: 40px 20px 60px; background: linear-gradient(180deg, #e6f4ea 0%, #ffffff 100%); position: relative;}
+    
+    /* 🔴追加：DB更新ボタン（右上に配置） */
+    .admin-tools { position: absolute; top: 15px; right: 15px; }
+    .update-db-btn { font-size: 11px; padding: 6px 12px; background: rgba(255, 255, 255, 0.7); border: 1px solid #ddd; border-radius: 6px; cursor: pointer; color: #555; transition: 0.2s;}
+    .update-db-btn:hover { background: #fff; border-color: #aaa;}
+    
     .container { max-width: 900px; margin: auto; padding: 20px; }
     
-    /* 検索・タグフィルター */
     .filter-section { margin-bottom: 25px; }
     .search-bar { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; font-family: 'Zen Maru Gothic', sans-serif;}
     .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .filter-tag { padding: 6px 14px; border-radius: 20px; background: #eee; font-size: 12px; cursor: pointer; border: none; transition: 0.2s; color: #555;}
     .filter-tag.active { background: #2f3e2f; color: white; }
 
-    /* AIセクション */
     .ai-section { background: #fff; border: 2px solid #e6f4ea; padding: 20px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .ai-input-group { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;}
     input[type="text"] { flex: 1; min-width: 200px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Zen Maru Gothic', sans-serif;}
     .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap;}
     .ai-btn:disabled { background: #ccc; }
     
-    /* リセットボタン */
     .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; display: none;}
     .reset-btn:hover { background: #f0f0f0; }
 
-    /* AIの回答表示エリア */
     #aiResultArea { display: none; margin-top: 20px; }
     .ai-text { line-height: 1.6; font-size: 14px; color: #444; border-left: 4px solid #e6f4ea; padding-left: 15px; margin-bottom: 20px;}
     
-    /* =========================================
-       グリッドとカード（PC・タブレット用基本設定）
-       ========================================= */
     .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
     .card { background: white; border-radius: 12px; padding: 20px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center;}
     
@@ -53,29 +53,10 @@
     .button { display: inline-block; padding: 8px 18px; background: #333; color: #fff; text-decoration: none; border-radius: 20px; font-size: 12px; margin-top: auto; transition: 0.2s; white-space: nowrap;}
     .button:hover { background: #555; }
 
-    /* =========================================
-       📱 スマホ用レスポンシブ設定（ここを追加）
-       ========================================= */
     @media (max-width: 767px) {
-      .grid { 
-        /* 強制的に3列にし、隙間を狭くする */
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px; 
-      }
-      .card { 
-        /* カード内の余白を減らす */
-        padding: 10px 5px; 
-        border-radius: 8px;
-      }
-      .cover { 
-        /* 画像をカード幅に合わせて自動縮小 */
-        width: 100%; 
-        max-width: 70px; /* 大きくなりすぎないよう制限 */
-        height: auto;
-        aspect-ratio: 2 / 3; /* 本の縦横比をキープ */
-        margin-bottom: 8px;
-      }
-      /* 文字やボタンのサイズをスマホの3列に合わせて極小化 */
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .card { padding: 10px 5px; border-radius: 8px;}
+      .cover { width: 100%; max-width: 70px; height: auto; aspect-ratio: 2 / 3; margin-bottom: 8px;}
       .title { font-size: 10px; margin-bottom: 2px; }
       .author { font-size: 8px; margin-bottom: 4px; }
       .rating { font-size: 9px; margin-bottom: 4px; letter-spacing: 0; }
@@ -85,7 +66,6 @@
       .new-badge { font-size: 8px; padding: 2px 5px; top: -4px; left: -4px; }
     }
 
-    /* ローディング */
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
     .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2f3e2f; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -99,13 +79,17 @@
 </div>
 
 <div class="header">
+  <!-- 🔴追加：管理者用のDB更新ボタン -->
+  <div class="admin-tools">
+    <button id="updateDbBtn" class="update-db-btn">🔄 AIに本を覚えさせる</button>
+  </div>
+  
   <h1>AI Book Shelf</h1>
   <p>あなたの気分に合わせた一冊を、私の本棚から探します</p>
 </div>
 
 <div class="container">
 
-  <!-- AI相談窓口 -->
   <div class="ai-section">
     <strong>🤖 AIに本を相談する</strong>
     <div class="ai-input-group">
@@ -114,20 +98,17 @@
       <button id="resetBtn" class="reset-btn">リセット</button>
     </div>
     
-    <!-- AIの回答とおすすめ本の表示エリア -->
     <div id="aiResultArea">
       <div id="aiText" class="ai-text"></div>
       <div id="aiBooksGrid" class="grid"></div>
     </div>
   </div>
 
-  <!-- 検索とタグフィルター -->
   <div class="filter-section">
     <input type="text" id="searchBar" class="search-bar" placeholder="本のタイトルや著者名で検索...">
     <div id="tagsContainer" class="tags-container"></div>
   </div>
 
-  <!-- 本棚表示 -->
   <div id="grid" class="grid"></div>
 </div>
 
@@ -274,6 +255,36 @@
     document.getElementById("aiQuery").value = ""; 
     document.getElementById("aiResultArea").style.display = "none"; 
     document.getElementById("resetBtn").style.display = "none"; 
+  };
+
+  // 🔴追加：DB更新ボタンの処理
+  document.getElementById("updateDbBtn").onclick = async () => {
+    const pass = prompt("新しい本をAIに覚えさせるための「合言葉」を入力してください。");
+    if (!pass) return; // キャンセルした場合は何もしない
+
+    const btn = document.getElementById("updateDbBtn");
+    btn.textContent = "処理中（1〜2分かかります）...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "updateDB", password: pass })
+      });
+      const data = await res.json();
+      
+      if (data.status === "success") {
+        alert("AIが新しい本を覚えました！\nページをリロードして反映します。");
+        location.reload(); // 成功したら画面をリロード
+      } else {
+        alert("エラー: " + data.message);
+      }
+    } catch (e) {
+      alert("通信エラーが発生しました。");
+    } finally {
+      btn.textContent = "🔄 AIに本を覚えさせる";
+      btn.disabled = false;
+    }
   };
 
 </script>
