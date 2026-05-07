@@ -187,7 +187,8 @@
     .reader-card { background: white; border-radius: 30px; padding: 45px 35px; position: relative; transition: 0.4s; opacity: 0; transform: translateY(20px);}
     .reader-card.show { opacity: 1; transform: translateY(0); }
     .reader-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-hard); }
-    .reader-card::before { content: "“"; position: absolute; top: 10px; left: 20px; font-size: 80px; color: #ffe5d4; font-family: serif; }
+    /* ★ 引用符を前面に表示 */
+    .reader-card::before { content: "“"; position: absolute; top: 10px; left: 20px; font-size: 80px; color: #ffe5d4; font-family: serif; z-index: 20; pointer-events: none;}
     .reader-quote { font-size: 16px; background: #fffbf0; padding: 30px; border-radius: 20px; margin-bottom: 30px; line-height: 2; color: #555; z-index: 10; position: relative;}
     .rank-badge { position: absolute; top: -15px; left: -15px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 90; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); background: white; border-radius: 50%;}
 
@@ -683,12 +684,23 @@
   function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
   function resetPrescription() { document.getElementById("worryInput").value = ""; document.getElementById("prescriptionResultArea").style.display = "none"; }
   
+  // ★ カウント即時反映の修正
   async function handleAction(id, a) { 
     const l = a === 'likeBook' ? likedBooks : readBooks; if (l.includes(id)) return; 
     l.push(id); localStorage.setItem(a === 'likeBook' ? 'likedBooks' : 'readBooks', JSON.stringify(l)); 
-    if (a === 'readBook') spawnConfetti(); renderAll(); 
+
+    // ローカルデータのカウントをインクリメント
+    const book = [...allData, ...readerData].find(b => b.id === id);
+    if (book) {
+      if (a === 'likeBook') book.likes++;
+      else if (a === 'readBook') book.reads++;
+    }
+
+    if (a === 'readBook') spawnConfetti(); 
+    renderAll(); 
     fetch(API_URL, { method: "POST", body: JSON.stringify({ action: a, pageId: id }) });
   }
+
   function toggleSave(id) { if (savedBooks.includes(id)) savedBooks = savedBooks.filter(i => i !== id); else savedBooks.push(id); localStorage.setItem('savedBooks', JSON.stringify(savedBooks)); renderAll(); }
   function spawnConfetti() { for (let i = 0; i < 60; i++) { const c = document.createElement('div'); c.style.cssText = `position:fixed; width:10px; height:10px; background:${['#ffc0cb','#ffb6c1','#ff69b4','#fff0f5'][Math.floor(Math.random()*4)]}; left:${Math.random()*100}vw; top:-10px; border-radius:50%; animation: fall ${Math.random()*3+2}s linear forwards; z-index:4000;`; document.body.appendChild(c); setTimeout(() => c.remove(), 5000); } }
   function observeCards() { const o = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('show'), 10); o.unobserve(e.target); } }); }, { threshold: 0.1 }); document.querySelectorAll('.card:not(.show), .reader-card:not(.show)').forEach(c => o.observe(c)); }
