@@ -32,35 +32,57 @@
       animation: twinkle 1.5s infinite alternate; margin-bottom: 20px;
     }
 
+    /* 🌟 イントロダクション（紹介文） */
+    .intro-overlay {
+      position: fixed; inset: 0; background: rgba(9, 10, 15, 0.92);
+      z-index: 5000; display: flex; justify-content: center; align-items: center;
+      backdrop-filter: blur(10px); opacity: 0; animation: fadeInIntro 2s forwards 0.5s;
+    }
+    .intro-content {
+      text-align: center; color: #e2e8f0; max-width: 600px; padding: 40px;
+    }
+    .intro-title {
+      font-size: 24px; font-weight: 700; letter-spacing: 5px; margin-bottom: 30px;
+      color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    }
+    .intro-text {
+      font-size: 15px; line-height: 2.2; margin-bottom: 50px; color: #cbd5e1;
+    }
+    @keyframes fadeInIntro { to { opacity: 1; } }
+    .fade-out { animation: fadeOutIntro 1.5s forwards; pointer-events: none; }
+    @keyframes fadeOutIntro { to { opacity: 0; visibility: hidden; } }
+
     /* ヘッダー */
     .top-nav {
       position: fixed; top: 0; left: 0; width: 100%; padding: 20px;
       background: linear-gradient(to bottom, rgba(9,10,15,0.8), transparent);
       z-index: 100; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; /* 下の星をタップできるようにする */
     }
+    .top-nav > * { pointer-events: auto; } /* ボタン等はタップ可能に */
+    
     .back-btn {
       color: white; text-decoration: none; font-size: 14px; font-weight: 700;
       background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px;
       backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); transition: 0.3s;
     }
-    .back-btn:hover { background: rgba(255,255,255,0.2); }
+    .back-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
     .page-title { margin: 0; font-size: 16px; font-weight: 400; letter-spacing: 3px; color: #94a3b8; }
 
     /* 星空キャンバス */
     #starsContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     
     .star {
-      position: absolute; background: white; border-radius: 50%;
-      box-shadow: 0 0 10px rgba(255,255,255,0.8); cursor: pointer;
-      animation: floatStar 4s infinite alternate ease-in-out;
-      /* タップしやすくするための透明な当たり判定 */
+      position: absolute; border-radius: 50%;
+      cursor: pointer; animation: floatStar 4s infinite alternate ease-in-out;
     }
-    .star::before { content: ""; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px; }
-    .star:hover { transform: scale(1.5); box-shadow: 0 0 20px var(--accent); }
+    /* タップしやすくするための透明な当たり判定 */
+    .star::before { content: ""; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px; }
+    .star:hover { transform: scale(1.5) !important; box-shadow: 0 0 30px var(--accent) !important; z-index: 50;}
 
     @keyframes floatStar {
       0% { transform: translateY(0px); opacity: 0.7; }
-      100% { transform: translateY(-10px); opacity: 1; }
+      100% { transform: translateY(-15px); opacity: 1; }
     }
     @keyframes twinkle {
       0% { opacity: 0.3; transform: scale(0.8); }
@@ -110,6 +132,9 @@
     .btn-close:hover { background: rgba(255,255,255,0.1); color: white; }
 
     @media (max-width: 767px) {
+      .intro-content { padding: 20px; }
+      .intro-title { font-size: 20px; }
+      .intro-text { font-size: 14px; }
       .phrase-display { font-size: 18px; }
       .modal-content { padding: 30px 20px; }
       .ai-intro-box { font-size: 13px; padding: 15px; }
@@ -119,19 +144,37 @@
 </head>
 <body>
 
+<!-- ローディング -->
 <div id="loading">
   <div class="loading-star"></div>
   <p style="font-weight:700; letter-spacing:3px; color:#cbd5e1; font-size:14px;">本棚の奥から、言葉の星を抽出しています...</p>
 </div>
 
+<!-- 🌟 イントロダクション（紹介文） -->
+<div id="introModal" class="intro-overlay" style="display: none;">
+  <div class="intro-content">
+    <div class="intro-title">言葉のプラネタリウム</div>
+    <div class="intro-text">
+      ようこそ、名言が瞬く夜空へ。<br><br>
+      ここは、あらすじや表紙といった「先入観」を捨てて、<br>
+      心に響く一行だけで、未知の物語と出会う場所です。<br><br>
+      気になる星を見つけたら、そっと触れてみてください。<br>
+      そこに眠る美しい言葉が、<br>あなたを新しい世界へと導いてくれるはずです。
+    </div>
+    <button class="btn btn-primary" onclick="closeIntro()">星空を見上げる</button>
+  </div>
+</div>
+
+<!-- ヘッダー -->
 <div class="top-nav">
   <a href="index.html" class="back-btn">← 本棚へ戻る</a>
   <h1 class="page-title">言葉のプラネタリウム</h1>
 </div>
 
+<!-- 星空コンテナ -->
 <div id="starsContainer"></div>
 
-<!-- モーダル -->
+<!-- モーダル（観測結果） -->
 <div id="starModal" class="modal-overlay">
   <div class="modal-content">
     <div id="modalPhrase" class="phrase-display"></div>
@@ -153,7 +196,7 @@
 </div>
 
 <script>
-  // メインのGAS WebアプリURLを同じものに設定してください
+  // メインのGAS WebアプリURLを設定してください
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let currentBookData = null;
@@ -182,36 +225,66 @@
         generateStars(starsData);
       }
       
-      // ローディング非表示
+      // ローディング非表示＆イントロダクション表示
       const loader = document.getElementById("loading");
       loader.style.opacity = "0";
-      setTimeout(() => loader.style.display = "none", 1000);
+      setTimeout(() => {
+        loader.style.display = "none";
+        document.getElementById("introModal").style.display = "flex"; // イントロを表示
+      }, 1000);
 
     } catch (e) {
       alert("星空の観測に失敗しました。");
     }
   };
 
+  // 🌟 イントロダクションを閉じる関数
+  function closeIntro() {
+    const intro = document.getElementById('introModal');
+    intro.classList.add('fade-out');
+    setTimeout(() => {
+      intro.style.display = 'none';
+    }, 1500); // アニメーション終了後に完全に非表示
+  }
+
+  // 🌟 星をランダムに配置する関数
   function generateStars(starsData) {
     const container = document.getElementById("starsContainer");
-    const containerHeight = document.body.scrollHeight; // スクロール領域全体
+    
+    // 広大な宇宙空間を仮想的に設定（縦は最低2000px以上を確保）
+    const containerHeight = Math.max(window.innerHeight * 2.5, 2500); 
     const containerWidth = document.body.clientWidth;
+    
+    // スクロール領域をCSSで強制的に拡張
+    document.body.style.minHeight = `${containerHeight}px`;
+
+    // 星の色バリエーション（本物の星空に近づけるため、白・微青・微黄を混ぜる）
+    const starColors = ["#ffffff", "#e0f2fe", "#fef9c3", "#ffffff", "#ffffff"];
 
     starsData.forEach(data => {
       const star = document.createElement("div");
       star.className = "star";
       
-      // ランダムな配置とサイズ
-      const top = Math.random() * (containerHeight - 100) + 50; // 上下少し余白
-      const left = Math.random() * (containerWidth - 50) + 20;
-      const size = Math.random() * 4 + 2; // 2px ~ 6px
+      // ランダムな配置
+      const top = Math.random() * (containerHeight - 150) + 80; // 上下少し余白
+      const left = Math.random() * (containerWidth - 60) + 30;
+      
+      // 星のサイズと色、光の強さをランダム化
+      const size = Math.random() * 4 + 2.5; // 2.5px ~ 6.5px
+      const color = starColors[Math.floor(Math.random() * starColors.length)];
+      const glow = Math.random() * 10 + 5;
       
       star.style.top = `${top}px`;
       star.style.left = `${left}px`;
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
+      star.style.backgroundColor = color;
+      star.style.boxShadow = `0 0 ${glow}px ${color}`;
+      
+      // 揺らぎのアニメーション開始タイミングをズラす
       star.style.animationDelay = `${Math.random() * 5}s`;
 
+      // クリックイベント
       star.onclick = () => openStarModal(data.book, data.phrase);
       container.appendChild(star);
     });
