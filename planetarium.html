@@ -97,10 +97,19 @@
     }
     .modal-content {
       background: rgba(255, 255, 255, 0.05); padding: 50px 40px; border-radius: 30px;
-      width: 100%; max-width: 600px; border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%; max-width: 600px; 
+      /* ★修正：縦スクロールを可能にする */
+      max-height: 85vh; overflow-y: auto; box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 30px 60px rgba(0,0,0,0.5); text-align: center;
       animation: popModal 0.6s cubic-bezier(0.19, 1, 0.22, 1);
     }
+    
+    /* ★追加：スクロールバーのデザインを世界観に合わせてカスタマイズ */
+    .modal-content::-webkit-scrollbar { width: 6px; }
+    .modal-content::-webkit-scrollbar-track { background: transparent; }
+    .modal-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
     @keyframes popModal { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     .phrase-display {
@@ -302,6 +311,9 @@
     document.getElementById("actionArea").style.display = "none";
     document.getElementById("revealArea").style.display = "none";
 
+    // モーダルを表示した時点で一番上にスクロールを戻す
+    document.querySelector(".modal-content").scrollTop = 0;
+
     // AIに紹介文をリクエスト
     try {
       const res = await fetch(API_URL, {
@@ -333,6 +345,14 @@
     } else {
       linkBtn.style.display = "none";
     }
+
+    // 本の情報が開いた際に、ボタンが見えるように少し下にスクロールさせる
+    setTimeout(() => {
+      document.querySelector(".modal-content").scrollBy({
+        top: 200,
+        behavior: 'smooth'
+      });
+    }, 100);
   }
 
   function closeModal() {
