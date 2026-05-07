@@ -3,160 +3,245 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Book Shelf</title>
+  <title>AI Book Shelf | 読書コミュニティ</title>
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* 共通設定 */
+    /* ------------------------------------------
+       1. 基本スタイル & アニメーション
+    ------------------------------------------ */
     html { scroll-behavior: smooth; }
-    body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #f9fbfb; color: #333; }
-    
-    /* ヘッダー背景 */
-    .header { text-align: center; padding: 60px 20px 80px; position: relative; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; background: linear-gradient(-45deg, #2c3e50, #000000, #4ca1af, #2c3e50); background-size: 400% 400%; animation: gradientBG 15s ease infinite;}
+    body { margin: 0; font-family: 'Zen Maru Gothic', sans-serif; background: #fdfdfd; color: #333; line-height: 1.6; }
+
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseGacha { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+    @keyframes buttonPulse { 0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 140, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); } }
+
+    /* ------------------------------------------
+       2. ヘッダー & ナビゲーション
+    ------------------------------------------ */
+    .header { text-align: center; padding: 80px 20px 100px; position: relative; color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; background: linear-gradient(-45deg, #2c3e50, #000000, #4ca1af, #2c3e50); background-size: 400% 400%; animation: gradientBG 15s ease infinite;}
     .header-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); z-index: 1; }
-    .header-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
-    .header h1 { font-size: 34px; margin: 0 0 15px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px;}
+    .header-content { position: relative; z-index: 2; max-width: 800px; margin: auto; }
+    .header h1 { font-size: 38px; margin: 0 0 20px 0; text-shadow: 0 2px 15px rgba(0,0,0,0.4); letter-spacing: 3px; font-weight: 700;}
 
-    /* ナビゲーションボタン */
-    .nav-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 25px; }
-    .nav-btn { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px 18px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; text-decoration: none;}
-    .nav-btn:hover { background: white; color: #2c3e50; transform: translateY(-2px); }
+    .nav-links { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; }
+    .nav-btn { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: bold; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.3s ease; text-decoration: none; display: flex; align-items: center; gap: 6px;}
+    .nav-btn:hover { background: white; color: #2c3e50; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
-    /* 管理者ツール（右上） */
-    .admin-tools { position: absolute; top: 10px; right: 10px; z-index: 100; display: flex; gap: 5px;}
-    .update-db-btn { font-size: 9px; padding: 5px 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; color: white; transition: 0.3s; backdrop-filter: blur(4px); font-family: inherit;}
-    .add-book-btn { font-size: 9px; padding: 5px 10px; background: rgba(46, 125, 50, 0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; cursor: pointer; color: white; transition: 0.3s; backdrop-filter: blur(4px); font-family: inherit;}
+    .shelf-mood { background: rgba(255, 255, 255, 0.18); backdrop-filter: blur(10px); display: inline-block; padding: 10px 25px; border-radius: 40px; font-size: 14px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-    /* AIの空気感 */
-    .shelf-mood { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); display: inline-block; padding: 8px 20px; border-radius: 30px; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); max-width: 85%; }
-    
-    .container { max-width: 900px; margin: auto; padding: 20px; }
+    /* 管理ツール（右上） */
+    .admin-tools { position: absolute; top: 15px; right: 15px; z-index: 100; display: flex; gap: 8px;}
+    .update-db-btn, .add-book-btn { font-size: 10px; padding: 6px 14px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; cursor: pointer; color: white; transition: 0.3s; backdrop-filter: blur(5px); font-family: inherit; font-weight: bold;}
+    .add-book-btn { background: rgba(46, 125, 50, 0.6); }
+    .update-db-btn:hover, .add-book-btn:hover { background: rgba(255,255,255,0.2); border-color: white;}
+
+    /* ------------------------------------------
+       3. メインレイアウト
+    ------------------------------------------ */
+    .container { max-width: 1000px; margin: auto; padding: 20px; }
 
     /* ガチャ */
-    .gacha-section { text-align: center; margin-top: -45px; margin-bottom: 45px; position: relative; z-index: 90; }
-    .gacha-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e53); color: white; font-size: 16px; font-weight: bold; padding: 15px 40px; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); transition: 0.3s; animation: pulseGacha 2s infinite; font-family: 'Zen Maru Gothic', sans-serif;}
+    .gacha-section { text-align: center; margin-top: -50px; margin-bottom: 60px; position: relative; z-index: 90; }
+    .gacha-btn { background: linear-gradient(45deg, #ff6b6b, #ff8e53); color: white; font-size: 18px; font-weight: bold; padding: 18px 45px; border: none; border-radius: 60px; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4); transition: all 0.3s ease; animation: pulseGacha 2s infinite; font-family: 'Zen Maru Gothic', sans-serif; letter-spacing: 1px;}
+    .gacha-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.5); }
 
     /* AI相談セクション */
-    .ai-section { background: #fff; border: 1px solid #e0f2e9; padding: 25px; border-radius: 20px; margin-bottom: 40px; box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
-    .ai-top-row { display: flex; align-items: flex-end; gap: 20px; margin-bottom: 20px; }
-    .ai-avatar-circle { width: 75px; height: 70px; border-radius: 50%; border: 3px solid #e0f2e9; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #eee; transition: opacity 0.3s ease; }
-    .ai-header { flex: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
-    .diagnose-btn { background: #e0f7fa; color: #00796b; border: 1px solid #b2ebf2; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: inherit;}
+    .ai-section { background: #fff; border: 1px solid #eef2f1; padding: 35px; border-radius: 25px; margin-bottom: 50px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
+    .ai-top-row { display: flex; align-items: center; gap: 25px; margin-bottom: 25px; }
+    .ai-avatar-circle { width: 85px; height: 85px; border-radius: 50%; border: 4px solid #f0f4f3; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.08); background: #f9f9f9; transition: opacity 0.3s ease; flex-shrink: 0;}
+    .ai-header { flex: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+    .ai-title { font-size: 20px; font-weight: bold; color: #2f3e2f; display: flex; align-items: center; gap: 10px;}
+    .diagnose-btn { background: #e0f7fa; color: #00796b; border: 1px solid #b2ebf2; padding: 10px 20px; border-radius: 25px; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; font-family: inherit;}
+    .diagnose-btn:hover { background: #b2ebf2; transform: translateY(-2px); }
 
-    .ai-input-group { display: flex; gap: 10px; flex-wrap: wrap;}
-    .persona-select { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff; cursor: pointer;}
-    input[type="text"], input[type="number"], select, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none;}
-    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-weight: bold;}
-    .reset-btn { background: #fff; color: #2f3e2f; border: 1px solid #2f3e2f; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: none; font-weight: bold;}
+    .ai-input-group { display: flex; gap: 12px; flex-wrap: wrap;}
+    .persona-select { padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 15px; font-family: inherit; background: #fff; cursor: pointer; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+    input[type="text"], input[type="number"], select, textarea { padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 15px; font-family: inherit; outline: none; transition: border-color 0.3s;}
+    input[type="text"]:focus, textarea:focus { border-color: #4ca1af; background: #fafafa;}
+    .ai-btn { background: #2f3e2f; color: white; border: none; padding: 12px 30px; border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 15px; letter-spacing: 1px;}
+    .ai-btn:hover { background: #1a251a; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-    .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-    .prompt-btn { font-size: 11px; padding: 8px 15px; border-radius: 20px; background: #f4f7f6; color: #2f3e2f; border: 1px solid #e6f4ea; cursor: pointer; transition: 0.2s; font-family: inherit;}
+    .prompt-suggestions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .prompt-btn { font-size: 12px; padding: 10px 18px; border-radius: 30px; background: #f8faf9; color: #4a5a4a; border: 1px solid #e6eeea; cursor: pointer; transition: 0.2s; font-family: inherit; font-weight: bold;}
+    .prompt-btn:hover { background: #e6f4ea; border-color: #2f3e2f; color: #2f3e2f; }
 
-    #aiResultArea { display: none; margin-top: 25px; border-top: 1px dashed #ddd; padding-top: 25px;}
-    .ai-text { line-height: 1.8; font-size: 14.5px; color: #444; border-left: 4px solid #e6f4ea; padding: 15px; background: #fafdfb; border-radius: 0 10px 10px 0;}
+    #aiResultArea { display: none; margin-top: 35px; border-top: 1px dashed #e0e0e0; padding-top: 30px; animation: fadeIn 0.6s ease;}
+    .ai-text { line-height: 1.9; font-size: 15px; color: #444; border-left: 5px solid #e6f4ea; padding: 20px 25px; background: #fafdfb; border-radius: 0 15px 15px 0; margin-bottom: 25px;}
     
-    /* カードグリッド */
-    .grid { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-bottom: 60px;}
-    .card, .reader-card { background: white; border-radius: 15px; padding: 20px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; opacity: 0; transform: translateY(40px); transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
-    .card.show, .reader-card.show { opacity: 1; transform: translateY(0); }
-    .card:hover, .reader-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+    /* ------------------------------------------
+       4. フィルター & カード
+    ------------------------------------------ */
+    .filter-section { margin-bottom: 40px; background: #fff; padding: 25px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+    .search-bar { width: 100%; padding: 16px 20px; border: 1px solid #e0e0e0; border-radius: 15px; font-size: 15px; box-sizing: border-box; margin-bottom: 20px; font-family: inherit; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+    .tags-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+    .filter-tag { padding: 8px 18px; border-radius: 30px; background: #fff; border: 1px solid #ddd; font-size: 13px; cursor: pointer; transition: all 0.2s ease; color: #666; font-weight: bold;}
+    .filter-tag.active { background: #2f3e2f; color: white; border-color: #2f3e2f; box-shadow: 0 4px 10px rgba(47,62,47,0.2); }
     
-    .new-badge { position: absolute; top: -8px; left: -8px; background: #ff4757; color: white; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 12px; transform: rotate(-5deg); z-index: 100;}
-    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100;}
+    .sort-options { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .sort-btn { padding: 10px 22px; border-radius: 30px; border: 1px solid #e0e0e0; background: white; font-family: inherit; font-size: 13px; cursor: pointer; transition: all 0.3s ease; font-weight: bold; color: #555;}
+    .sort-btn.active { background: #2f3e2f; color: white; border-color: #2f3e2f; }
+    .my-shelf-btn { background: #fff5e6; color: #d35400; border: 1px solid #ffcc80; }
+    .my-shelf-btn.active { background: #d35400; color: white; }
 
-    .cover { width: 95px; height: 135px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; box-shadow: 3px 3px 10px rgba(0,0,0,0.15);}
-    .title { font-weight: bold; font-size: 14px; margin: 0 0 5px 0; line-height: 1.4; }
-    .author { font-size: 12px; color: #777; margin-bottom: 8px; }
-    .rating { color: #f1c40f; font-size: 13px; margin-bottom: 8px; letter-spacing: 2px; }
+    /* 本棚グリッド */
+    .grid { display: grid; gap: 30px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); margin-bottom: 80px;}
+
+    /* カードデザイン（復活） */
+    .card { 
+      background: white; border-radius: 20px; padding: 25px 20px; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04); text-align: center; position: relative; 
+      display: flex; flex-direction: column; align-items: center; 
+      transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    /* キラッと反射エフェクト */
+    .card::after {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: 20px; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.6) 35%, transparent 40%);
+      background-size: 300% 300%; background-position: 150% 0;
+      transition: background-position 0.8s ease-out; pointer-events: none; z-index: 10; 
+    }
+    .card:hover::after { background-position: -50% 0; }
+
+    .rank-badge { position: absolute; top: -12px; right: -12px; padding: 8px 16px; border-radius: 25px; font-size: 13px; font-weight: bold; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.15); z-index: 100;}
+    .rank-1 { background: linear-gradient(135deg, #ffd700, #daa520); } 
+    .rank-2 { background: linear-gradient(135deg, #e0e0e0, #9e9e9e); color: #333; } 
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); } 
+
+    .cover { width: 110px; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; box-shadow: 5px 5px 15px rgba(0,0,0,0.15); transition: transform 0.3s;}
+    .card:hover .cover { transform: scale(1.05); }
+
+    .title { font-weight: bold; font-size: 15px; margin: 0 0 8px 0; line-height: 1.4; color: #222;}
+    .author { font-size: 13px; color: #777; margin-bottom: 10px; }
+    .rating { color: #f1c40f; font-size: 14px; margin-bottom: 12px; letter-spacing: 3px; }
     
-    .button-area { width: 100%; margin-top: auto; z-index: 20; display: flex; flex-direction: column; gap: 6px;}
-    .primary-buttons { display: flex; gap: 5px; }
-    .button { flex: 1; padding: 10px 5px; background: #333; color: #fff; text-decoration: none; border-radius: 15px; font-size: 10px; transition: 0.2s; font-weight: bold; text-align: center; border: none; cursor: pointer; font-family: inherit;}
-    .button.ai-summary-btn { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb;}
+    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 20px; min-height: 44px;}
+    .card-tag { font-size: 11px; background: #f4f4f4; padding: 4px 10px; border-radius: 12px; color: #666; font-weight: bold;}
     
-    .action-row { display: flex; gap: 5px; width: 100%; }
+    .button-area { width: 100%; margin-top: auto; z-index: 20; display: flex; flex-direction: column; gap: 8px;}
+    .primary-buttons { display: flex; gap: 8px; }
+    .card-btn { flex: 1; padding: 12px 5px; background: #333; color: #fff; text-decoration: none; border-radius: 18px; font-size: 11px; transition: 0.2s; font-weight: bold; text-align: center; border: none; cursor: pointer; font-family: inherit;}
+    .card-btn.ai-summary-btn { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb;}
+    .card-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    
+    .action-row { display: flex; gap: 6px; width: 100%; }
     .action-row button { 
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2px; padding: 6px 2px; border-radius: 12px; font-size: 8px; border: 1px solid #eee; 
-      background: #fdfdfd; cursor: pointer; font-family: inherit; font-weight: bold; transition: 0.2s; color: #666;
+      gap: 3px; padding: 8px 2px; border-radius: 15px; font-size: 9px; border: 1px solid #f0f0f0; 
+      background: #fdfdfd; cursor: pointer; font-family: inherit; font-weight: bold; transition: all 0.2s ease; color: #666;
     }
-    .action-row button span { font-size: 12px; }
+    .action-row button span { font-size: 14px; }
+    .action-row button:hover { background: #f5f5f5; border-color: #ddd; }
 
-    /* 処方箋セクション */
-    .prescription-section { background: #fff; border-radius: 20px; padding: 40px 30px; margin-bottom: 60px; border: 1px solid #e1f5fe; box-shadow: 0 10px 30px rgba(1, 87, 155, 0.05); scroll-margin-top: 20px; }
-    .prescription-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; justify-content: center;}
-    .prescription-title { font-size: 22px; font-weight: bold; color: #01579b; margin: 0; }
-    .prescription-input-group { display: flex; gap: 10px; margin: 20px auto 0; max-width: 600px; }
-    .prescribe-btn { background: #01579b; color: white; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(1, 87, 155, 0.2); white-space: nowrap;}
-    
-    #prescriptionResultArea { display: none; margin-top: 30px; animation: fadeIn 0.5s ease; }
-    .prescription-card { background: #f1f8ff; border: 2px dashed #0288d1; border-radius: 15px; padding: 25px; position: relative; margin: auto; max-width: 600px;}
-    .prescription-card::before { content: "処方箋"; position: absolute; top: -12px; right: 20px; background: white; padding: 0 10px; color: #0288d1; font-weight: bold; font-size: 12px;}
-    .prescription-book-box { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 10px;}
-    
-    /* 管理人プロフィール */
-    .admin-profile-section { margin-bottom: 60px; padding: 0 10px; scroll-margin-top: 20px; }
-    .admin-profile-card { max-width: 700px; margin: auto; background: #fff; border-radius: 15px; padding: 30px; display: flex; align-items: center; gap: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e0f2e9; position: relative; overflow: hidden;}
-    .admin-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #f9fbfb; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
-    .admin-name { margin: 0 0 12px 0; font-size: 20px; color: #2f3e2f; display: flex; align-items: center; gap: 8px; line-height: 1.4;}
+    .like-btn.liked { background: #fff1f2; color: #ff4757; border-color: #ff4757; }
+    .read-btn.read { background: #f0f9fa; color: #4ca1af; border-color: #4ca1af; }
+    .save-btn.saved { background: #fff7ed; color: #d35400; border-color: #d35400; }
 
-    /* おすすめ投稿ボタン */
+    /* ------------------------------------------
+       5. 処方箋 & プロフィール
+    ------------------------------------------ */
+    .prescription-section { background: #fff; border-radius: 30px; padding: 50px 40px; margin-bottom: 80px; border: 1px solid #e1f5fe; box-shadow: 0 15px 50px rgba(1, 87, 155, 0.04); scroll-margin-top: 40px; }
+    .prescription-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; justify-content: center;}
+    .prescription-title { font-size: 26px; font-weight: bold; color: #01579b; margin: 0; letter-spacing: 1px;}
+    .prescription-input-group { display: flex; gap: 15px; margin: 30px auto 0; max-width: 700px; }
+    .prescribe-btn { background: #01579b; color: white; border: none; padding: 15px 40px; border-radius: 40px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(1, 87, 155, 0.2); white-space: nowrap; font-size: 15px;}
+    .prescribe-btn:hover { background: #0277bd; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(1, 87, 155, 0.3); }
+    
+    #prescriptionResultArea { display: none; margin-top: 40px; animation: fadeIn 0.7s ease; }
+    .prescription-card { background: #f1f8ff; border: 2px dashed #0288d1; border-radius: 20px; padding: 35px; position: relative; margin: auto; max-width: 650px;}
+    .prescription-card::before { content: "処方箋レシピ"; position: absolute; top: -14px; right: 30px; background: white; padding: 0 15px; color: #0288d1; font-weight: bold; font-size: 13px; border-radius: 10px; border: 1px solid #0288d1;}
+    .prescription-book-box { display: flex; align-items: center; gap: 25px; margin-bottom: 25px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);}
+    .prescription-book-box img { width: 70px; height: 100px; object-fit: cover; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);}
+    
+    .admin-profile-section { margin-bottom: 80px; padding: 0 10px; scroll-margin-top: 40px; }
+    .admin-profile-card { max-width: 750px; margin: auto; background: #fff; border-radius: 25px; padding: 40px; display: flex; align-items: center; gap: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid #e0f2e9; position: relative; overflow: hidden;}
+    .admin-profile-card::before { content: ""; position: absolute; top: 0; left: 0; width: 8px; height: 100%; background: #4ca1af; }
+    .admin-avatar { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #f9fbfb; box-shadow: 0 5px 15px rgba(0,0,0,0.08);}
+    .admin-info { flex: 1; text-align: left; }
+    .admin-name { margin: 0 0 15px 0; font-size: 24px; color: #2f3e2f; font-weight: 700; line-height: 1.3;}
+    .admin-bio { margin: 0; font-size: 15px; color: #555; line-height: 1.9; }
+
+    .reader-section { padding: 80px 20px; background: #fffaf4; border-radius: 40px; border: 2px solid #faebd7; scroll-margin-top: 40px; margin-bottom: 60px;}
+    .reader-section h2 { text-align: center; color: #d35400; font-size: 28px; margin-top: 0; margin-bottom: 45px; letter-spacing: 2px;}
+    .reader-grid { display: grid; gap: 30px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .reader-card { background: white; border-radius: 20px; padding: 35px 25px; text-align: left; position: relative; display: flex; flex-direction: column;}
+    .reader-card::before { content: "💬"; position: absolute; top: -20px; left: -15px; font-size: 45px; transform: rotate(-10deg); filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1)); z-index: 100;}
+    .reader-quote { font-size: 15px; background: #fdfbf7; padding: 20px; border-radius: 15px; border-left: 5px solid #ffcc80; margin-bottom: 25px; flex-grow: 1; line-height: 1.8; color: #444; font-style: italic;}
+
+    /* ------------------------------------------
+       6. モーダル & UI要素
+    ------------------------------------------ */
     .floating-btn {
-      position: fixed; bottom: 25px; right: 25px;
+      position: fixed; bottom: 35px; right: 35px;
       background: linear-gradient(135deg, #ff8c00, #ff6b6b); color: white;
-      padding: 16px 28px; border-radius: 50px; border: none;
+      padding: 18px 35px; border-radius: 50px; border: none;
       font-weight: bold; font-family: inherit; cursor: pointer;
-      box-shadow: 0 10px 25px rgba(255, 140, 0, 0.4);
-      z-index: 1000; animation: buttonPulse 2.5s infinite;
+      box-shadow: 0 10px 30px rgba(255, 140, 0, 0.4);
+      z-index: 1000; transition: all 0.3s ease; font-size: 15px; letter-spacing: 1px;
+      animation: buttonPulse 3s infinite;
     }
+    .floating-btn:hover { transform: scale(1.1) translateY(-5px); box-shadow: 0 15px 40px rgba(255, 140, 0, 0.6); }
 
-    @keyframes buttonPulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.7); }
-      70% { box-shadow: 0 0 0 20px rgba(255, 140, 0, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); }
-    }
-
-    /* モーダル */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(3px);}
-    .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: popModal 0.3s ease-out;}
-    @keyframes popModal { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box;}
+    .modal-content { background: white; padding: 40px; border-radius: 30px; width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.3); animation: popModal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative;}
+    @keyframes popModal { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    
+    .modal-content h3 { margin-top: 0; color: #2f3e2f; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 25px;}
+    .modal-actions { display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;}
+    .btn-secondary { padding: 12px 25px; border-radius: 12px; border: none; background: #eee; cursor: pointer; font-weight: bold; font-family: inherit; color: #555;}
+    .btn-primary { padding: 12px 30px; border-radius: 12px; border: none; background: #2f3e2f; color: white; cursor: pointer; font-weight: bold; font-family: inherit;}
 
     #loading { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
-    .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #2f3e2f; border-radius: 50%; animation: spin 1s linear infinite; }
+    .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #2f3e2f; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* スマホ対応 */
     @media (max-width: 767px) {
-      .header h1 { font-size: 24px; padding-top: 20px; }
-      .admin-tools { right: 5px; top: 5px; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .header { padding: 60px 20px 80px; }
+      .header h1 { font-size: 26px; padding-top: 25px; }
+      .admin-tools { right: 10px; top: 10px; }
+      .nav-btn { font-size: 10px; padding: 8px 14px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+      .card { padding: 15px 10px; border-radius: 15px; }
+      .cover { width: 90px; height: 130px; }
+      .title { font-size: 12px; }
+      .card-tags, .author, .rating { display: none; }
+      .prescription-section { padding: 40px 20px; }
       .prescription-input-group { flex-direction: column; }
+      .prescribe-btn { width: 100%; }
+      .admin-profile-card { flex-direction: column; text-align: center; padding: 30px 20px; }
+      .admin-info { text-align: center; }
+      .floating-btn { bottom: 20px; right: 20px; padding: 15px 25px; font-size: 13px; }
     }
   </style>
 </head>
 <body>
 
+<!-- ローディング画面 -->
 <div id="loading">
   <div class="spinner"></div>
-  <p style="margin-top: 15px; font-size: 14px; font-weight:bold;">本棚を整頓中...</p>
+  <p style="margin-top: 20px; font-size: 15px; font-weight:bold; letter-spacing: 1px; color:#2f3e2f;">本棚を整頓しています...</p>
 </div>
 
 <!-- 🔴管理者用：本を追加モーダル -->
 <div id="adminAddModal" class="modal-overlay">
   <div class="modal-content">
-    <h3 style="margin-top:0; color:#2e7d32;">📖 本棚に新刊を追加する</h3>
-    <div style="background:#f1f8f5; padding:15px; border-radius:10px; margin-bottom:20px;">
-      <label style="font-size:11px; font-weight:bold; color:#2e7d32;">ISBNで自動入力</label>
-      <div style="display:flex; gap:5px; margin-top:5px;">
-        <input type="text" id="isbnInput" placeholder="13桁のISBNを入力" style="flex:1;">
-        <button onclick="fetchISBN()" style="background:#2e7d32; color:white; border:none; border-radius:8px; padding:0 15px; cursor:pointer; font-weight:bold;">検索</button>
+    <h3 style="color:#2e7d32;">📖 本棚に新刊を追加する</h3>
+    <div style="background:#f1f8f5; padding:20px; border-radius:15px; margin-bottom:25px; border:1px solid #e8f5e9;">
+      <label style="font-size:12px; font-weight:bold; color:#2e7d32;">ISBNで書籍情報を自動取得</label>
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <input type="text" id="isbnInput" placeholder="13桁のISBN番号を入力" style="flex:1;">
+        <button onclick="fetchISBN()" style="background:#2e7d32; color:white; border:none; border-radius:10px; padding:0 20px; cursor:pointer; font-weight:bold;">検索</button>
       </div>
     </div>
-    <div style="display:grid; gap:12px;">
-      <input type="text" id="addTitle" placeholder="タイトル">
-      <input type="text" id="addAuthor" placeholder="著者">
-      <input type="text" id="addImage" placeholder="画像URL（ISBN検索で自動取得）">
-      <div style="display:flex; gap:10px; align-items:center;">
-        <label style="font-size:12px;">評価：</label>
+    <div style="display:grid; gap:15px;">
+      <input type="text" id="addTitle" placeholder="書籍名（タイトル）">
+      <input type="text" id="addAuthor" placeholder="著者名">
+      <input type="text" id="addImage" placeholder="書影画像URL">
+      <div style="display:flex; align-items:center; gap:15px;">
+        <label style="font-size:13px; font-weight:bold; color:#555;"> shota評価：</label>
         <select id="addRating" style="flex:1;">
           <option value="5">★★★★★ (5)</option>
           <option value="4">★★★★☆ (4)</option>
@@ -165,75 +250,196 @@
           <option value="1">★☆☆☆☆ (1)</option>
         </select>
       </div>
-      <textarea id="addReel" placeholder="リール文章（サイトのカードに表示される短い紹介）" style="height:60px;"></textarea>
-      <textarea id="addReview" placeholder="レビュー全文（AIの知識ベースになります）" style="height:120px;"></textarea>
+      <textarea id="addReel" placeholder="キャッチコピー（カードに表示される短い文章）" style="height:60px;"></textarea>
+      <textarea id="addReview" placeholder="レビュー全文（AIが学習する知識ベースとなります）" style="height:150px;"></textarea>
     </div>
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
-      <button onclick="closeAdminAddModal()" style="padding:10px 20px; border:none; border-radius:8px; background:#eee; cursor:pointer;">キャンセル</button>
-      <button id="adminSubmitBtn" onclick="submitAdminBook()" style="padding:10px 20px; border:none; border-radius:8px; background:#2e7d32; color:white; cursor:pointer; font-weight:bold;">本棚に並べる</button>
+    <div class="modal-actions">
+      <button onclick="closeAdminAddModal()" class="btn-secondary">キャンセル</button>
+      <button id="adminSubmitBtn" onclick="submitAdminBook()" class="btn-primary" style="background:#2e7d32;">本棚に並べる</button>
     </div>
   </div>
 </div>
 
-<!-- その他既存モーダル -->
-<div id="gachaModal" class="modal-overlay"><div class="modal-content"><div id="gachaTitle" style="font-size:18px; font-weight:bold; text-align:center; margin-bottom:15px;"></div><div style="width:140px; height:200px; margin:20px auto; border-radius:10px; overflow:hidden;"><img id="gachaSlotImg" src="" style="width:100%; height:100%; object-fit:cover;"></div><div id="gachaDesc" style="text-align:center; font-size:14px; margin-bottom:20px;"></div><div id="gachaActions" style="display:none; gap:10px; justify-content:center;"><button onclick="closeGacha()" style="padding:10px 20px; border-radius:20px; border:none; background:#eee; cursor:pointer;">閉じる</button><button id="gachaLinkBtn" style="padding:10px 20px; border-radius:20px; border:none; background:#ff8c00; color:white; cursor:pointer;">詳細を見る</button></div></div></div>
-<div id="summaryModal" class="modal-overlay"><div class="modal-content"><h3 id="summaryBookTitle" style="margin:0 0 15px; color:#00695c; font-size:18px;"></h3><div id="summaryText" style="line-height:1.8; font-size:14px; background:#f9f9f9; padding:20px; border-radius:15px; border-left:5px solid #00695c;"></div><div style="text-align:right; margin-top:25px;"><button onclick="closeSummaryModal()" style="padding:10px 25px; border:none; border-radius:8px; background:#eee; cursor:pointer;">閉じる</button></div></div></div>
-<div id="diagnoseModal" class="modal-overlay"><div class="modal-content"><h3>🩺 読書カルテ診断</h3><textarea id="diagnoseInput" placeholder="作品を3つ書いてね" style="width:100%; height:120px;"></textarea><div style="text-align:right; margin-top:20px;"><button onclick="closeDiagnoseModal()" style="padding:10px 20px; border:none; background:#eee; border-radius:8px;">キャンセル</button><button onclick="runDiagnose()" style="padding:10px 20px; border:none; background:#00796b; color:white; border-radius:8px;">分析</button></div></div></div>
-<div id="submitModal" class="modal-overlay"><div class="modal-content"><h3>おすすめ本を教えてください</h3><input type="text" id="submitTitle" placeholder="書籍名" style="width:100%; margin-bottom:15px;"><input type="text" id="submitAuthor" placeholder="著者" style="width:100%; margin-bottom:15px;"><textarea id="submitReason" placeholder="理由" style="width:100%; height:100px;"></textarea><div style="text-align:right; margin-top:20px;"><button onclick="closeModal()" style="padding:10px 20px; border:none; background:#eee; border-radius:8px;">キャンセル</button><button onclick="submitBook()" style="padding:10px 20px; border:none; background:#2f3e2f; color:white; border-radius:8px;">送信</button></div></div></div>
+<!-- ガチャモーダル -->
+<div id="gachaModal" class="modal-overlay">
+  <div class="modal-content">
+    <div id="gachaTitle" style="font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 20px; color:#d35400;"></div>
+    <div style="width: 160px; height: 230px; margin: 25px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+      <img id="gachaSlotImg" src="" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    <div id="gachaDesc" style="text-align: center; font-size: 15px; margin-bottom: 30px; line-height: 1.8;"></div>
+    <div id="gachaActions" style="display:none; gap: 12px; justify-content: center;">
+      <button onclick="closeGacha()" class="btn-secondary">閉じる</button>
+      <button id="gachaLinkBtn" class="btn-primary" style="background:#ff8c00;">詳細をみる</button>
+    </div>
+  </div>
+</div>
 
-<!-- ヘッダー -->
+<!-- AI解説モーダル -->
+<div id="summaryModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 500px;">
+    <h3 id="summaryBookTitle" style="color:#00695c;">📖 本の内容を解説</h3>
+    <div id="summaryText" class="ai-text" style="font-size: 15px; border-left-color: #00695c;"></div>
+    <div class="modal-actions">
+      <button onclick="closeSummaryModal()" class="btn-secondary">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- カルテ診断モーダル -->
+<div id="diagnoseModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>🩺 読書カルテを作成する</h3>
+    <p style="font-size:14px; color:#555; margin-bottom:20px;">過去に感動した作品（本・映画等）を3つ教えてください。あなたの好みの傾向をAIが深く分析します。</p>
+    <textarea id="diagnoseInput" placeholder="1. 作品名A&#10;2. 作品名B&#10;3. 作品名C" style="width:100%; height:140px; line-height:1.6;"></textarea>
+    <div class="modal-actions">
+      <button onclick="closeDiagnoseModal()" class="btn-secondary">キャンセル</button>
+      <button onclick="runDiagnose()" class="btn-primary" style="background:#00796b;">カルテを分析する</button>
+    </div>
+  </div>
+</div>
+
+<!-- おすすめ投稿モーダル -->
+<div id="submitModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>💡 おすすめ本を教える</h3>
+    <div style="display:grid; gap:15px;">
+      <input type="text" id="submitTitle" placeholder="書籍名（必須）">
+      <input type="text" id="submitAuthor" placeholder="著者名（任意）">
+      <textarea id="submitReason" placeholder="あなたのおすすめポイントを教えてください（必須）" style="height:120px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="btn-secondary">キャンセル</button>
+      <button id="submitConfirmBtn" onclick="submitBook()" class="btn-primary">管理人に届ける</button>
+    </div>
+  </div>
+</div>
+
+<!-- ヘッダーセクション -->
 <div class="header">
   <div class="header-overlay"></div>
   <div class="admin-tools">
     <button class="add-book-btn" onclick="openAdminAddModal()">📖 本を追加</button>
-    <button id="updateDbBtn" class="update-db-btn">🔄 AI学習更新</button>
+    <button id="updateDbBtn" class="update-db-btn">🔄 AI学習を更新</button>
   </div>
   <div class="header-content">
     <h1>AI Book Shelf</h1>
     <div class="nav-links">
       <a href="#adminProfile" class="nav-btn">💼 プロフィール</a>
-      <a href="#prescriptionSection" class="nav-btn">💊 処方箋をもらう</a>
-      <a href="#readerSection" class="nav-btn">👑 みんなの推薦</a>
+      <a href="#prescriptionSection" class="nav-btn">💊 本の処方箋</a>
+      <a href="#readerSection" class="nav-btn">👑 読者の推薦</a>
     </div>
-    <div id="shelfMood" class="shelf-mood">本棚を整頓中...</div>
+    <div id="shelfMood" class="shelf-mood">本棚の空気を読み込み中...</div>
   </div>
 </div>
 
 <div class="container">
-  <div class="gacha-section"><button class="gacha-btn" onclick="playGacha()">🎲 運命の一冊ガチャを回す</button></div>
 
-  <!-- AI相談 -->
-  <div class="ai-section">
-    <div class="ai-top-row"><img id="aiChatAvatar" class="ai-avatar-circle" src=""><div class="ai-header"><strong>🤖 AI相談</strong><button class="diagnose-btn" onclick="openDiagnoseModal()">🩺 診断カルテ</button></div></div>
-    <div class="ai-input-group">
-      <select id="aiPersona" class="persona-select" onchange="updateChatAvatar('normal')"><option value="normal">👓 丁寧な司書さん</option><option value="hot">🔥 熱血書店員</option><option value="cat">🐱 猫</option></select>
-      <input type="text" id="aiQuery" placeholder="今の気分は？"><button id="aiBtn" class="ai-btn" onclick="runAiConsult()">相談</button>
-    </div>
-    <div class="prompt-suggestions"><button class="prompt-btn" onclick="setAiPrompt('☕ 休日にのんびり読めるエッセイ')">☕ のんびり</button><button class="prompt-btn" onclick="setAiPrompt('😭 思いっきり泣ける恋愛小説')">😭 泣きたい</button></div>
-    <div id="aiResultArea"><div id="aiText" class="ai-text"></div><div id="aiBooksGrid" class="grid" style="margin-top:20px;"></div><button class="reset-btn" onclick="resetAi()">リセット</button></div>
+  <!-- ガチャ -->
+  <div class="gacha-section">
+    <button class="gacha-btn" onclick="playGacha()">🎲 運命の一冊に出会う</button>
   </div>
 
-  <div class="filter-section"><input type="text" id="searchBar" class="search-bar" placeholder="タイトル検索..." oninput="renderAll()"><div id="tagsContainer" class="tags-container"></div><div class="sort-options"><button id="sortNewBtn" class="sort-btn active" onclick="changeSortMode('new')">📅 新着</button><button id="sortLikeBtn" class="sort-btn" onclick="changeSortMode('like')">❤️ 人気</button><button id="myShelfBtn" class="sort-btn my-shelf-btn" onclick="toggleMyShelf()">🔖 あとで読む</button></div></div>
+  <!-- AI相談セクション -->
+  <div class="ai-section">
+    <div class="ai-top-row">
+      <img id="aiChatAvatar" class="ai-avatar-circle" src="">
+      <div class="ai-header">
+        <div class="ai-title">🤖 AIに本を相談する</div>
+        <button class="diagnose-btn" onclick="openDiagnoseModal()">🩺 読書カルテ診断</button>
+      </div>
+    </div>
+    <div class="ai-input-group">
+      <select id="aiPersona" class="persona-select" onchange="updateChatAvatar('normal')">
+        <option value="normal">👓 丁寧な司書さん</option>
+        <option value="hot">🔥 熱血カリスマ書店員</option>
+        <option value="cat">🐱 気まぐれな猫</option>
+      </select>
+      <input type="text" id="aiQuery" placeholder="今の気分や、読みたい物語のイメージを教えてください..." style="flex:1;">
+      <button id="aiBtn" class="ai-btn" onclick="runAiConsult()">相談する</button>
+    </div>
+    
+    <div class="prompt-suggestions">
+      <button class="prompt-btn" onclick="setAiPrompt('☕ 休日にのんびり、コーヒーを飲みながら読めるエッセイ')">☕ のんびり</button>
+      <button class="prompt-btn" onclick="setAiPrompt('😭 心の奥底まで浄化されるような、思いっきり泣ける恋愛小説')">😭 泣きたい</button>
+      <button class="prompt-btn" onclick="setAiPrompt('🚀 明日からの仕事に活力が湧いてくる、勇気をくれる本')">🚀 元気がほしい</button>
+    </div>
+    
+    <div id="aiResultArea">
+      <div id="aiText" class="ai-text"></div>
+      <div id="aiBooksGrid" class="grid" style="margin-top:30px;"></div>
+      <div style="text-align:center;">
+        <button class="btn-secondary" onclick="resetAi()" style="font-size:12px; padding:8px 25px;">チャットをリセット</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- 本棚フィルター -->
+  <div class="filter-section">
+    <input type="text" id="searchBar" class="search-bar" placeholder="本のタイトル、著者名で検索..." oninput="renderAll()">
+    <div id="tagsContainer" class="tags-container"></div>
+    <div class="sort-options">
+      <button id="sortNewBtn" class="sort-btn active" onclick="changeSortMode('new')">📅 新着順</button>
+      <button id="sortLikeBtn" class="sort-btn" onclick="changeSortMode('like')">❤️ 人気順</button>
+      <button id="myShelfBtn" class="sort-btn my-shelf-btn" onclick="toggleMyShelf()">🔖 あとで読む本棚</button>
+    </div>
+  </div>
+
+  <!-- 本棚本体 -->
   <div id="grid" class="grid"></div>
 
-  <!-- 処方箋 -->
+  <!-- 本の処方箋セクション -->
   <div id="prescriptionSection" class="prescription-section">
-    <div class="prescription-header"><img id="pharmacistAvatar" class="ai-avatar-circle" src=""><div class="prescription-title">💊 本の処方箋</div></div>
-    <div class="prescription-input-group"><input type="text" id="worryInput" placeholder="お悩みは？"><button class="prescribe-btn" onclick="runPrescription()">処方箋をもらう</button></div>
-    <div id="prescriptionResultArea"><div class="prescription-card"><div class="prescription-book-box" id="prescribedBookBox"></div><div id="prescriptionText"></div></div><div style="text-align:center;"><button class="cancel-btn" onclick="resetPrescription()">もう一度</button></div></div>
+    <div class="prescription-header">
+      <img id="pharmacistAvatar" class="ai-avatar-circle" src="">
+      <div class="prescription-title">💊 AI本の処方箋</div>
+    </div>
+    <p style="text-align:center; font-size:14px; color:#555; max-width:600px; margin: 0 auto 30px;">今の悩みや、言葉にできない「モヤモヤ」を打ち明けてください。<br>あなたの心に最も深く効く物語を、一冊だけ処方します。</p>
+    <div class="prescription-input-group">
+      <input type="text" id="worryInput" placeholder="例：仕事で失敗して落ち込んでいる、誰かに優しくなりたい..." style="flex:1; border-radius:30px; padding-left:25px;">
+      <button id="prescribeBtn" class="prescribe-btn" onclick="runPrescription()">処方箋をもらう</button>
+    </div>
+    <div id="prescriptionResultArea">
+      <div class="prescription-card">
+        <div class="prescription-book-box" id="prescribedBookBox"></div>
+        <div id="prescriptionText" style="line-height:2; font-size:15px; color:#333;"></div>
+      </div>
+      <div style="text-align:center; margin-top:30px;">
+        <button class="btn-secondary" onclick="resetPrescription()">他のお悩みも相談する</button>
+      </div>
+    </div>
   </div>
 
-  <!-- プロフィール -->
-  <div id="adminProfile" class="admin-profile-section"><div class="admin-profile-card"><img src="ChatGPT Image 2026年5月6日 19_04_17.png" class="admin-avatar"><div class="admin-info"><h3 class="admin-name">💼 管理人<br>s h o t a</h3><p class="admin-bio">恋愛小説、海外文学を中心に物語を読んでいます。年末のベスト5選びが恒例行事です。</p></div></div></div>
+  <!-- 管理人プロフィール -->
+  <div id="adminProfile" class="admin-profile-section">
+    <div class="admin-profile-card">
+      <img src="ChatGPT Image 2026年5月6日 19_04_17.png" alt="管理人" class="admin-avatar">
+      <div class="admin-info">
+        <h3 class="admin-name">💼 管理人<br>s h o t a</h3>
+        <p class="admin-bio">
+          恋愛小説、海外文学、エッセイをこよなく愛する読書家です。<br>
+          一冊の物語が誰かの人生を変える瞬間を信じて、この本棚を運営しています。<br>
+          年末に「その年のベスト5」を選ぶのが一番の楽しみ。この場所が、あなたにとっての『運命の一冊』との出会いの場になれば幸いです。
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- 読者コーナー -->
-  <div id="readerSection" class="reader-section"><h2>👑 みんなのおすすめ人気ランキング</h2><div id="readerGrid" class="reader-grid"></div></div>
+  <div id="readerSection" class="reader-section">
+    <h2>👑 みんなのおすすめ人気本</h2>
+    <div id="readerGrid" class="reader-grid"></div>
+  </div>
+
 </div>
 
+<!-- フローティング投稿ボタン -->
 <button class="floating-btn" onclick="openModal()">💡 おすすめ本を教える</button>
 
 <script>
+  /* ------------------------------------------
+     JavaScript ロジック
+  ------------------------------------------ */
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   const AI_AVATARS = {
@@ -247,25 +453,52 @@
   let likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [], readBooks = JSON.parse(localStorage.getItem('readBooks')) || [], savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
 
   window.onload = async () => {
-    updateChatAvatar('normal'); document.getElementById('pharmacistAvatar').src = AI_AVATARS.pharmacist.normal;
+    updateChatAvatar('normal');
+    document.getElementById('pharmacistAvatar').src = AI_AVATARS.pharmacist.normal;
     try {
-      const res = await fetch(API_URL); const data = await res.json();
-      allData = data.books; readerData = data.readerBooks || [];
-      generateFilterTags(allData); renderAll(); fetchMood();
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      allData = data.books || [];
+      readerData = data.readerBooks || [];
+      generateFilterTags(allData);
+      renderAll();
+      fetchMood();
       gachaPool = [...allData.map(b => ({ ...b, type: 'admin' })), ...readerData.map(b => ({ ...b, type: 'reader' }))];
       document.getElementById("loading").style.display = "none";
-    } catch (e) { alert("読込失敗"); }
+    } catch (e) {
+      console.error(e);
+      alert("データの取得に失敗しました。時間をおいて再度お試しください。");
+    }
   };
 
+  /* ------------------------------------------
+     AI キャラクター関連
+  ------------------------------------------ */
   function updateChatAvatar(state) {
-    const persona = document.getElementById('aiPersona').value; const img = document.getElementById('aiChatAvatar');
-    if(img) { img.style.opacity = 0; setTimeout(() => { img.src = AI_AVATARS[persona][state]; img.style.opacity = 1; }, 200); }
+    const persona = document.getElementById('aiPersona').value;
+    const img = document.getElementById('aiChatAvatar');
+    if(img) {
+      img.style.opacity = 0;
+      setTimeout(() => { img.src = AI_AVATARS[persona][state]; img.style.opacity = 1; }, 200);
+    }
   }
 
-  // 🔴管理者：ISBN検索
+  async function fetchMood() {
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getMood" }) });
+      const data = await res.json();
+      document.getElementById("shelfMood").textContent = "✨ " + data.mood;
+    } catch(e) {
+      document.getElementById("shelfMood").textContent = "✨ 本棚には今日も素敵な物語が並んでいます。";
+    }
+  }
+
+  /* ------------------------------------------
+     管理者機能（ISBN・DB追加）
+  ------------------------------------------ */
   async function fetchISBN() {
     const isbn = document.getElementById("isbnInput").value.trim();
-    if(!isbn) return alert("ISBNを入力してください");
+    if(!isbn) return alert("ISBNコードを入力してください。");
     const btn = event.target; btn.disabled = true; btn.textContent = "...";
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "fetchBookInfo", isbn: isbn }) });
@@ -275,101 +508,164 @@
         document.getElementById("addAuthor").value = data.author;
         document.getElementById("addImage").value = data.image;
         document.getElementById("addReview").value = data.summary;
-        alert("書籍情報を見つけました！");
-      } else { alert(data.message); }
-    } catch(e) { alert("取得失敗"); } finally { btn.disabled = false; btn.textContent = "検索"; }
+        alert("書籍情報が見つかりました！");
+      } else { alert("本が見つかりませんでした。手入力をお願いします。"); }
+    } catch(e) { alert("通信エラーが発生しました。"); } 
+    finally { btn.disabled = false; btn.textContent = "検索"; }
   }
 
-  // 🔴管理者：本棚への追加送信
   async function submitAdminBook() {
     const pass = prompt("管理者の合言葉を入力してください");
     if(!pass) return;
     const data = {
-      title: document.getElementById("addTitle").value, author: document.getElementById("addAuthor").value,
-      image: document.getElementById("addImage").value, rating: document.getElementById("addRating").value,
-      reel: document.getElementById("addReel").value, review: document.getElementById("addReview").value
+      title: document.getElementById("addTitle").value,
+      author: document.getElementById("addAuthor").value,
+      image: document.getElementById("addImage").value,
+      rating: document.getElementById("addRating").value,
+      reel: document.getElementById("addReel").value,
+      review: document.getElementById("addReview").value
     };
-    if(!data.title) return alert("タイトルは必須です");
-    const btn = document.getElementById("adminSubmitBtn"); btn.disabled = true; btn.textContent = "登録中...";
+    if(!data.title) return alert("タイトルは必ず入力してください。");
+    const btn = document.getElementById("adminSubmitBtn"); btn.disabled = true;
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "adminAddBook", password: pass, data: data }) });
       const resData = await res.json();
       if(resData.status === "success") {
-        alert("本棚に新しい物語が並びました✨ AIの学習を更新して反映させてください。");
+        alert("本棚に新しい物語が並びました✨ AI学習を更新すると検索に反映されます。");
         closeAdminAddModal();
       } else { alert(resData.message); }
-    } catch(e) { alert("登録失敗"); } finally { btn.disabled = false; btn.textContent = "本棚に並べる"; }
+    } catch(e) { alert("登録に失敗しました。"); } 
+    finally { btn.disabled = false; }
   }
 
   function openAdminAddModal() { document.getElementById("adminAddModal").style.display = "flex"; }
   function closeAdminAddModal() { document.getElementById("adminAddModal").style.display = "none"; }
 
-  // 既存ロジック
+  /* ------------------------------------------
+     AI相談・診断・処方箋
+  ------------------------------------------ */
   async function runAiConsult() {
-    const q = document.getElementById("aiQuery").value; if (!q) return;
-    const btn = document.getElementById("aiBtn"); btn.disabled = true; updateChatAvatar('searching');
+    const q = document.getElementById("aiQuery").value;
+    if (!q) return alert("相談内容を入力してください。");
+    const btn = document.getElementById("aiBtn");
+    btn.disabled = true; updateChatAvatar('searching');
     document.getElementById("aiResultArea").style.display = "block";
-    document.getElementById("aiText").innerHTML = "探索中..."; document.getElementById("aiBooksGrid").innerHTML = "";
+    document.getElementById("aiText").innerHTML = "本棚から最適な一冊を探索しています...";
+    document.getElementById("aiBooksGrid").innerHTML = "";
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ message: q, persona: document.getElementById("aiPersona").value }) });
-      const d = await res.json(); document.getElementById("aiText").innerHTML = d.result.replace(/\n/g, "<br>");
+      const d = await res.json();
+      document.getElementById("aiText").innerHTML = d.result.replace(/\n/g, "<br>");
       if (d.recommendedBooks) {
         const updated = d.recommendedBooks.map(aib => [...allData, ...readerData].find(f => f.id === aib.id) || aib);
         document.getElementById("aiBooksGrid").innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
+        setTimeout(observeCards, 100);
       }
       document.getElementById("resetBtn").style.display = "inline-block";
-    } catch (e) { document.getElementById("aiText").innerHTML = "エラー"; } finally { btn.disabled = false; updateChatAvatar('normal'); }
+    } catch (e) { document.getElementById("aiText").innerHTML = "申し訳ありません。エラーが発生しました。"; } 
+    finally { btn.disabled = false; updateChatAvatar('normal'); }
   }
 
   async function showSummary(id) {
-    const book = [...allData, ...readerData].find(b => b.id === id); if (!book) return;
-    document.getElementById("summaryBookTitle").textContent = "解説：" + book.title;
-    document.getElementById("summaryText").innerHTML = "読み込み中..."; document.getElementById("summaryModal").style.display = "flex";
+    const book = [...allData, ...readerData].find(b => b.id === id);
+    if (!book) return;
+    document.getElementById("summaryBookTitle").textContent = "📖 AI司書の解説：" + book.title;
+    document.getElementById("summaryText").innerHTML = "司書が本の内容を紐解いています..."; 
+    document.getElementById("summaryModal").style.display = "flex";
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getSummary", bookData: book }) });
-      const d = await res.json(); document.getElementById("summaryText").innerHTML = d.summary.replace(/\n/g, "<br>");
-    } catch (e) { document.getElementById("summaryText").innerHTML = "失敗"; }
+      const d = await res.json();
+      document.getElementById("summaryText").innerHTML = d.summary.replace(/\n/g, "<br>");
+    } catch (e) { document.getElementById("summaryText").innerHTML = "解説の取得に失敗しました。"; }
   }
 
-  function generateCardHTML(book, index) {
-    const isL = likedBooks.includes(book.id), isR = readBooks.includes(book.id), isS = savedBooks.includes(book.id);
-    const n = (new Date() - new Date(book.updated)) / 86400000 <= 7 ? '<div class="new-badge">New!</div>' : '';
-    let r = ""; if (book.rating) { const s = parseInt(book.rating); r = `<div class="rating">${"★".repeat(s)}${"☆".repeat(5-s)}</div>`; }
-    return `<div class="card">${n}<img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/80x130'"><div class="title">${book.title}</div><div class="author">${book.author}</div>${r}<div class="card-tags">${book.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}</div><div class="button-area"><div class="primary-buttons"><a href="${book.url}" target="_blank" class="button">感想</a><button onclick="showSummary('${book.id}')" class="button ai-summary-btn">📖 解説</button></div><div class="action-row"><button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isL?'liked':''}"><span>❤️</span>${book.likes}<br>いいね</button><button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isR?'read':''}"><span>✅</span>${book.reads}<br>読了</button><button onclick="toggleSave('${book.id}')" class="save-btn ${isS?'saved':''}"><span>🔖</span><br>${isS?'保存中':'保存'}</button></div></div></div>`;
-  }
-
-  function generateReaderCardHTML(book, i) {
-    const isL = likedBooks.includes(book.id);
-    return `<div class="reader-card"><div style="font-size:14px; background:#fdfbf7; padding:15px; border-radius:10px; border-left:4px solid #ffcc80; margin-bottom:15px;">${book.reason.replace(/\n/g, '<br>')}</div><div style="font-weight:bold;">📖 ${book.title}</div><div style="font-size:12px; color:#777; margin-bottom:15px;">✍️ ${book.author}</div><div class="action-row"><button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isL?'liked':''}"><span>❤️</span>${book.likes}<br>いいね</button></div></div>`;
-  }
-
-  // 補助関数群
   async function runPrescription() {
-    const w = document.getElementById("worryInput").value; if (!w) return alert("入力してね");
-    const btn = event.target; btn.disabled = true; document.getElementById("pharmacistAvatar").src = AI_AVATARS.pharmacist.searching;
+    const w = document.getElementById("worryInput").value.trim();
+    if (!w) return alert("お悩みをご記入ください。");
+    const btn = document.getElementById("prescribeBtn");
+    btn.disabled = true; document.getElementById("pharmacistAvatar").src = AI_AVATARS.pharmacist.searching;
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "prescribe", message: w }) });
       const d = await res.json();
-      document.getElementById("prescribedBookBox").innerHTML = `<img src="${d.recommendedBook.image}" style="width:60px; height:85px; border-radius:4px;"><div style="font-weight:bold; color:#01579b;">薬：『${d.recommendedBook.title}』</div>`;
+      const freshBook = [...allData, ...readerData].find(f => f.id === d.recommendedBook.id) || d.recommendedBook;
+      document.getElementById("prescribedBookBox").innerHTML = `
+        <img src="${freshBook.image}" onerror="this.src='https://via.placeholder.com/70x100'">
+        <div>
+          <div style="font-weight:bold; font-size:16px; color:#01579b;">💊 処方本：『${freshBook.title}』</div>
+          <button onclick="showSummary('${freshBook.id}')" style="margin-top:8px; font-size:11px; border:none; background:#e1f5fe; color:#01579b; padding:5px 12px; border-radius:10px; cursor:pointer; font-weight:bold;">この本の効能を見る</button>
+        </div>`;
       document.getElementById("prescriptionText").innerHTML = d.prescription.replace(/\n/g, "<br>");
       document.getElementById("prescriptionResultArea").style.display = "block";
-    } catch(e) { alert("失敗"); } finally { btn.disabled = false; document.getElementById("pharmacistAvatar").src = AI_AVATARS.pharmacist.normal; }
+    } catch(e) { alert("処方箋の作成に失敗しました。"); } 
+    finally { btn.disabled = false; document.getElementById("pharmacistAvatar").src = AI_AVATARS.pharmacist.normal; }
   }
 
+  /* ------------------------------------------
+     レンダリング・UI管理
+  ------------------------------------------ */
   function renderAll() {
     const s = document.getElementById("searchBar").value.toLowerCase();
     let f = allData.filter(b => (b.title + b.author).toLowerCase().includes(s) && activeTags.every(t => b.tags.includes(t)) && (isMyShelfMode ? savedBooks.includes(b.id) : true));
-    if (currentSortMode === 'new') f.sort((a, b) => new Date(b.updated) - new Date(a.updated)); else f.sort((a, b) => b.likes - a.likes);
+    
+    if (currentSortMode === 'new') f.sort((a, b) => new Date(b.updated) - new Date(a.updated)); 
+    else if (currentSortMode === 'like') f.sort((a, b) => b.likes - a.likes);
+
     document.getElementById("grid").innerHTML = f.map((b, i) => generateCardHTML(b, i)).join("");
     document.getElementById("readerGrid").innerHTML = [...readerData].sort((a,b) => b.likes - a.likes).map((b, i) => generateReaderCardHTML(b, i)).join("");
     setTimeout(observeCards, 100);
   }
 
+  function generateCardHTML(book, index) {
+    const isL = likedBooks.includes(book.id), isR = readBooks.includes(book.id), isS = savedBooks.includes(book.id);
+    const isNew = (new Date() - new Date(book.updated)) / 86400000 <= 7 ? '<div class="new-badge">New!</div>' : '';
+    let badgeHtml = (currentSortMode === 'like' && index >= 0 && index <= 2 && book.likes > 0) ? `<div class="rank-badge rank-${index+1}">${index+1}位</div>` : "";
+    
+    let r = ""; if (book.rating) { const s = parseInt(book.rating); if(!isNaN(s)) r = `<div class="rating">${"★".repeat(s)}${"☆".repeat(5-s)}</div>`; }
+
+    return `
+      <div class="card">
+        ${isNew}${badgeHtml}
+        <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/110x160?text=No+Image'">
+        <div class="title">${book.title}</div>
+        <div class="author">${book.author}</div>
+        ${r}
+        <div class="card-tags">${book.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}</div>
+        <div class="button-area">
+          <div class="primary-buttons">
+            <a href="${book.url}" target="_blank" class="card-btn">感想を見る</a>
+            <button onclick="showSummary('${book.id}')" class="card-btn ai-summary-btn">📖 内容解説</button>
+          </div>
+          <div class="action-row">
+            <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isL?'liked':''}"><span>❤️</span>${book.likes}<br>読みたい</button>
+            <button onclick="handleAction('${book.id}', 'readBook')" class="read-btn ${isR?'read':''}"><span>✅</span>${book.reads}<br>既読</button>
+            <button onclick="toggleSave('${book.id}')" class="save-btn ${isS?'saved':''}"><span>🔖</span><br>${isS?'保存中':'保存'}</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function generateReaderCardHTML(book, i) {
+    const isL = likedBooks.includes(book.id);
+    let rank = i <= 2 && book.likes > 0 ? `<div class="rank-badge rank-${i+1}">${i+1}位</div>` : "";
+    return `
+      <div class="reader-card">
+        ${rank}
+        <div class="reader-quote">${book.reason.replace(/\n/g, '<br>')}</div>
+        <div style="font-weight:bold; font-size:15px; color:#222; margin-bottom:5px;">📖 ${book.title}</div>
+        <div style="font-size:12px; color:#777; margin-bottom:20px;">著者：${book.author}</div>
+        <div class="action-row" style="margin-top:auto;">
+          <button onclick="handleAction('${book.id}', 'likeBook')" class="like-btn ${isL?'liked':''}" style="flex:none; width:80px;"><span>❤️</span>${book.likes}<br>いいね</button>
+        </div>
+      </div>`;
+  }
+
+  /* ------------------------------------------
+     共通イベント・補助機能
+  ------------------------------------------ */
   function setAiPrompt(p) { document.getElementById("aiQuery").value = p; runAiConsult(); }
   function resetAi() { document.getElementById("aiQuery").value = ""; document.getElementById("aiResultArea").style.display = "none"; }
   function toggleMyShelf() { isMyShelfMode = !isMyShelfMode; document.getElementById("myShelfBtn").classList.toggle("active"); renderAll(); }
   function changeSortMode(m) { currentSortMode = m; document.getElementById("sortNewBtn").classList.toggle("active", m === 'new'); document.getElementById("sortLikeBtn").classList.toggle("active", m === 'like'); renderAll(); }
-  async function fetchMood() { try { const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "getMood" }) }); const d = await res.json(); document.getElementById("shelfMood").textContent = "✨ " + d.mood; } catch(e){} }
   function closeModal() { document.getElementById("submitModal").style.display = "none"; }
   function openModal() { document.getElementById("submitModal").style.display = "flex"; }
   function openDiagnoseModal() { document.getElementById("diagnoseModal").style.display = "flex"; }
@@ -377,14 +673,97 @@
   function closeSummaryModal() { document.getElementById("summaryModal").style.display = "none"; }
   function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
   function resetPrescription() { document.getElementById("worryInput").value = ""; document.getElementById("prescriptionResultArea").style.display = "none"; }
-  async function handleAction(id, a) { const l = a === 'likeBook' ? likedBooks : readBooks; if (l.includes(id)) return; l.push(id); localStorage.setItem(a === 'likeBook' ? 'likedBooks' : 'readBooks', JSON.stringify(l)); if (a === 'readBook') spawnConfetti(); renderAll(); fetch(API_URL, { method: "POST", body: JSON.stringify({ action: a, pageId: id }) }); }
-  function toggleSave(id) { if (savedBooks.includes(id)) savedBooks = savedBooks.filter(i => i !== id); else savedBooks.push(id); localStorage.setItem('savedBooks', JSON.stringify(savedBooks)); renderAll(); }
-  function spawnConfetti() { for (let i = 0; i < 40; i++) { const c = document.createElement('div'); c.style.cssText = `position:fixed; width:10px; height:10px; background:#ffc0cb; left:${Math.random()*100}vw; animation: fall ${Math.random()*3+2}s linear forwards; z-index:4000;`; document.body.appendChild(c); setTimeout(() => c.remove(), 5000); } }
-  function observeCards() { const o = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('show'), 50); o.unobserve(e.target); } }); }, { threshold: 0.1 }); document.querySelectorAll('.card:not(.show), .reader-card:not(.show)').forEach(c => o.observe(c)); }
-  function generateFilterTags(bs) { const c = document.getElementById("tagsContainer"); const ts = new Set(); bs.forEach(b => b.tags.forEach(t => ts.add(t))); ts.forEach(t => { const b = document.createElement("button"); b.className = "filter-tag"; b.textContent = t; b.onclick = () => { b.classList.toggle("active"); if (activeTags.includes(t)) activeTags = activeTags.filter(x => x !== t); else activeTags.push(t); renderAll(); }; c.appendChild(b); }); }
-  function playGacha() { if (gachaPool.length === 0) return; const m = document.getElementById('gachaModal'), s = document.getElementById('gachaSlotImg'), t = document.getElementById('gachaTitle'), d = document.getElementById('gachaDesc'), a = document.getElementById('gachaActions'); m.style.display = 'flex'; a.style.display = 'none'; t.innerHTML = "探索中..."; let c = 0; const i = setInterval(() => { s.src = gachaPool[Math.floor(Math.random() * gachaPool.length)].image; if (++c > 20) { clearInterval(i); const w = gachaPool[Math.floor(Math.random() * gachaPool.length)]; s.src = w.image; t.innerHTML = "✨ 運命の一冊！"; d.innerHTML = `『${w.title}』<br>${w.author}`; a.style.display = 'flex'; if (w.url && w.url !== "#") document.getElementById('gachaLinkBtn').onclick = () => window.open(w.url, '_blank'); else document.getElementById('gachaLinkBtn').style.display = 'none'; } }, 100); }
-  async function submitBook() { const t = document.getElementById("submitTitle").value, r = document.getElementById("submitReason").value; if (!t || !r) return alert("必須項目を埋めてね"); try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "submitBook", data: { title: t, author: document.getElementById("submitAuthor").value, reason: r } }) }); alert("送信完了！"); closeModal(); } catch (e) { alert("失敗"); } }
-  document.getElementById("updateDbBtn").onclick = async () => { const p = prompt("合言葉は？"); if (!p) return; const btn = event.target; btn.disabled = true; try { const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: p }) }); const d = await res.json(); if (d.status === "success") { alert("学習完了！"); location.reload(); } else { alert(d.message); } } catch (e) { alert("エラー"); } finally { btn.disabled = false; } };
+  
+  async function handleAction(id, a) { 
+    const l = a === 'likeBook' ? likedBooks : readBooks; if (l.includes(id)) return; 
+    l.push(id); localStorage.setItem(a === 'likeBook' ? 'likedBooks' : 'readBooks', JSON.stringify(l)); 
+    if (a === 'readBook') spawnConfetti(); renderAll(); 
+    fetch(API_URL, { method: "POST", body: JSON.stringify({ action: a, pageId: id }) });
+  }
+
+  function toggleSave(id) { 
+    if (savedBooks.includes(id)) savedBooks = savedBooks.filter(i => i !== id); 
+    else savedBooks.push(id); 
+    localStorage.setItem('savedBooks', JSON.stringify(savedBooks)); renderAll(); 
+  }
+
+  function spawnConfetti() { 
+    for (let i = 0; i < 50; i++) { 
+      const c = document.createElement('div'); 
+      c.style.cssText = `position:fixed; width:10px; height:10px; background:${['#ffc0cb','#ffb6c1','#ff69b4','#fff0f5'][Math.floor(Math.random()*4)]}; left:${Math.random()*100}vw; top:-10px; border-radius:50%; animation: fall ${Math.random()*3+2}s linear forwards; z-index:4000;`; 
+      document.body.appendChild(c); setTimeout(() => c.remove(), 5000); 
+    } 
+  }
+  
+  function observeCards() { 
+    const o = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('show'), 50); o.unobserve(e.target); } }); }, { threshold: 0.1 }); 
+    document.querySelectorAll('.card:not(.show), .reader-card:not(.show)').forEach(c => o.observe(c)); 
+  }
+
+  function generateFilterTags(bs) { 
+    const c = document.getElementById("tagsContainer"); c.innerHTML = "";
+    const ts = new Set(); bs.forEach(b => b.tags.forEach(t => ts.add(t))); 
+    ts.forEach(t => { 
+      const b = document.createElement("button"); b.className = "filter-tag"; b.textContent = t; 
+      b.onclick = () => { b.classList.toggle("active"); if (activeTags.includes(t)) activeTags = activeTags.filter(x => x !== t); else activeTags.push(t); renderAll(); }; 
+      c.appendChild(b); 
+    }); 
+  }
+
+  function playGacha() { 
+    if (gachaPool.length === 0) return; 
+    const m = document.getElementById('gachaModal'), s = document.getElementById('gachaSlotImg'), t = document.getElementById('gachaTitle'), d = document.getElementById('gachaDesc'), a = document.getElementById('gachaActions'); 
+    m.style.display = 'flex'; a.style.display = 'none'; t.innerHTML = "運命の一冊を探索中..."; 
+    let c = 0; const i = setInterval(() => { 
+      s.src = gachaPool[Math.floor(Math.random() * gachaPool.length)].image || 'https://via.placeholder.com/160x230'; 
+      if (++c > 20) { 
+        clearInterval(i); const w = gachaPool[Math.floor(Math.random() * gachaPool.length)]; 
+        s.src = w.image || 'https://via.placeholder.com/160x230'; 
+        t.innerHTML = "✨ 今、あなたが出会うべき本 ✨"; 
+        d.innerHTML = `<strong>『${w.title}』</strong><br>${w.author}`; a.style.display = 'flex'; 
+        if (w.url && w.url !== "#" && w.url !== "javascript:void(0)") document.getElementById('gachaLinkBtn').onclick = () => window.open(w.url, '_blank'); 
+        else document.getElementById('gachaLinkBtn').style.display = 'none'; 
+      } 
+    }, 100); 
+  }
+
+  async function submitBook() { 
+    const t = document.getElementById("submitTitle").value, r = document.getElementById("submitReason").value; 
+    if (!t || !r) return alert("タイトルと理由は必ず入力してくださいね。"); 
+    const btn = document.getElementById("submitConfirmBtn"); btn.disabled = true; btn.textContent = "送信中...";
+    try { 
+      await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "submitBook", data: { title: t, author: document.getElementById("submitAuthor").value, reason: r } }) }); 
+      alert("おすすめ本の推薦、ありがとうございます！管理人が確認させていただきますね。"); closeModal(); 
+    } catch (e) { alert("通信に失敗しました。"); } finally { btn.disabled = false; btn.textContent = "管理人に届ける"; }
+  }
+
+  document.getElementById("updateDbBtn").onclick = async () => { 
+    const p = prompt("合言葉を入力してください"); if (!p) return; 
+    const btn = document.getElementById("updateDbBtn"); btn.disabled = true; btn.textContent = "学習中...";
+    try { 
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "updateDB", password: p }) }); 
+      const d = await res.json(); 
+      if (d.status === "success") { alert("AIが最新の本棚情報を学習しました！"); location.reload(); } else { alert(d.message); } 
+    } catch (e) { alert("エラーが発生しました。"); } finally { btn.disabled = false; btn.textContent = "🔄 AI学習を更新"; } 
+  };
+
+  async function runDiagnose() {
+    const input = document.getElementById("diagnoseInput").value.trim();
+    if (!input) return alert("分析する作品名を教えてくださいね。");
+    closeDiagnoseModal();
+    const resultArea = document.getElementById("aiResultArea"), aiText = document.getElementById("aiText"), aiGrid = document.getElementById("aiBooksGrid");
+    resultArea.style.display = "block"; aiText.innerHTML = "あなたの読書傾向を深く分析し、カルテを作成しています..."; aiGrid.innerHTML = "";
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "diagnose", message: input }) });
+      const data = await res.json();
+      aiText.innerHTML = "<h4 style='color:#00796b;margin-top:0;'>🩺 あなたの読書カルテ報告書</h4>" + data.result.replace(/\n/g, "<br>");
+      if (data.recommendedBooks) {
+        const updated = data.recommendedBooks.map(aib => [...allData, ...readerData].find(f => f.id === aib.id) || aib);
+        aiGrid.innerHTML = updated.map(b => generateCardHTML(b, -1)).join("");
+        setTimeout(observeCards, 100);
+      }
+    } catch (e) { aiText.innerHTML = "分析中に迷子になってしまいました。再度お試しください。"; }
+  }
 </script>
 </body>
 </html>
