@@ -80,25 +80,50 @@
 
     /* フルスクリーン動画再生オーバーレイ */
     #videoOverlay {
-      display: none; position: fixed; inset: 0; background: #000; z-index: 5000;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000;
       flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
-      opacity: 0; transition: opacity 1s ease;
+      opacity: 0; transition: opacity 0.8s ease;
     }
-    .close-video-btn {
-      position: absolute; top: 30px; right: 40px; color: rgba(255,255,255,0.5);
-      font-size: 14px; font-weight: 700; cursor: pointer; border: none; background: transparent;
-      z-index: 5010; transition: 0.3s; padding: 10px;
-    }
-    .close-video-btn:hover { color: white; }
     
-    .video-container { width: 100%; height: 100%; max-width: 1400px; display: flex; align-items: center; justify-content: center;}
-    #theaterVideo { width: 100%; height: 100%; object-fit: contain; }
+    .video-header {
+      position: absolute; top: 0; left: 0; width: 100%; padding: 20px 40px; box-sizing: border-box;
+      display: flex; justify-content: space-between; align-items: center; z-index: 5010;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    }
+
+    .close-video-btn {
+      color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700; cursor: pointer; 
+      border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); border-radius: 50px;
+      transition: 0.3s; padding: 10px 20px; backdrop-filter: blur(5px);
+    }
+    .close-video-btn:hover { color: white; border-color: white; background: rgba(255,255,255,0.1); }
+    
+    /* iframe用のコンテナ調整 */
+    .video-container { 
+      width: 100%; height: 75vh; max-width: 1200px; 
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 40px; box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 10px; overflow: hidden;
+    }
+    #theaterIframe { width: 100%; height: 100%; border: none; background: #000; }
+
+    /* 次への導線ボタン */
+    .next-action-area {
+      margin-top: 30px; text-align: center; z-index: 5010;
+    }
+    .finish-watch-btn {
+      background: #fff; color: #000; border: none; padding: 15px 40px; border-radius: 50px;
+      font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 0 30px rgba(255,255,255,0.2);
+    }
+    .finish-watch-btn:hover {
+      transform: translateY(-3px); box-shadow: 0 0 40px rgba(255,255,255,0.4);
+    }
 
     /* 動画終了後のリザルト画面 */
     #resultOverlay {
-      display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+      display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
       flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;
-      animation: fadeInResult 1.5s forwards; padding: 20px; z-index: 5005;
+      animation: fadeInResult 1.5s forwards; padding: 20px; z-index: 5020;
     }
     @keyframes fadeInResult { from { opacity: 0; } to { opacity: 1; } }
     
@@ -120,6 +145,9 @@
       .page-title { font-size: 16px; }
       .intro-text { font-size: 13px; margin-bottom: 40px; }
       .movie-grid { gap: 30px; grid-template-columns: repeat(2, 1fr); }
+      .video-container { height: 40vh; margin-top: 60px; }
+      .video-header { padding: 15px 20px; }
+      .finish-watch-btn { padding: 12px 25px; font-size: 14px; }
       .result-title { font-size: 20px; }
       .result-cover { width: 120px; height: 175px; }
       .result-actions { flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
@@ -150,19 +178,27 @@
 </div>
 
 <div id="videoOverlay">
-  <button class="close-video-btn" onclick="closeTheater()">退出する ✕</button>
+  <div class="video-header">
+    <div style="font-size:12px; color:#ff4757; font-weight:700; letter-spacing:3px;">NOW SHOWING</div>
+    <button class="close-video-btn" onclick="closeTheater()">退出する ✕</button>
+  </div>
+  
   <div class="video-container">
-    <video id="theaterVideo" playsinline></video>
+    <iframe id="theaterIframe" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+
+  <div class="next-action-area">
+    <button class="finish-watch-btn" onclick="showResult()">🎬 鑑賞を終えて、物語の詳細を見る</button>
   </div>
   
   <div id="resultOverlay">
-    <div style="font-size:12px; color:#ff4757; font-weight:700; letter-spacing:3px; margin-bottom:20px;">NOW SHOWING</div>
     <img id="resultCover" class="result-cover" src="">
     <div id="resultTitle" class="result-title"></div>
     <div id="resultAuthor" class="result-author"></div>
     <div class="result-actions">
       <a id="resultLink" href="#" target="_blank" class="btn btn-primary">この物語の感想を嗜む</a>
       <button onclick="replayVideo()" class="btn btn-secondary">もう一度鑑賞する</button>
+      <button onclick="closeTheater()" class="btn btn-secondary" style="background:transparent; border:none; color:#94a3b8;">シアターへ戻る</button>
     </div>
   </div>
 </div>
@@ -213,21 +249,33 @@
       </div>
     `).join("");
 
-    // スクロール時のフェードイン演出
     setTimeout(() => {
       document.querySelectorAll('.movie-card').forEach(c => c.classList.add('show'));
     }, 100);
   }
 
-  // Google DriveのURLをダイレクト再生用URLに変換する関数
+  // 🌟 Google Drive & YouTube の両方をセキュアな埋め込み形式に変換する強化版ロジック
   function getDirectVideoUrl(url) {
     if (!url) return "";
+    
+    // Google Driveの場合（/preview を使用）
     if (url.includes('drive.google.com')) {
       const match = url.match(/[-\w]{25,}/);
       if (match) {
-        return `https://drive.google.com/uc?export=download&id=${match[0]}`;
+        return `https://drive.google.com/file/d/${match[0]}/preview`;
       }
     }
+    
+    // YouTubeの場合（/embed を使用）
+    if (url.includes('youtube.com/watch')) {
+      const urlObj = new URL(url);
+      const v = urlObj.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
+    } else if (url.includes('youtu.be/')) {
+      const v = url.split('youtu.be/')[1].split('?')[0];
+      if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
+    }
+    
     return url;
   }
 
@@ -238,24 +286,16 @@
     currentPlayingBook = book;
     const overlay = document.getElementById('videoOverlay');
     const resultOverlay = document.getElementById('resultOverlay');
-    const video = document.getElementById('theaterVideo');
+    const iframe = document.getElementById('theaterIframe');
     
-    // UIのリセット
     resultOverlay.style.display = 'none';
     overlay.style.display = 'flex';
     
-    // 少し遅れてフェードイン（暗転効果）
+    // 少し遅れてフェードイン
     setTimeout(() => {
       overlay.style.opacity = "1";
-      video.src = getDirectVideoUrl(book.videoUrl);
-      video.load();
-      video.play();
+      iframe.src = getDirectVideoUrl(book.videoUrl);
     }, 50);
-
-    // 動画終了時のイベント
-    video.onended = () => {
-      showResult();
-    };
   }
 
   function showResult() {
@@ -278,23 +318,27 @@
 
   function replayVideo() {
     document.getElementById('resultOverlay').style.display = 'none';
-    const video = document.getElementById('theaterVideo');
-    video.currentTime = 0;
-    video.play();
+    const iframe = document.getElementById('theaterIframe');
+    // iframeのsrcを再設定して強制リロード（再読み込み）
+    const currentSrc = iframe.src;
+    iframe.src = "";
+    setTimeout(() => {
+      iframe.src = currentSrc;
+    }, 50);
   }
 
   function closeTheater() {
     const overlay = document.getElementById('videoOverlay');
-    const video = document.getElementById('theaterVideo');
+    const iframe = document.getElementById('theaterIframe');
     
-    video.pause();
-    video.src = ""; // ソースを空にして確実な停止とメモリ解放
+    iframe.src = ""; // iframeを空にして動画の音や通信を完全にカット
     currentPlayingBook = null;
     
     overlay.style.opacity = "0";
     setTimeout(() => {
       overlay.style.display = 'none';
-    }, 1000);
+      document.getElementById('resultOverlay').style.display = 'none';
+    }, 800);
   }
 </script>
 </body>
