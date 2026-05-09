@@ -240,6 +240,10 @@
     .pulse-text { animation: pulseText 2s infinite; }
     @keyframes pulseText { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
+    /* ★ タグ選択用UI */
+    .form-tag { padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; background: #fff; color: #555; }
+    .form-tag.selected { background: #166534; color: white; border-color: #166534; }
+
     input[type="text"], textarea, select { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 10px; font-family: inherit; font-size: 14px; box-sizing: border-box;}
     textarea { resize: vertical; }
 
@@ -359,8 +363,11 @@
       <input type="text" id="addAuthor" placeholder="著者名">
       <input type="text" id="addUrl" placeholder="URL（AmazonのURLなど）">
       
-      <input type="text" id="addTags" placeholder="タグ（例：小説, エッセイ）※手動設定用" disabled title="Notion側で手動設定してください" style="background-color: #f5f5f5;">
-      
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:13px; font-weight:700; color:#555;"> タグ（複数選択可）：</label>
+        <div id="tagSelectContainer" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+      </div>
+
       <div style="display:flex; flex-direction:column; gap:5px;">
         <label style="font-size:13px; font-weight:700; color:#555;"> 書影（画像ファイルを選択）：</label>
         <input type="file" id="addImageFile" accept="image/*" style="border:none; padding:0;">
@@ -521,12 +528,17 @@
     pharmacist: { normal: "処方箋_通常.png", searching: "処方箋_探し中.png" }
   };
 
+  // 🌟 タグ選択用変数
+  const AVAILABLE_TAGS = ["短編小説", "長編小説", "エッセイ", "ビジネス", "心理学・精神分析", "海外文学", "恋愛小説"];
+  let selectedFormTags = [];
+
   let allData = [], readerData = [], gachaPool = [], activeTags = [], currentSortMode = 'new', isMyShelfMode = false;
   let likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [], readBooks = JSON.parse(localStorage.getItem('readBooks')) || [], savedBooks = JSON.parse(localStorage.getItem('savedBooks')) || [];
 
   window.onload = async () => {
     updateChatAvatar('normal');
     document.getElementById('pharmacistAvatar').src = AI_AVATARS.pharmacist.normal;
+    renderFormTags(); // タグボタンを生成
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -544,6 +556,28 @@
     if(img) { img.style.opacity = 0; setTimeout(() => { img.src = AI_AVATARS[persona][state]; img.style.opacity = 1; }, 200); }
   }
 
+  // 🌟 新刊登録パネル用のタグUIを生成
+  function renderFormTags() {
+    const container = document.getElementById("tagSelectContainer");
+    container.innerHTML = "";
+    AVAILABLE_TAGS.forEach(tag => {
+      const btn = document.createElement("button");
+      btn.type = "button"; // フォーム送信を防ぐ
+      btn.className = "form-tag";
+      if (selectedFormTags.includes(tag)) btn.classList.add("selected");
+      btn.textContent = tag;
+      btn.onclick = () => {
+        if (selectedFormTags.includes(tag)) {
+          selectedFormTags = selectedFormTags.filter(t => t !== tag);
+        } else {
+          selectedFormTags.push(tag);
+        }
+        renderFormTags(); // 再描画
+      };
+      container.appendChild(btn);
+    });
+  }
+
   /* ------------------------------------------
      管理者機能 & ISBN特定
   ------------------------------------------ */
@@ -557,10 +591,7 @@
       if(data.status === "success") {
         document.getElementById("addTitle").value = data.title;
         document.getElementById("addAuthor").value = data.author;
-        
-        // 🌟 取得したあらすじをテキストエリアにセット
         document.getElementById("addReview").value = data.summary;
-        
         document.getElementById("scoutImageUrl").value = data.image;
         alert("物語を特定しました。書影は自動取得できない場合があるため、ご自身でファイルを選択してください。");
       } else { alert("AIが本を見つけられませんでした。手入力をお願いします。"); }
@@ -590,10 +621,8 @@
       author: document.getElementById("addAuthor").value,
       url: document.getElementById("addUrl").value,
       rating: document.getElementById("addRating").value,
-      
-      // 🌟 画面から入力・追記されたレビュー全文を取得して送信
       review: document.getElementById("addReview").value,
-      
+      tags: selectedFormTags, // 🌟 選択したタグの配列を渡す
       scoutImage: document.getElementById("scoutImageUrl").value,
       fileData: fileData,
       filename: filename
@@ -608,7 +637,13 @@
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "adminAddBook", password: pass, data: data }) });
       const resData = await res.json();
-      if(resData.status === "success") { alert("本棚へ迎え入れました✨ 知識を更新して反映させてください。"); closeAdminAddModal(); location.reload(); } else { alert(resData.message); }
+      if(resData.status === "success") { 
+        alert("本棚へ迎え入れました✨ 知識を更新して反映させてください。"); 
+        closeAdminAddModal(); 
+        location.reload(); 
+      } else { 
+        alert(resData.message); 
+      }
     } catch(e) { alert("登録中にエラーが発生しました。"); } finally { btn.disabled = false; }
   }
 
