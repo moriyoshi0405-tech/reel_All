@@ -528,7 +528,6 @@
     pharmacist: { normal: "処方箋_通常.png", searching: "処方箋_探し中.png" }
   };
 
-  // 🌟 タグ選択用変数
   const AVAILABLE_TAGS = ["短編小説", "長編小説", "エッセイ", "ビジネス", "心理学・精神分析", "海外文学", "恋愛小説"];
   let selectedFormTags = [];
 
@@ -538,7 +537,7 @@
   window.onload = async () => {
     updateChatAvatar('normal');
     document.getElementById('pharmacistAvatar').src = AI_AVATARS.pharmacist.normal;
-    renderFormTags(); // タグボタンを生成
+    renderFormTags();
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
@@ -556,13 +555,12 @@
     if(img) { img.style.opacity = 0; setTimeout(() => { img.src = AI_AVATARS[persona][state]; img.style.opacity = 1; }, 200); }
   }
 
-  // 🌟 新刊登録パネル用のタグUIを生成
   function renderFormTags() {
     const container = document.getElementById("tagSelectContainer");
     container.innerHTML = "";
     AVAILABLE_TAGS.forEach(tag => {
       const btn = document.createElement("button");
-      btn.type = "button"; // フォーム送信を防ぐ
+      btn.type = "button";
       btn.className = "form-tag";
       if (selectedFormTags.includes(tag)) btn.classList.add("selected");
       btn.textContent = tag;
@@ -572,7 +570,7 @@
         } else {
           selectedFormTags.push(tag);
         }
-        renderFormTags(); // 再描画
+        renderFormTags(); 
       };
       container.appendChild(btn);
     });
@@ -622,7 +620,7 @@
       url: document.getElementById("addUrl").value,
       rating: document.getElementById("addRating").value,
       review: document.getElementById("addReview").value,
-      tags: selectedFormTags, // 🌟 選択したタグの配列を渡す
+      tags: selectedFormTags,
       scoutImage: document.getElementById("scoutImageUrl").value,
       fileData: fileData,
       filename: filename
