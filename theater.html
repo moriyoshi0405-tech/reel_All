@@ -7,14 +7,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #0b0b0b;
+      --bg-color: #050505;
       --text-color: #f1f5f9;
       --accent: #ff4757;
+      --theater-light: rgba(255, 71, 87, 0.05);
     }
     
     body {
       margin: 0; padding: 0; font-family: 'Zen Maru Gothic', sans-serif;
-      background: var(--bg-color); color: var(--text-color);
+      /* 天井のスポットライトのようなグラデーション背景 */
+      background: radial-gradient(circle at 50% 0%, #1a0a0c 0%, var(--bg-color) 70%);
+      color: var(--text-color);
       min-height: 100vh; overflow-x: hidden;
     }
 
@@ -33,7 +36,7 @@
     /* ヘッダー */
     .top-nav {
       padding: 30px 40px; display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
       position: sticky; top: 0; z-index: 100;
     }
     .back-btn {
@@ -42,7 +45,7 @@
       backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); transition: 0.3s;
     }
     .back-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
-    .page-title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 5px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    .page-title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 5px; color: #fff; text-shadow: 0 0 15px rgba(255,71,87,0.4); }
 
     /* メインコンテンツ（上映リスト） */
     .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; text-align: center; }
@@ -57,30 +60,36 @@
       transform: translateY(20px); opacity: 0;
     }
     .movie-card.show { transform: translateY(0); opacity: 1; }
-    .movie-card:hover { transform: scale(1.05); }
+    .movie-card:hover { transform: scale(1.03); }
 
     .poster-wrapper {
-      position: relative; border-radius: 15px; overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5); aspect-ratio: 2/3; margin-bottom: 20px;
+      position: relative; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8); aspect-ratio: 2/3; margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
-    .movie-poster { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: brightness(0.8); }
-    .movie-card:hover .movie-poster { filter: brightness(1); }
+    .poster-wrapper::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%);
+      pointer-events: none;
+    }
+    .movie-poster { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: brightness(0.7) contrast(1.1); }
+    .movie-card:hover .movie-poster { filter: brightness(1) contrast(1); }
     
     .play-icon {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 60px; height: 60px; background: rgba(255, 71, 87, 0.8); border-radius: 50%;
+      width: 70px; height: 70px; background: rgba(255, 71, 87, 0.85); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; color: white; opacity: 0; transition: 0.3s;
-      box-shadow: 0 0 30px rgba(255, 71, 87, 0.5); padding-left: 5px; box-sizing: border-box;
+      font-size: 28px; color: white; opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 40px rgba(255, 71, 87, 0.6); padding-left: 6px; box-sizing: border-box;
     }
-    .movie-card:hover .play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    .movie-card:hover .play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-    .movie-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #fff; }
-    .movie-author { font-size: 14px; color: #94a3b8; }
+    .movie-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #fff; letter-spacing: 1px;}
+    .movie-author { font-size: 13px; color: #718096; }
 
     /* フルスクリーン動画再生オーバーレイ */
     #videoOverlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000;
+      display: none; position: fixed; inset: 0; background: #000; z-index: 5000;
       flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
       opacity: 0; transition: opacity 0.8s ease;
     }
@@ -88,55 +97,85 @@
     .video-header {
       position: absolute; top: 0; left: 0; width: 100%; padding: 20px 40px; box-sizing: border-box;
       display: flex; justify-content: space-between; align-items: center; z-index: 5010;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
     }
 
     .close-video-btn {
-      color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 700; cursor: pointer; 
-      border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); border-radius: 50px;
-      transition: 0.3s; padding: 10px 20px; backdrop-filter: blur(5px);
+      color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 700; cursor: pointer; 
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); border-radius: 50px;
+      transition: 0.3s; padding: 10px 25px; backdrop-filter: blur(5px); letter-spacing: 1px;
     }
     .close-video-btn:hover { color: white; border-color: white; background: rgba(255,255,255,0.1); }
     
-    /* iframe用のコンテナ調整 */
+    /* 🌟 カウントダウン演出 */
+    #countdownLayer {
+      position: absolute; inset: 0; background: #000; z-index: 5005;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+    }
+    .film-count-circle {
+      position: relative; width: 200px; height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      border: 4px solid rgba(255,255,255,0.8); border-radius: 50%;
+      animation: filmFlicker 0.12s infinite;
+    }
+    .film-count-circle::before { content: ''; position: absolute; width: 2px; height: 100%; background: rgba(255,255,255,0.8); }
+    .film-count-circle::after { content: ''; position: absolute; height: 2px; width: 100%; background: rgba(255,255,255,0.8); }
+    .film-number { font-size: 120px; font-weight: 700; color: #fff; z-index: 10; font-family: 'Courier New', Courier, monospace;}
+    
+    @keyframes filmFlicker {
+      0% { opacity: 1; filter: sepia(0.3) contrast(1.5) brightness(1); transform: scale(1.01) translate(1px, 1px); }
+      50% { opacity: 0.8; filter: sepia(0.4) contrast(1.2) brightness(0.9); transform: scale(0.99) translate(-1px, -1px); }
+      100% { opacity: 0.9; filter: sepia(0.3) contrast(1.4) brightness(1.1); transform: scale(1) translate(0, 0); }
+    }
+
+    /* iframe用のコンテナ（スクリーンの光漏れを演出） */
     .video-container { 
       width: 100%; height: 75vh; max-width: 1200px; 
       display: flex; align-items: center; justify-content: center;
-      margin-top: 40px; box-shadow: 0 0 50px rgba(0,0,0,0.8); border-radius: 10px; overflow: hidden;
+      margin-top: 40px; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 0 100px rgba(255, 255, 255, 0.05), 0 0 40px rgba(0, 0, 0, 1);
+      position: relative; opacity: 0; transition: opacity 1s ease;
     }
     #theaterIframe { width: 100%; height: 100%; border: none; background: #000; }
 
-    /* 次への導線ボタン */
-    .next-action-area {
-      margin-top: 30px; text-align: center; z-index: 5010;
-    }
+    .next-action-area { margin-top: 35px; text-align: center; z-index: 5010; opacity: 0; transition: opacity 1s ease; }
     .finish-watch-btn {
-      background: #fff; color: #000; border: none; padding: 15px 40px; border-radius: 50px;
-      font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; transition: 0.3s;
-      box-shadow: 0 0 30px rgba(255,255,255,0.2);
+      background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 15px 40px; border-radius: 50px;
+      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: 0.3s;
     }
-    .finish-watch-btn:hover {
-      transform: translateY(-3px); box-shadow: 0 0 40px rgba(255,255,255,0.4);
-    }
+    .finish-watch-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; transform: translateY(-2px); }
 
     /* 動画終了後のリザルト画面 */
     #resultOverlay {
-      display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
+      display: none; position: absolute; inset: 0; background: rgba(5,5,5,0.92); backdrop-filter: blur(20px);
       flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;
       animation: fadeInResult 1.5s forwards; padding: 20px; z-index: 5020;
     }
     @keyframes fadeInResult { from { opacity: 0; } to { opacity: 1; } }
     
-    .result-cover { width: 160px; height: 230px; object-fit: cover; border-radius: 10px; box-shadow: 0 0 40px rgba(255,255,255,0.1); margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);}
-    .result-title { font-size: 28px; font-weight: 700; margin-bottom: 10px; letter-spacing: 2px;}
-    .result-author { font-size: 15px; color: #cbd5e1; margin-bottom: 40px; }
+    .result-cover { width: 180px; height: 260px; object-fit: cover; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);}
+    .result-title { font-size: 32px; font-weight: 700; margin-bottom: 15px; letter-spacing: 2px;}
+    .result-author { font-size: 16px; color: #94a3b8; margin-bottom: 50px; }
     
-    .result-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-    .btn { padding: 15px 35px; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; border: none; font-family: inherit; text-decoration: none;}
-    .btn-primary { background: #fff; color: #000; }
-    .btn-primary:hover { background: #e2e8f0; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.2);}
-    .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-    .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .result-actions { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; align-items: center;}
+
+    /* 🌟 チケット風ボタン */
+    .ticket-btn {
+      position: relative; background: #fdfdfd; color: #111; padding: 18px 45px;
+      font-size: 15px; font-weight: 700; text-decoration: none; border-left: 2px dashed #cbd5e1;
+      border-radius: 5px; transition: 0.4s; box-shadow: 0 15px 30px rgba(0,0,0,0.5); display: inline-block;
+    }
+    .ticket-btn::before, .ticket-btn::after {
+      content: ''; position: absolute; left: -12px; width: 22px; height: 22px;
+      background: #050505; /* リザルト背景と同じ色で切り抜きを表現 */
+      border-radius: 50%;
+    }
+    .ticket-btn::before { top: -11px; }
+    .ticket-btn::after { bottom: -11px; }
+    .ticket-btn:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(255,255,255,0.15); background: #fff; }
+
+    .btn-secondary { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 18px 35px; border-radius: 50px; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: inherit;}
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
 
     .no-movies { margin-top: 50px; font-size: 16px; color: #94a3b8; }
 
@@ -147,11 +186,12 @@
       .movie-grid { gap: 30px; grid-template-columns: repeat(2, 1fr); }
       .video-container { height: 40vh; margin-top: 60px; }
       .video-header { padding: 15px 20px; }
-      .finish-watch-btn { padding: 12px 25px; font-size: 14px; }
-      .result-title { font-size: 20px; }
-      .result-cover { width: 120px; height: 175px; }
-      .result-actions { flex-direction: column; gap: 10px; width: 100%; max-width: 300px; }
-      .btn { width: 100%; box-sizing: border-box; }
+      .film-count-circle { width: 120px; height: 120px; }
+      .film-number { font-size: 70px; }
+      .result-title { font-size: 24px; }
+      .result-cover { width: 140px; height: 200px; }
+      .result-actions { flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+      .ticket-btn, .btn-secondary { width: 100%; box-sizing: border-box; }
     }
   </style>
 </head>
@@ -179,16 +219,22 @@
 
 <div id="videoOverlay">
   <div class="video-header">
-    <div style="font-size:12px; color:#ff4757; font-weight:700; letter-spacing:3px;">NOW SHOWING</div>
+    <div style="font-size:12px; color:#ff4757; font-weight:700; letter-spacing:4px;">NOW SHOWING</div>
     <button class="close-video-btn" onclick="closeTheater()">退出する ✕</button>
   </div>
   
-  <div class="video-container">
+  <div id="countdownLayer">
+    <div class="film-count-circle">
+      <div id="filmNumber" class="film-number">3</div>
+    </div>
+  </div>
+
+  <div id="videoScreen" class="video-container">
     <iframe id="theaterIframe" allow="autoplay; fullscreen" allowfullscreen></iframe>
   </div>
 
-  <div class="next-action-area">
-    <button class="finish-watch-btn" onclick="showResult()">🎬 鑑賞を終えて、物語の詳細を見る</button>
+  <div id="nextAction" class="next-action-area">
+    <button class="finish-watch-btn" onclick="showResult()">鑑賞を終えて、物語の詳細を見る</button>
   </div>
   
   <div id="resultOverlay">
@@ -196,15 +242,17 @@
     <div id="resultTitle" class="result-title"></div>
     <div id="resultAuthor" class="result-author"></div>
     <div class="result-actions">
-      <a id="resultLink" href="#" target="_blank" class="btn btn-primary">この物語の感想を嗜む</a>
-      <button onclick="replayVideo()" class="btn btn-secondary">もう一度鑑賞する</button>
-      <button onclick="closeTheater()" class="btn btn-secondary" style="background:transparent; border:none; color:#94a3b8;">シアターへ戻る</button>
+      <a id="resultLink" href="#" target="_blank" class="ticket-btn">
+        <span style="display:block; font-size:10px; color:#888; margin-bottom:2px; letter-spacing:2px;">ADMIT ONE</span>
+        この物語の感想を嗜む
+      </a>
+      <button onclick="replayVideo()" class="btn-secondary">もう一度鑑賞する</button>
+      <button onclick="closeTheater()" class="btn-secondary" style="background:transparent; border:none; color:#94a3b8;">シアターへ戻る</button>
     </div>
   </div>
 </div>
 
 <script>
-  // メインのGAS WebアプリURLを設定してください
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let cinemaBooks = [];
@@ -215,9 +263,7 @@
       const res = await fetch(API_URL);
       const data = await res.json();
       
-      // 予告編動画URLを持っている本だけを抽出
       cinemaBooks = (data.books || []).filter(b => b.videoUrl && b.videoUrl.trim() !== "");
-      
       renderMovies();
       
       const loader = document.getElementById("theater-loading");
@@ -254,28 +300,19 @@
     }, 100);
   }
 
-  // 🌟 Google Drive & YouTube の両方をセキュアな埋め込み形式に変換する強化版ロジック
   function getDirectVideoUrl(url) {
     if (!url) return "";
-    
-    // Google Driveの場合（/preview を使用）
     if (url.includes('drive.google.com')) {
       const match = url.match(/[-\w]{25,}/);
-      if (match) {
-        return `https://drive.google.com/file/d/${match[0]}/preview`;
-      }
+      if (match) return `https://drive.google.com/file/d/${match[0]}/preview`;
     }
-    
-    // YouTubeの場合（/embed を使用）
     if (url.includes('youtube.com/watch')) {
-      const urlObj = new URL(url);
-      const v = urlObj.searchParams.get('v');
+      const v = new URL(url).searchParams.get('v');
       if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
     } else if (url.includes('youtu.be/')) {
       const v = url.split('youtu.be/')[1].split('?')[0];
       if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
     }
-    
     return url;
   }
 
@@ -287,20 +324,42 @@
     const overlay = document.getElementById('videoOverlay');
     const resultOverlay = document.getElementById('resultOverlay');
     const iframe = document.getElementById('theaterIframe');
+    const countdownLayer = document.getElementById('countdownLayer');
+    const videoScreen = document.getElementById('videoScreen');
+    const nextAction = document.getElementById('nextAction');
+    const filmNum = document.getElementById('filmNumber');
     
+    // UI初期化
     resultOverlay.style.display = 'none';
+    countdownLayer.style.display = 'flex';
+    videoScreen.style.opacity = '0';
+    nextAction.style.opacity = '0';
     overlay.style.display = 'flex';
     
-    // 少し遅れてフェードイン
-    setTimeout(() => {
-      overlay.style.opacity = "1";
-      iframe.src = getDirectVideoUrl(book.videoUrl);
-    }, 50);
+    // フェードイン
+    setTimeout(() => { overlay.style.opacity = "1"; }, 50);
+
+    // カウントダウン処理 (3 -> 2 -> 1)
+    let count = 3;
+    filmNum.textContent = count;
+    
+    const countInterval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        filmNum.textContent = count;
+      } else {
+        clearInterval(countInterval);
+        // カウントダウン終了、映像へ
+        countdownLayer.style.display = 'none';
+        videoScreen.style.opacity = '1';
+        nextAction.style.opacity = '1';
+        iframe.src = getDirectVideoUrl(book.videoUrl);
+      }
+    }, 1000); // 1秒ごとにカウント
   }
 
   function showResult() {
     const resultOverlay = document.getElementById('resultOverlay');
-    
     document.getElementById('resultCover').src = currentPlayingBook.image;
     document.getElementById('resultTitle').textContent = currentPlayingBook.title;
     document.getElementById('resultAuthor').textContent = `著者：${currentPlayingBook.author}`;
@@ -312,26 +371,22 @@
     } else {
       linkBtn.style.display = "none";
     }
-
     resultOverlay.style.display = 'flex';
   }
 
   function replayVideo() {
     document.getElementById('resultOverlay').style.display = 'none';
     const iframe = document.getElementById('theaterIframe');
-    // iframeのsrcを再設定して強制リロード（再読み込み）
     const currentSrc = iframe.src;
     iframe.src = "";
-    setTimeout(() => {
-      iframe.src = currentSrc;
-    }, 50);
+    setTimeout(() => { iframe.src = currentSrc; }, 50);
   }
 
   function closeTheater() {
     const overlay = document.getElementById('videoOverlay');
     const iframe = document.getElementById('theaterIframe');
     
-    iframe.src = ""; // iframeを空にして動画の音や通信を完全にカット
+    iframe.src = ""; 
     currentPlayingBook = null;
     
     overlay.style.opacity = "0";
