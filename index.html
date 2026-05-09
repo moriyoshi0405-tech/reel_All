@@ -93,9 +93,7 @@
     .prompt-btn { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.3s;}
     .prompt-btn:hover { background: #e2e8f0; }
 
-    /* ------------------------------------------
-       ★追加：言葉のプラネタリウム誘導バナー
-    ------------------------------------------ */
+    /* プラネタリウム誘導バナー */
     .planetarium-banner {
       background: linear-gradient(135deg, #090a0f, #1b2735);
       border-radius: 35px; padding: 60px 40px; text-align: center;
@@ -359,7 +357,15 @@
     <div style="display:grid; gap:18px;">
       <input type="text" id="addTitle" placeholder="書籍名（タイトル）">
       <input type="text" id="addAuthor" placeholder="著者名">
-      <input type="text" id="addImage" placeholder="書影（画像URL）">
+      <input type="text" id="addUrl" placeholder="URL（AmazonのURLなど）">
+      
+      <input type="text" id="addTags" placeholder="タグ（例：小説, エッセイ）※手動設定用" disabled title="Notion側で手動設定してください" style="background-color: #f5f5f5;">
+      
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:13px; font-weight:700; color:#555;"> 書影（画像ファイルを選択）：</label>
+        <input type="file" id="addImageFile" accept="image/*" style="border:none; padding:0;">
+      </div>
+
       <div style="display:flex; flex-direction:column; gap:5px;">
         <label style="font-size:14px; font-weight:700; color:#555;"> 管理人評価：</label>
         <select id="addRating">
@@ -370,8 +376,13 @@
           <option value="1">★☆☆☆☆ - まだ早かったようです</option>
         </select>
       </div>
-      <textarea id="addReel" placeholder="リール文章（カードに添える一言紹介）" style="height:60px;"></textarea>
-      <textarea id="addReview" placeholder="レビュー全文（AI司書の知識となります）" style="height:150px;"></textarea>
+
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:14px; font-weight:700; color:#555;"> レビュー全文（あらすじ ＋ 感想）：</label>
+        <textarea id="addReview" placeholder="AIスカウト実行後、ここにあらすじが自動入力されます。続きに感想を記録してください。" style="height:150px;"></textarea>
+      </div>
+      
+      <input type="hidden" id="scoutImageUrl">
     </div>
     <div class="modal-actions">
       <button onclick="closeAdminAddModal()" class="btn-cancel">一度閉じる</button>
@@ -397,6 +408,7 @@
       <a href="#adminProfile" class="nav-btn">💼 管理人の肖像</a>
       <a href="#prescriptionSection" class="nav-btn">💊 心の処方箋</a>
       <a href="#readerSection" class="nav-btn">👑 読者の推薦本</a>
+      <a href="planetarium.html" class="nav-btn">🌌 言葉のプラネタリウム</a>
     </div>
     <div id="shelfMood" class="shelf-mood">本棚の空気を読み解いています...</div>
   </div>
@@ -545,9 +557,12 @@
       if(data.status === "success") {
         document.getElementById("addTitle").value = data.title;
         document.getElementById("addAuthor").value = data.author;
-        document.getElementById("addImage").value = data.image;
+        
+        // 🌟 取得したあらすじをテキストエリアにセット
         document.getElementById("addReview").value = data.summary;
-        alert("物語を特定しました。内容をご確認ください。");
+        
+        document.getElementById("scoutImageUrl").value = data.image;
+        alert("物語を特定しました。書影は自動取得できない場合があるため、ご自身でファイルを選択してください。");
       } else { alert("AIが本を見つけられませんでした。手入力をお願いします。"); }
     } catch(e) { alert("通信エラーが発生しました。"); } 
     finally { btn.disabled = false; btn.textContent = "物語を特定"; }
@@ -555,13 +570,41 @@
 
   async function submitAdminBook() {
     const pass = prompt("管理者の合言葉を入力してください"); if(!pass) return;
-    const data = {
-      title: document.getElementById("addTitle").value, author: document.getElementById("addAuthor").value,
-      image: document.getElementById("addImage").value, rating: document.getElementById("addRating").value,
-      reel: document.getElementById("addReel").value, review: document.getElementById("addReview").value
-    };
-    if(!data.title) return alert("タイトルは必須です。");
     const btn = document.getElementById("adminSubmitBtn"); btn.disabled = true;
+
+    let fileData = null;
+    let filename = "";
+    const fileInput = document.getElementById("addImageFile");
+    if(fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      filename = file.name;
+      fileData = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const data = {
+      title: document.getElementById("addTitle").value, 
+      author: document.getElementById("addAuthor").value,
+      url: document.getElementById("addUrl").value,
+      rating: document.getElementById("addRating").value,
+      
+      // 🌟 画面から入力・追記されたレビュー全文を取得して送信
+      review: document.getElementById("addReview").value,
+      
+      scoutImage: document.getElementById("scoutImageUrl").value,
+      fileData: fileData,
+      filename: filename
+    };
+    
+    if(!data.title) {
+      alert("タイトルは必須です。");
+      btn.disabled = false;
+      return;
+    }
+    
     try {
       const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "adminAddBook", password: pass, data: data }) });
       const resData = await res.json();
@@ -607,13 +650,12 @@
     const btn = document.getElementById("prescribeBtn"); btn.disabled = true; 
     document.getElementById("pharmacistAvatar").src = AI_AVATARS.pharmacist.searching;
 
-    // 💡 演出：AIが調合中（待機中）の表示
     const pArea = document.getElementById("prescriptionResultArea");
     const pBox = document.getElementById("prescribedBookBox");
     const pText = document.getElementById("prescriptionText");
 
     pArea.style.display = "block";
-    pBox.style.display = "none"; // 本の情報を一時的に隠す
+    pBox.style.display = "none"; 
     pText.innerHTML = `
       <div class="pulse-text" style="text-align:center; padding: 40px 10px; font-weight:700; color:#0c4a6e;">
         心の痛みを和らげる言葉を、<br>ページの中から一つずつ集めて調合しています...<br>
@@ -625,8 +667,7 @@
       const d = await res.json();
       const fresh = [...allData, ...readerData].find(f => f.id === d.recommendedBook.id) || d.recommendedBook;
 
-      // 調合完了後、結果を表示
-      pBox.style.display = ""; // CSSのデフォルト（flex/column）に戻す
+      pBox.style.display = ""; 
       pBox.innerHTML = `<img src="${fresh.image}" style="width:70px; height:100px; object-fit:cover; border-radius:5px; box-shadow:0 5px 15px rgba(0,0,0,0.1);" onerror="this.src='https://via.placeholder.com/70x100'"><div style="text-align:left;"><div style="font-weight:700; font-size:18px; color:#0c4a6e; line-height:1.3; margin-bottom:5px;">『${fresh.title}』</div><div style="font-size:12px; color:#666;">著者：${fresh.author}</div><button onclick="showSummary('${fresh.id}')" style="margin-top:10px; font-size:11px; border:none; background:#e0f2fe; color:#0c4a6e; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:700; width:100%;">物語の効能（解説）を見る</button></div>`;
       pText.innerHTML = d.prescription.replace(/\n/g, "<br>");
 
@@ -706,12 +747,10 @@
   function closeGacha() { document.getElementById('gachaModal').style.display = 'none'; }
   function resetPrescription() { document.getElementById("worryInput").value = ""; document.getElementById("prescriptionResultArea").style.display = "none"; }
   
-  // ★ カウント即時反映の修正
   async function handleAction(id, a) { 
     const l = a === 'likeBook' ? likedBooks : readBooks; if (l.includes(id)) return; 
     l.push(id); localStorage.setItem(a === 'likeBook' ? 'likedBooks' : 'readBooks', JSON.stringify(l)); 
 
-    // ローカルデータのカウントをインクリメント
     const book = [...allData, ...readerData].find(b => b.id === id);
     if (book) {
       if (a === 'likeBook') book.likes++;
