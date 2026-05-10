@@ -55,7 +55,7 @@
     .admin-btn.scout { background: rgba(46, 125, 50, 0.7); }
     .admin-btn:hover { background: #fff; color: #333; }
 
-    /* 🌟 新設：ハンバーガーボタンとサイドメニュー */
+    /* 左上ハンバーガーボタンとサイドメニュー */
     .hamburger-btn {
       position: fixed; top: 20px; left: 20px; z-index: 1000;
       width: 46px; height: 46px; border-radius: 50%;
@@ -216,8 +216,8 @@
     }
     
     .button-area { width: 100%; margin-top: auto; display: flex; flex-direction: column; gap: 10px;}
-    .primary-buttons { display: flex; gap: 8px; width: 100%;}
-    .card-btn { flex: 1; padding: 12px 5px; background: #1a1a1a; color: white; text-decoration: none; border-radius: 20px; font-size: 12px; transition: 0.3s; font-weight: 700; border: none; cursor: pointer; display:flex; align-items:center; justify-content:center;}
+    .primary-buttons { display: flex; gap: 8px; width: 100%; flex-wrap: wrap;}
+    .card-btn { flex: 1; padding: 12px 5px; background: #1a1a1a; color: white; text-decoration: none; border-radius: 20px; font-size: 12px; transition: 0.3s; font-weight: 700; border: none; cursor: pointer; display:flex; align-items:center; justify-content:center; white-space:nowrap;}
     .card-btn.summary { background: #eefdfc; color: #00695c; border: 1px solid #b2dfdb; }
     .card-btn:hover { opacity: 0.8; transform: translateY(-2px); }
     
@@ -549,10 +549,14 @@
   <div class="filter-section">
     <input type="text" id="searchBar" class="search-bar" placeholder="記憶にあるタイトルや著者名を入力してください..." oninput="renderAll()">
     <div id="tagsContainer" class="tags-container"></div>
-    <div class="sort-options">
-      <button id="sortNewBtn" class="sort-btn active" onclick="changeSortMode('new')">📅 到着順</button>
-      <button id="sortLikeBtn" class="sort-btn" onclick="changeSortMode('like')">❤️ 人気順</button>
-      <button id="myShelfBtn" class="sort-btn my-shelf-btn" onclick="toggleMyShelf()">🔖 栞を挟んだ本</button>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div class="sort-options">
+        <button id="sortNewBtn" class="sort-btn active" onclick="changeSortMode('new')">📅 到着順</button>
+        <button id="sortLikeBtn" class="sort-btn" onclick="changeSortMode('like')">❤️ 人気順</button>
+        <button id="myShelfBtn" class="sort-btn my-shelf-btn" onclick="toggleMyShelf()">🔖 栞を挟んだ本</button>
+      </div>
+      <div id="bookCountDisplay" style="font-size: 13px; font-weight: 700; color: #888; letter-spacing: 1px;"></div>
     </div>
   </div>
 
@@ -631,7 +635,6 @@
     } catch (e) { alert("蔵書データの取得に失敗しました。"); }
   };
 
-  /* 🌟 新設：メニュー開閉ロジック */
   function toggleMenu() {
     document.getElementById('sideMenu').classList.toggle('open');
     document.getElementById('sideMenuOverlay').classList.toggle('open');
@@ -807,6 +810,10 @@
     const s = document.getElementById("searchBar").value.toLowerCase();
     let f = allData.filter(b => (b.title + b.author).toLowerCase().includes(s) && activeTags.every(t => b.tags.includes(t)) && (isMyShelfMode ? savedBooks.includes(b.id) : true));
     if (currentSortMode === 'new') f.sort((a, b) => new Date(b.updated) - new Date(a.updated)); else f.sort((a, b) => b.likes - a.likes);
+    
+    // 🌟 更新：蔵書数の表示処理
+    document.getElementById("bookCountDisplay").textContent = `蔵書数: ${allData.length}冊 (表示: ${f.length}冊)`;
+
     document.getElementById("grid").innerHTML = f.map((b, i) => generateCardHTML(b, i, i)).join("");
     document.getElementById("readerGrid").innerHTML = [...readerData].sort((a,b) => b.likes - a.likes).map((b, i) => generateReaderCardHTML(b, i)).join("");
     setTimeout(observeCards, 100);
@@ -818,6 +825,9 @@
     let crown = (currentSortMode === 'like' && sortIndex >= 0 && sortIndex <= 2 && book.likes > 0) ? `<div class="crown-badge">${['🥇','🥈','🥉'][sortIndex]}</div>` : "";
     let stars = ""; if (book.rating) { const s = parseInt(book.rating); if(!isNaN(s)) stars = `<div class="rating">${"★".repeat(s)}${"☆".repeat(5-s)}</div>`; }
 
+    // 🌟 追加：シアター動画リンクがある場合の予告編ボタン
+    const videoBtn = book.videoUrl ? `<a href="theater.html" class="card-btn" style="background:#1a0b1c; color:#fff; border:1px solid #ff4757;">🎬 予告編</a>` : "";
+
     return `
       <div class="card" style="transition-delay: ${animationDelayIndex * 0.05}s">${isNew}${crown}
         <img src="${book.image}" class="cover" onerror="this.src='https://via.placeholder.com/130x185'">
@@ -827,6 +837,7 @@
         <div class="card-tags">${book.tags.map(t => `<span class="card-tag">${t}</span>`).join("")}</div>
         <div class="button-area">
           <div class="primary-buttons">
+            ${videoBtn}
             <a href="${book.url}" target="_blank" class="card-btn">感想を嗜む</a>
             <button onclick="showSummary('${book.id}')" class="card-btn summary">解説を見る</button>
           </div>
