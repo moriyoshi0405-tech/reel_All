@@ -40,7 +40,7 @@
     }
 
     /* ------------------------------------------
-       2. ヘッダー & ナビゲーション
+       2. ヘッダー & メニュー
     ------------------------------------------ */
     .header { text-align: center; padding: 100px 20px 120px; position: relative; color: white; overflow: hidden; background: linear-gradient(-45deg, #1a252f, #000000, #34495e, #1a252f); background-size: 400% 400%; animation: gradientBG 15s ease infinite;}
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -48,16 +48,52 @@
     .header-content { position: relative; z-index: 2; }
     .header h1 { font-size: 42px; margin: 0 0 25px 0; text-shadow: 0 4px 20px rgba(0,0,0,0.5); letter-spacing: 5px; font-weight: 700;}
 
-    .nav-links { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 35px; }
-    .nav-btn { background: var(--glass-white); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 12px 24px; border-radius: 50px; font-size: 13px; font-weight: 700; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); text-decoration: none;}
-    .nav-btn:hover { background: #fff; color: #1a252f; transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-
-    .shelf-mood { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); display: inline-block; padding: 12px 30px; border-radius: 50px; font-size: 15px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow-soft); }
+    .shelf-mood { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); display: inline-block; padding: 12px 30px; border-radius: 50px; font-size: 15px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow-soft); margin-top: 10px;}
 
     .admin-tools { position: absolute; top: 20px; right: 20px; z-index: 100; display: flex; gap: 10px;}
     .admin-btn { font-size: 11px; padding: 8px 16px; border-radius: 10px; cursor: pointer; color: white; border: 1px solid rgba(255,255,255,0.2); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); font-weight: 700; transition: 0.3s;}
     .admin-btn.scout { background: rgba(46, 125, 50, 0.7); }
     .admin-btn:hover { background: #fff; color: #333; }
+
+    /* 🌟 新設：ハンバーガーボタンとサイドメニュー */
+    .hamburger-btn {
+      position: fixed; top: 20px; left: 20px; z-index: 1000;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+      cursor: pointer; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+    .hamburger-btn span { display: block; width: 22px; height: 2px; background: #fff; transition: 0.3s; border-radius: 2px; }
+
+    .side-menu-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+      z-index: 2000; opacity: 0; pointer-events: none; transition: 0.4s ease;
+    }
+    .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .side-menu {
+      position: fixed; top: 0; left: -320px; width: 300px; height: 100vh;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+      z-index: 2001; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column; padding: 40px 25px; box-sizing: border-box;
+    }
+    .side-menu.open { left: 0; }
+    
+    .side-menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
+    .close-menu-btn { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; transition: 0.3s; padding:0; display:flex; align-items:center;}
+    .close-menu-btn:hover { color: var(--accent-color); transform: rotate(90deg); }
+
+    .side-menu-links { display: flex; flex-direction: column; gap: 15px; }
+    .side-nav-btn {
+      color: #cbd5e1; text-decoration: none; font-size: 15px; font-weight: 700;
+      padding: 16px 20px; border-radius: 15px; transition: 0.3s;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center;
+    }
+    .side-nav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; transform: translateX(8px); border-color: rgba(255,255,255,0.3); }
 
     /* ------------------------------------------
        3. メインコンテンツ
@@ -112,7 +148,7 @@
     .banner-btn { background: transparent; color: white; border: 1px solid rgba(56,189,248,0.6); padding: 15px 40px; border-radius: 50px; font-size: 15px; font-weight: 700; text-decoration: none; display: inline-block; transition: 0.3s; box-shadow: 0 0 20px rgba(56, 189, 248, 0.1); }
     .banner-btn:hover { background: rgba(56,189,248,0.1); transform: translateY(-3px); border-color: #38bdf8; box-shadow: 0 0 30px rgba(56, 189, 248, 0.4); }
 
-    /* シアター誘導バナー (新設) */
+    /* シアター誘導バナー */
     .theater-banner {
       background: linear-gradient(135deg, #1a0b1c, #000000);
       border-radius: 35px; padding: 60px 40px; text-align: center;
@@ -272,11 +308,13 @@
     @media (max-width: 767px) {
       .header { padding: 60px 15px 80px; }
       .header h1 { font-size: 24px; letter-spacing: 1px; margin-bottom: 15px;}
-      .nav-links { gap: 10px; margin-bottom: 25px;}
-      .nav-btn { padding: 10px 16px; font-size: 12px; }
       .shelf-mood { font-size: 12px; padding: 10px 20px; }
       .admin-tools { top: 10px; right: 10px; gap: 5px;}
       .admin-btn { padding: 6px 10px; font-size: 10px; }
+
+      .hamburger-btn { width: 40px; height: 40px; top: 15px; left: 15px; }
+      .hamburger-btn span { width: 18px; gap: 4px; }
+      .side-menu { width: 260px; padding: 30px 20px; }
 
       .container { padding: 15px; }
 
@@ -367,6 +405,27 @@
   <p style="margin-top: 30px; font-size: 16px; font-weight:700; color:var(--primary-color); letter-spacing: 2px;">本棚を整頓しています...</p>
 </div>
 
+<div class="hamburger-btn" onclick="toggleMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<div class="side-menu-overlay" id="sideMenuOverlay" onclick="toggleMenu()"></div>
+<div class="side-menu" id="sideMenu">
+  <div class="side-menu-header">
+    <h2 style="margin:0; font-size:18px; font-weight:700; letter-spacing:2px; color:#fff;">Menu</h2>
+    <button class="close-menu-btn" onclick="toggleMenu()">✕</button>
+  </div>
+  <div class="side-menu-links">
+    <a href="#adminProfile" class="side-nav-btn" onclick="toggleMenu()">💼 管理人の肖像</a>
+    <a href="#prescriptionSection" class="side-nav-btn" onclick="toggleMenu()">💊 心の処方箋</a>
+    <a href="#readerSection" class="side-nav-btn" onclick="toggleMenu()">👑 読者の推薦本</a>
+    <a href="planetarium.html" class="side-nav-btn">🌌 言葉のプラネタリウム</a>
+    <a href="theater.html" class="side-nav-btn" style="background:rgba(255, 107, 107, 0.1); border-color:rgba(255, 107, 107, 0.4); color:#fff;">🎬 AI Book Theater</a>
+  </div>
+</div>
+
 <div id="adminAddModal" class="modal-overlay">
   <div class="modal-content">
     <h3>📖 物語を本棚へ迎える</h3>
@@ -432,13 +491,6 @@
   </div>
   <div class="header-content">
     <h1>AI Book Shelf</h1>
-    <div class="nav-links">
-      <a href="#adminProfile" class="nav-btn">💼 管理人の肖像</a>
-      <a href="#prescriptionSection" class="nav-btn">💊 心の処方箋</a>
-      <a href="#readerSection" class="nav-btn">👑 読者の推薦本</a>
-      <a href="planetarium.html" class="nav-btn">🌌 言葉のプラネタリウム</a>
-      <a href="theater.html" class="nav-btn" style="background:rgba(255, 107, 107, 0.2); border-color:rgba(255, 107, 107, 0.4);">🎬 AI Book Theater</a>
-    </div>
     <div id="shelfMood" class="shelf-mood">本棚の空気を読み解いています...</div>
   </div>
 </div>
@@ -578,6 +630,12 @@
       document.getElementById("loading").style.display = "none";
     } catch (e) { alert("蔵書データの取得に失敗しました。"); }
   };
+
+  /* 🌟 新設：メニュー開閉ロジック */
+  function toggleMenu() {
+    document.getElementById('sideMenu').classList.toggle('open');
+    document.getElementById('sideMenuOverlay').classList.toggle('open');
+  }
 
   function updateChatAvatar(state) {
     const persona = document.getElementById('aiPersona').value;
