@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本棚の羅針盤 - 読書診断 -</title>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --forest-dark: #064e3b;
+      --forest-light: #10b981;
+      --sunlight: #fef3c7;
+      --text-main: #334155;
+    }
+
+    body {
+      margin: 0; padding: 0; font-family: 'Zen Maru Gothic', sans-serif; color: var(--text-main);
+      background: radial-gradient(circle at center, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow-x: hidden; position: relative;
+    }
+
+    /* 光の粒子アニメーション */
+    .particle {
+      position: absolute; background: rgba(255, 255, 255, 0.6); border-radius: 50%;
+      pointer-events: none; animation: floatUp 10s infinite linear;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+    }
+
+    .top-nav {
+      position: fixed; top: 0; left: 0; width: 100%; padding: 20px; z-index: 100;
+      display: flex; justify-content: space-between; box-sizing: border-box;
+    }
+    .back-btn {
+      color: var(--forest-dark); text-decoration: none; font-size: 14px; font-weight: 700;
+      background: rgba(255,255,255,0.4); padding: 10px 20px; border-radius: 50px;
+      backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.5); transition: 0.3s;
+    }
+    .back-btn:hover { background: #fff; transform: translateY(-2px); }
+
+    /* グラスモーフィズム・コンテナ */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
+      padding: 50px 40px; width: 90%; max-width: 600px; text-align: center;
+      box-shadow: 0 20px 50px rgba(6, 78, 59, 0.1); position: relative; z-index: 10;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .hidden { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
+
+    /* オープニング */
+    .title { font-size: 28px; font-weight: 700; color: var(--forest-dark); margin-bottom: 20px; letter-spacing: 2px;}
+    .desc { font-size: 15px; line-height: 2; margin-bottom: 40px; color: #475569; }
+    .btn-start {
+      background: var(--forest-dark); color: white; border: none; padding: 16px 40px;
+      border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: inherit;
+      box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2);
+    }
+    .btn-start:hover { background: var(--forest-light); transform: translateY(-3px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); }
+
+    /* 質問画面 */
+    .q-number { font-size: 14px; font-weight: 700; color: var(--forest-light); letter-spacing: 2px; margin-bottom: 15px; }
+    .q-text { font-size: 20px; font-weight: 700; margin-bottom: 40px; line-height: 1.6; color: var(--forest-dark); }
+    .options { display: flex; flex-direction: column; gap: 15px; }
+    .option-btn {
+      background: rgba(255,255,255,0.8); border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 18px 25px; border-radius: 15px; font-size: 15px; color: #334155; font-weight: 500;
+      cursor: pointer; transition: 0.3s; text-align: left; font-family: inherit; line-height: 1.5;
+    }
+    .option-btn:hover { background: #fff; border-color: var(--forest-light); transform: translateX(5px); box-shadow: 0 5px 15px rgba(16,185,129,0.1); }
+
+    /* ローディング演出 */
+    .spinner {
+      width: 50px; height: 50px; border: 4px solid rgba(16,185,129,0.2);
+      border-top-color: var(--forest-light); border-radius: 50%;
+      animation: spin 1s linear infinite; margin: 0 auto 30px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 結果画面 */
+    .result-card { max-width: 800px; padding: 40px 20px;}
+    .result-header { font-size: 14px; color: var(--forest-light); font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
+    
+    .book-box {
+      display: flex; gap: 30px; align-items: center; text-align: left;
+      background: rgba(255,255,255,0.8); padding: 30px; border-radius: 20px; margin-bottom: 40px;
+    }
+    .book-cover { width: 120px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .book-title { font-size: 22px; font-weight: 700; color: var(--forest-dark); margin-bottom: 10px; }
+    .book-author { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+    .book-link { display: inline-block; background: var(--forest-dark); color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.3s; }
+    .book-link:hover { background: var(--forest-light); }
+
+    /* 🌟 管理人からの手紙エリア */
+    .letter-box {
+      text-align: left; background: #fff; padding: 40px; border-radius: 20px;
+      border: 1px solid #e2e8f0; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+    .letter-box::before {
+      content: '管理人 shota より'; position: absolute; top: -15px; left: 30px;
+      background: var(--forest-dark); color: white; padding: 5px 20px; border-radius: 50px;
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    }
+    .letter-text { font-size: 15px; line-height: 2.2; color: #334155; }
+
+    @media (max-width: 767px) {
+      .glass-card { padding: 40px 20px; }
+      .title { font-size: 22px; }
+      .q-text { font-size: 18px; }
+      .book-box { flex-direction: column; text-align: center; padding: 20px; gap: 15px;}
+      .letter-box { padding: 30px 20px; }
+      .letter-text { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="top-nav">
+  <a href="index.html" class="back-btn">← 本棚へ戻る</a>
+</div>
+
+<div id="screen-intro" class="glass-card">
+  <div class="title">本棚の羅針盤</div>
+  <div class="desc">
+    不思議な森に迷い込んだあなたへ。<br>
+    森の精霊からの3つの質問に直感で答えてください。<br>
+    あなたの歩んだ軌跡から、今一番必要な物語を導き出します。
+  </div>
+  <button class="btn-start" onclick="startJourney()">診断をはじめる</button>
+</div>
+
+<div id="screen-loading-q" class="glass-card hidden">
+  <div class="spinner"></div>
+  <div style="font-weight:700; color:var(--forest-dark); letter-spacing:1px;">森の精霊が、あなたへの問いを紡いでいます...</div>
+</div>
+
+<div id="screen-question" class="glass-card hidden">
+  <div id="qNum" class="q-number">QUESTION 1 / 3</div>
+  <div id="qText" class="q-text"></div>
+  <div id="qOptions" class="options"></div>
+</div>
+
+<div id="screen-loading-r" class="glass-card hidden">
+  <div class="spinner"></div>
+  <div style="font-weight:700; color:var(--forest-dark); letter-spacing:1px;">あなたの軌跡から、運命の一冊を探しています...</div>
+</div>
+
+<div id="screen-result" class="glass-card result-card hidden">
+  <div class="result-header">✨ あなたを導く物語 ✨</div>
+  
+  <div class="book-box">
+    <img id="resCover" class="book-cover" src="">
+    <div>
+      <div id="resTitle" class="book-title"></div>
+      <div id="resAuthor" class="book-author"></div>
+      <a id="resLink" href="#" target="_blank" class="book-link">この物語の感想を嗜む</a>
+    </div>
+  </div>
+
+  <div class="letter-box">
+    <div id="shotaMessage" class="letter-text"></div>
+  </div>
+  
+  <div style="margin-top: 40px;">
+    <button class="back-btn" onclick="location.reload()" style="background:transparent; color:var(--text-main); border:none; cursor:pointer;">もう一度森を歩く</button>
+  </div>
+</div>
+
+<script>
+  // メインのGAS WebアプリURLを設定してください
+  const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
+  
+  let questions = [];
+  let currentQIndex = 0;
+  let userAnswers = [];
+
+  // 粒子アニメーションの生成
+  function createParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 15; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.width = p.style.height = (Math.random() * 6 + 2) + 'px';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      container.appendChild(p);
+    }
+  }
+  createParticles();
+
+  function switchScreen(hideId, showId) {
+    document.getElementById(hideId).classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById(hideId).style.display = 'none';
+      const showEl = document.getElementById(showId);
+      showEl.style.display = '';
+      setTimeout(() => showEl.classList.remove('hidden'), 50);
+    }, 500);
+  }
+
+  async function startJourney() {
+    switchScreen('screen-intro', 'screen-loading-q');
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "generateCompassQuestions" }) });
+      const data = await res.json();
+      if(data.status === "success" && data.questions.length > 0) {
+        questions = data.questions;
+        showQuestion();
+        switchScreen('screen-loading-q', 'screen-question');
+      } else { throw new Error("質問の生成に失敗しました"); }
+    } catch (e) {
+      alert("森の奥が少し曇っているようです。もう一度お試しください。");
+      location.reload();
+    }
+  }
+
+  function showQuestion() {
+    const q = questions[currentQIndex];
+    document.getElementById('qNum').textContent = `QUESTION ${currentQIndex + 1} / ${questions.length}`;
+    document.getElementById('qText').innerHTML = q.q.replace(/\n/g, '<br>');
+    
+    const optionsHtml = q.options.map((opt, i) => 
+      `<button class="option-btn" onclick="selectAnswer('${opt}')">${opt}</button>`
+    ).join("");
+    document.getElementById('qOptions').innerHTML = optionsHtml;
+  }
+
+  function selectAnswer(answerText) {
+    // 回答を記録
+    userAnswers.push({ q: questions[currentQIndex].q, a: answerText });
+    
+    currentQIndex++;
+    if (currentQIndex < questions.length) {
+      // 次の質問へ（フワッと切り替え）
+      const qBox = document.getElementById('screen-question');
+      qBox.style.opacity = 0;
+      setTimeout(() => {
+        showQuestion();
+        qBox.style.opacity = 1;
+      }, 300);
+    } else {
+      // 診断終了、結果取得へ
+      getCompassResult();
+    }
+  }
+
+  async function getCompassResult() {
+    switchScreen('screen-question', 'screen-loading-r');
+    try {
+      const res = await fetch(API_URL, { 
+        method: "POST", 
+        body: JSON.stringify({ action: "getCompassResult", answers: userAnswers }) 
+      });
+      const data = await res.json();
+      
+      if(data.status === "success") {
+        renderResult(data.result);
+        switchScreen('screen-loading-r', 'screen-result');
+      } else { throw new Error("結果の取得に失敗"); }
+    } catch (e) {
+      alert("本棚の奥で迷子になってしまいました。もう一度お試しください。");
+      location.reload();
+    }
+  }
+
+  function renderResult(result) {
+    const book = result.book;
+    document.getElementById('resCover').src = book.image || 'https://via.placeholder.com/120x180';
+    document.getElementById('resTitle').textContent = book.title;
+    document.getElementById('resAuthor').textContent = `著者：${book.author}`;
+    
+    const linkBtn = document.getElementById('resLink');
+    if (book.url && book.url !== "#") {
+      linkBtn.href = book.url;
+      linkBtn.style.display = "inline-block";
+    } else {
+      linkBtn.style.display = "none";
+    }
+
+    document.getElementById('shotaMessage').innerHTML = result.message.replace(/\n/g, '<br>');
+  }
+</script>
+</body>
+</html>
