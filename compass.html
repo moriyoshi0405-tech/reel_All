@@ -20,7 +20,6 @@
       overflow-x: hidden; position: relative;
     }
 
-    /* 光の粒子アニメーション */
     .particle {
       position: absolute; background: rgba(255, 255, 255, 0.6); border-radius: 50%;
       pointer-events: none; animation: floatUp 10s infinite linear;
@@ -44,7 +43,6 @@
     }
     .back-btn:hover { background: #fff; transform: translateY(-2px); }
 
-    /* グラスモーフィズム・コンテナ */
     .glass-card {
       background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(15px);
       border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 30px;
@@ -54,7 +52,6 @@
     }
     .hidden { opacity: 0; transform: translateY(20px); pointer-events: none; position: absolute; }
 
-    /* オープニング */
     .title { font-size: 28px; font-weight: 700; color: var(--forest-dark); margin-bottom: 20px; letter-spacing: 2px;}
     .desc { font-size: 15px; line-height: 2; margin-bottom: 40px; color: #475569; }
     .btn-start {
@@ -62,9 +59,8 @@
       border-radius: 50px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; font-family: inherit;
       box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2);
     }
-    .btn-start:hover { background: var(--forest-light); transform: translateY(-3px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); }
+    .btn-start:hover { background: var(--forest-light); transform: translateY(-3px); }
 
-    /* 質問画面 */
     .q-number { font-size: 14px; font-weight: 700; color: var(--forest-light); letter-spacing: 2px; margin-bottom: 15px; }
     .q-text { font-size: 20px; font-weight: 700; margin-bottom: 40px; line-height: 1.6; color: var(--forest-dark); }
     .options { display: flex; flex-direction: column; gap: 15px; }
@@ -73,9 +69,8 @@
       padding: 18px 25px; border-radius: 15px; font-size: 15px; color: #334155; font-weight: 500;
       cursor: pointer; transition: 0.3s; text-align: left; font-family: inherit; line-height: 1.5;
     }
-    .option-btn:hover { background: #fff; border-color: var(--forest-light); transform: translateX(5px); box-shadow: 0 5px 15px rgba(16,185,129,0.1); }
+    .option-btn:hover { background: #fff; border-color: var(--forest-light); transform: translateX(5px); }
 
-    /* ローディング演出 */
     .spinner {
       width: 50px; height: 50px; border: 4px solid rgba(16,185,129,0.2);
       border-top-color: var(--forest-light); border-radius: 50%;
@@ -83,7 +78,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* 結果画面 */
     .result-card { max-width: 800px; padding: 40px 20px;}
     .result-header { font-size: 14px; color: var(--forest-light); font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
     
@@ -91,13 +85,12 @@
       display: flex; gap: 30px; align-items: center; text-align: left;
       background: rgba(255,255,255,0.8); padding: 30px; border-radius: 20px; margin-bottom: 40px;
     }
-    .book-cover { width: 120px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    .book-title { font-size: 22px; font-weight: 700; color: var(--forest-dark); margin-bottom: 10px; }
-    .book-author { font-size: 14px; color: #64748b; margin-bottom: 20px; }
-    .book-link { display: inline-block; background: var(--forest-dark); color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.3s; }
-    .book-link:hover { background: var(--forest-light); }
+    .book-cover { width: 120px; height: 175px; object-fit: cover; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05); }
+    .book-title { font-size: 20px; font-weight: 700; color: var(--forest-dark); margin-bottom: 8px; line-height: 1.4; }
+    .book-author { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    .book-link { display: inline-block; background: var(--forest-dark); color: white; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-size: 13px; font-weight: 700; transition: 0.3s; }
+    .book-link:hover { background: var(--forest-light); transform: translateY(-2px); }
 
-    /* 🌟 管理人からの手紙エリア */
     .letter-box {
       text-align: left; background: #fff; padding: 40px; border-radius: 20px;
       border: 1px solid #e2e8f0; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
@@ -110,10 +103,10 @@
     .letter-text { font-size: 15px; line-height: 2.2; color: #334155; }
 
     @media (max-width: 767px) {
-      .glass-card { padding: 40px 20px; }
-      .title { font-size: 22px; }
+      .glass-card { padding: 30px 20px; }
       .q-text { font-size: 18px; }
       .book-box { flex-direction: column; text-align: center; padding: 20px; gap: 15px;}
+      .book-cover { width: 100px; height: 145px; }
       .letter-box { padding: 30px 20px; }
       .letter-text { font-size: 14px; }
     }
@@ -130,16 +123,16 @@
 <div id="screen-intro" class="glass-card">
   <div class="title">本棚の羅針盤</div>
   <div class="desc">
-    不思議な森に迷い込んだあなたへ。<br>
-    森の精霊からの3つの質問に直感で答えてください。<br>
-    あなたの歩んだ軌跡から、今一番必要な物語を導き出します。
+    不思議な森へようこそ。旅人さん。<br>
+    あなたの日常や心のありようについて、3つの問いを紡ぎます。<br>
+    その答えから、今あなたに一番必要な物語を導き出しましょう。
   </div>
   <button class="btn-start" onclick="startJourney()">診断をはじめる</button>
 </div>
 
 <div id="screen-loading-q" class="glass-card hidden">
   <div class="spinner"></div>
-  <div style="font-weight:700; color:var(--forest-dark); letter-spacing:1px;">森の精霊が、あなたへの問いを紡いでいます...</div>
+  <div style="font-weight:700; color:var(--forest-dark);">森の精霊が、あなたへの問いを紡いでいます...</div>
 </div>
 
 <div id="screen-question" class="glass-card hidden">
@@ -150,14 +143,14 @@
 
 <div id="screen-loading-r" class="glass-card hidden">
   <div class="spinner"></div>
-  <div style="font-weight:700; color:var(--forest-dark); letter-spacing:1px;">あなたの軌跡から、運命の一冊を探しています...</div>
+  <div style="font-weight:700; color:var(--forest-dark);">あなたの軌跡から、運命の一冊を紐解いています...</div>
 </div>
 
 <div id="screen-result" class="glass-card result-card hidden">
   <div class="result-header">✨ あなたを導く物語 ✨</div>
   
   <div class="book-box">
-    <img id="resCover" class="book-cover" src="">
+    <img id="resCover" class="book-cover" src="" onerror="this.src='https://via.placeholder.com/120x175?text=No+Image'">
     <div>
       <div id="resTitle" class="book-title"></div>
       <div id="resAuthor" class="book-author"></div>
@@ -175,14 +168,12 @@
 </div>
 
 <script>
-  // メインのGAS WebアプリURLを設定してください
   const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec"; 
   
   let questions = [];
   let currentQIndex = 0;
   let userAnswers = [];
 
-  // 粒子アニメーションの生成
   function createParticles() {
     const container = document.getElementById('particles');
     for (let i = 0; i < 15; i++) {
@@ -202,7 +193,7 @@
     setTimeout(() => {
       document.getElementById(hideId).style.display = 'none';
       const showEl = document.getElementById(showId);
-      showEl.style.display = '';
+      showEl.style.display = 'block';
       setTimeout(() => showEl.classList.remove('hidden'), 50);
     }, 500);
   }
@@ -216,7 +207,7 @@
         questions = data.questions;
         showQuestion();
         switchScreen('screen-loading-q', 'screen-question');
-      } else { throw new Error("質問の生成に失敗しました"); }
+      } else { throw new Error("Fail"); }
     } catch (e) {
       alert("森の奥が少し曇っているようです。もう一度お試しください。");
       location.reload();
@@ -228,19 +219,16 @@
     document.getElementById('qNum').textContent = `QUESTION ${currentQIndex + 1} / ${questions.length}`;
     document.getElementById('qText').innerHTML = q.q.replace(/\n/g, '<br>');
     
-    const optionsHtml = q.options.map((opt, i) => 
+    const optionsHtml = q.options.map(opt => 
       `<button class="option-btn" onclick="selectAnswer('${opt}')">${opt}</button>`
     ).join("");
     document.getElementById('qOptions').innerHTML = optionsHtml;
   }
 
   function selectAnswer(answerText) {
-    // 回答を記録
     userAnswers.push({ q: questions[currentQIndex].q, a: answerText });
-    
     currentQIndex++;
     if (currentQIndex < questions.length) {
-      // 次の質問へ（フワッと切り替え）
       const qBox = document.getElementById('screen-question');
       qBox.style.opacity = 0;
       setTimeout(() => {
@@ -248,7 +236,6 @@
         qBox.style.opacity = 1;
       }, 300);
     } else {
-      // 診断終了、結果取得へ
       getCompassResult();
     }
   }
@@ -261,11 +248,10 @@
         body: JSON.stringify({ action: "getCompassResult", answers: userAnswers }) 
       });
       const data = await res.json();
-      
       if(data.status === "success") {
         renderResult(data.result);
         switchScreen('screen-loading-r', 'screen-result');
-      } else { throw new Error("結果の取得に失敗"); }
+      } else { throw new Error("Fail"); }
     } catch (e) {
       alert("本棚の奥で迷子になってしまいました。もう一度お試しください。");
       location.reload();
@@ -274,12 +260,13 @@
 
   function renderResult(result) {
     const book = result.book;
-    document.getElementById('resCover').src = book.image || 'https://via.placeholder.com/120x180';
+    // 🌟 修正：書影を確実に表示（GAS側で紐付けたimageを使用）
+    document.getElementById('resCover').src = book.image;
     document.getElementById('resTitle').textContent = book.title;
     document.getElementById('resAuthor').textContent = `著者：${book.author}`;
     
     const linkBtn = document.getElementById('resLink');
-    if (book.url && book.url !== "#") {
+    if (book.url && book.url !== "#" && book.url !== "javascript:void(0)") {
       linkBtn.href = book.url;
       linkBtn.style.display = "inline-block";
     } else {
