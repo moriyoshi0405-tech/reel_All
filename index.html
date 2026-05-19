@@ -1400,7 +1400,437 @@ input[type="file"]::file-selector-button {
   to { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
 }
 
-/* ---------- 15. レスポンシブ (スマホ用) ---------- */
+/* ---------- 15. 📜 本日の栞 (Today's Bookmark) ---------- */
+.todays-bookmark-section {
+  margin: 0 auto 70px;
+  max-width: 920px;
+  position: relative;
+  animation: bookmarkFadeIn 1s ease-out;
+}
+@keyframes bookmarkFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bookmark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 32px;
+  padding: 50px 45px;
+  position: relative;
+  box-shadow: var(--shadow-medium);
+}
+.bookmark-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-texture);
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: 32px;
+}
+.bookmark-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 60px;
+  width: 50px;
+  height: 28px;
+  background: var(--gradient-warm);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  box-shadow: 0 4px 12px rgba(139, 58, 58, 0.3);
+}
+
+.bookmark-chapter-tag {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  background: var(--bg-soft);
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1px solid var(--border-soft);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  letter-spacing: 3px;
+  z-index: 5;
+}
+
+.bookmark-seal {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 35px;
+  padding-top: 35px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+.bookmark-date-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  border: 2px solid var(--accent-burgundy);
+  border-radius: 100px;
+  color: var(--accent-burgundy);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 700;
+  background: rgba(139, 58, 58, 0.06);
+  letter-spacing: 3px;
+}
+.bookmark-meta {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+}
+.bookmark-meta strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.bookmark-title-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  text-align: center;
+  letter-spacing: 10px;
+  position: relative;
+  z-index: 2;
+}
+.bookmark-subtitle {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  position: relative; z-index: 2;
+}
+
+.bookmark-section-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+.bookmark-section-label::before,
+.bookmark-section-label::after {
+  content: "";
+  height: 1px;
+  background: var(--border-soft);
+  flex: 1;
+}
+
+.bookmark-passage-wrapper {
+  margin: 35px auto 25px;
+  padding: 45px 30px;
+  background: linear-gradient(180deg, var(--bg-soft) 0%, transparent 100%);
+  border-radius: 24px;
+  display: flex;
+  justify-content: center;
+  position: relative; z-index: 2;
+  min-height: 280px;
+}
+.bookmark-passage {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.3em;
+  line-height: 2.4;
+  max-height: 360px;
+  padding: 0 25px;
+  position: relative;
+  text-align: justify;
+}
+.bookmark-passage::before,
+.bookmark-passage::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--accent-secondary);
+  opacity: 0.35;
+}
+.bookmark-passage::before { right: 0; }
+.bookmark-passage::after { left: 0; }
+
+.bookmark-source {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 35px;
+  position: relative; z-index: 2;
+  letter-spacing: 2px;
+}
+.bookmark-source strong {
+  color: var(--accent-burgundy);
+  font-weight: 700;
+}
+
+.bookmark-book-row {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 22px 25px;
+  background: var(--bg-soft);
+  border-radius: 18px;
+  margin: 25px 0;
+  border: 1px solid var(--border-soft);
+  position: relative; z-index: 2;
+  transition: 0.3s;
+}
+.bookmark-book-row:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-primary);
+}
+.bookmark-book-cover {
+  width: 72px;
+  height: 105px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 4px 6px 14px rgba(80, 60, 30, 0.2);
+}
+.bookmark-book-info-text { flex: 1; }
+.bookmark-book-info-text .bk-title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.bookmark-book-info-text .bk-author {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 2px;
+}
+
+.bookmark-why {
+  background: rgba(58, 90, 58, 0.06);
+  border-left: 4px solid var(--accent-primary);
+  padding: 22px 28px;
+  border-radius: 0 18px 18px 0;
+  margin: 25px 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 15px;
+  line-height: 2;
+  color: var(--text-primary);
+  position: relative; z-index: 2;
+}
+
+.bookmark-pairing {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 25px 0;
+  position: relative; z-index: 2;
+}
+.pairing-item {
+  text-align: center;
+  padding: 22px 14px;
+  background: var(--bg-soft);
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pairing-item:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--accent-secondary);
+}
+.pairing-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+}
+.pairing-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+.bookmark-question {
+  background: var(--gradient-warm);
+  color: #fff;
+  padding: 32px 38px;
+  border-radius: 24px;
+  margin: 30px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow: var(--shadow-warm);
+}
+.bookmark-question::before {
+  content: "💭";
+  position: absolute;
+  font-size: 100px;
+  opacity: 0.12;
+  right: -15px;
+  top: -25px;
+  transform: rotate(-15deg);
+}
+.bookmark-question-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  position: relative; z-index: 2;
+  font-weight: 700;
+}
+.bookmark-question-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.85;
+  margin: 0;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 2;
+}
+
+.bookmark-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 35px;
+  position: relative; z-index: 2;
+}
+.bookmark-btn {
+  padding: 15px 18px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  letter-spacing: 1px;
+}
+.bookmark-btn:hover {
+  background: var(--bg-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--accent-primary);
+}
+.bookmark-btn.primary {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+.bookmark-btn.primary:hover {
+  filter: brightness(1.15);
+  border-color: var(--accent-primary);
+}
+.bookmark-btn.saved {
+  background: var(--accent-secondary);
+  color: #fff;
+  border-color: var(--accent-secondary);
+}
+
+.bookmark-loading {
+  text-align: center;
+  padding: 80px 20px;
+}
+.bookmark-loading-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 4px;
+}
+
+/* アーカイブカレンダー */
+.archive-stats {
+  text-align: center;
+  margin-top: 20px;
+  padding: 18px;
+  background: var(--bg-soft);
+  border-radius: 14px;
+  font-family: 'Noto Serif JP', serif;
+  color: var(--text-primary);
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+.archive-stats strong {
+  color: var(--accent-burgundy);
+  font-size: 22px;
+  font-family: 'Cormorant Garamond', serif;
+  margin: 0 6px;
+}
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.archive-item {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  padding: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+}
+.archive-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--accent-primary);
+}
+.archive-item-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--accent-burgundy);
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.archive-item-cover {
+  width: 60px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 0 auto 10px;
+  display: block;
+  box-shadow: var(--shadow-soft);
+}
+.archive-item-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ---------- 16. レスポンシブ (スマホ用) ---------- */
 @media (max-width: 767px) {
   .header { padding: 70px 15px 90px; }
   .header h1 { font-size: 28px; letter-spacing: 2px; margin-bottom: 15px; }
@@ -1501,6 +1931,33 @@ input[type="file"]::file-selector-button {
   .modal-actions { flex-direction: column; gap: 10px; margin-top: 22px; }
   .btn-cancel, .btn-submit { width: 100%; padding: 13px; font-size: 14px; }
   .ai-text { font-size: 13px; padding: 18px; }
+
+  /* 本日の栞 - スマホ */
+  .bookmark-card { padding: 38px 22px; border-radius: 26px; }
+  .bookmark-card::after { left: 35px; width: 40px; height: 22px; }
+  .bookmark-chapter-tag { top: 15px; right: 18px; padding: 6px 14px; font-size: 10px; letter-spacing: 2px; }
+  .bookmark-seal { padding-top: 30px; gap: 12px; margin-bottom: 25px; }
+  .bookmark-date-stamp { font-size: 14px; padding: 8px 16px; letter-spacing: 2px; }
+  .bookmark-meta { font-size: 12px; letter-spacing: 2px; }
+  .bookmark-meta strong { font-size: 13px; }
+  .bookmark-title-jp { font-size: 24px; letter-spacing: 5px; }
+  .bookmark-subtitle { font-size: 11px; letter-spacing: 4px; margin-bottom: 25px; }
+  .bookmark-passage-wrapper { padding: 35px 15px; margin: 25px auto; min-height: 240px; }
+  .bookmark-passage { font-size: 18px; max-height: 300px; letter-spacing: 0.25em; }
+  .bookmark-source { font-size: 12px; margin-bottom: 28px; }
+  .bookmark-book-row { padding: 18px; gap: 18px; flex-direction: column; text-align: center; }
+  .bookmark-why { padding: 18px 22px; font-size: 13px; line-height: 1.9; }
+  .bookmark-pairing { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .pairing-item { padding: 14px 8px; }
+  .pairing-icon { font-size: 24px; margin-bottom: 6px; }
+  .pairing-text { font-size: 11px; }
+  .bookmark-question { padding: 24px 22px; }
+  .bookmark-question-text { font-size: 14px; letter-spacing: 1px; line-height: 1.8; }
+  .bookmark-question-label { font-size: 10px; letter-spacing: 3px; }
+  .bookmark-actions { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bookmark-btn { padding: 12px 10px; font-size: 11px; letter-spacing: 0.5px; }
+  .archive-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .archive-item { padding: 14px; }
 }
 
 /* ---------- 16. アクセシビリティ & 設定 ---------- */
@@ -1546,6 +2003,7 @@ input[type="file"]::file-selector-button {
     <button class="close-menu-btn" onclick="toggleMenu()" aria-label="閉じる">✕</button>
   </div>
   <div class="side-menu-links">
+    <a href="#" class="side-nav-btn" onclick="toggleMenu(); openArchiveModal(); return false;">📅 私の栞箱</a>
     <a href="#statsSection" class="side-nav-btn" onclick="toggleMenu()">📊 読書の足跡</a>
     <a href="#adminProfile" class="side-nav-btn" onclick="toggleMenu()">💼 管理人の肖像</a>
     <a href="#prescriptionSection" class="side-nav-btn" onclick="toggleMenu()">💊 心の処方箋</a>
@@ -1654,6 +2112,30 @@ input[type="file"]::file-selector-button {
   </div>
 </div>
 
+<!-- 📖 3ページ読んでみるモーダル -->
+<div id="sampleModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>📖 物語の最初の扉</h3>
+    <p style="text-align:center; color:var(--text-secondary); font-size:13px; margin-bottom:25px; font-family:'Noto Serif JP', serif; letter-spacing:2px;">— この本の世界の入口を、少しだけ覗いてみましょう —</p>
+    <div id="sampleContent" class="ai-text" style="border-left-color:var(--accent-secondary); font-family:'Noto Serif JP', 'Shippori Mincho', serif; line-height:2.2; font-size:15px;"></div>
+    <div class="modal-actions">
+      <button onclick="closeSampleModal()" class="btn-cancel">そっと閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📅 栞箱アーカイブモーダル -->
+<div id="archiveModal" class="modal-overlay">
+  <div class="modal-content" style="max-width:760px;">
+    <h3>📅 私の栞箱</h3>
+    <p style="text-align:center; color:var(--text-secondary); font-size:13px; margin-bottom:10px; font-family:'Noto Serif JP', serif; letter-spacing:2px;">これまでに出会った、日々の物語</p>
+    <div id="archiveContent"></div>
+    <div class="modal-actions">
+      <button onclick="closeArchiveModal()" class="btn-cancel">栞箱を閉じる</button>
+    </div>
+  </div>
+</div>
+
 <!-- ヘッダー -->
 <header class="header">
   <div class="admin-tools">
@@ -1668,6 +2150,27 @@ input[type="file"]::file-selector-button {
 </header>
 
 <div class="container">
+
+  <!-- 📜 本日の栞 (Today's Bookmark) -->
+  <section class="todays-bookmark-section">
+    <div class="bookmark-card">
+      <div id="bookmarkChapterTag" class="bookmark-chapter-tag">朝の章</div>
+
+      <div class="bookmark-seal">
+        <div id="bookmarkDateStamp" class="bookmark-date-stamp">2026.05.19</div>
+        <div id="bookmarkMeta" class="bookmark-meta"><strong>火曜</strong> · 立夏のころ</div>
+      </div>
+
+      <h2 class="bookmark-title-jp">本日の栞</h2>
+      <div class="bookmark-subtitle">Today's Bookmark</div>
+
+      <div id="bookmarkContent">
+        <div class="bookmark-loading">
+          <div class="bookmark-loading-text pulse-text">今日のあなたに合う一冊を探しています...</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ガチャ -->
   <div class="gacha-section">
@@ -1902,6 +2405,8 @@ window.onload = async () => {
     const loading = document.getElementById("loading");
     loading.classList.add('fade-out');
     setTimeout(() => { loading.style.display = "none"; }, 600);
+    // 本日の栞は最後にロード（蔵書データを使うため）
+    loadTodaysBookmark();
   } catch (e) {
     console.error(e);
     alert("蔵書データの取得に失敗しました。");
@@ -2513,6 +3018,328 @@ window.addEventListener('scroll', () => {
     h.style.opacity = Math.max(0, 1 - y / 400);
   }
 }, { passive: true });
+
+/* ============================================================
+   📜 本日の栞 (Today's Bookmark)
+   ============================================================ */
+
+const SEKKI = [
+  { md: '01-05', name: '小寒' }, { md: '01-20', name: '大寒' },
+  { md: '02-04', name: '立春' }, { md: '02-19', name: '雨水' },
+  { md: '03-06', name: '啓蟄' }, { md: '03-21', name: '春分' },
+  { md: '04-05', name: '清明' }, { md: '04-20', name: '穀雨' },
+  { md: '05-06', name: '立夏' }, { md: '05-21', name: '小満' },
+  { md: '06-06', name: '芒種' }, { md: '06-21', name: '夏至' },
+  { md: '07-07', name: '小暑' }, { md: '07-23', name: '大暑' },
+  { md: '08-07', name: '立秋' }, { md: '08-23', name: '処暑' },
+  { md: '09-08', name: '白露' }, { md: '09-23', name: '秋分' },
+  { md: '10-08', name: '寒露' }, { md: '10-23', name: '霜降' },
+  { md: '11-07', name: '立冬' }, { md: '11-22', name: '小雪' },
+  { md: '12-07', name: '大雪' }, { md: '12-22', name: '冬至' }
+];
+
+function getCurrentSekki(date) {
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const today = `${m}-${d}`;
+  let current = { md: '12-22', name: '冬至' };
+  for (const s of SEKKI) {
+    if (s.md <= today) current = s;
+  }
+  return current;
+}
+
+function getDayInfo() {
+  const now = new Date();
+  const hour = now.getHours();
+  const dayJp = ['日','月','火','水','木','金','土'][now.getDay()];
+  const sekki = getCurrentSekki(now);
+  const chapter = hour < 11 ? '朝の章' : (hour >= 18 ? '夜の章' : '昼の章');
+  const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+  return { dateStr, dayJp, sekki, chapter, hour };
+}
+
+async function loadTodaysBookmark() {
+  const info = getDayInfo();
+
+  // 日付スタンプを即座に表示
+  document.getElementById('bookmarkDateStamp').textContent = info.dateStr;
+  document.getElementById('bookmarkMeta').innerHTML = `<strong>${info.dayJp}曜</strong> · ${info.sekki.name}のころ`;
+  document.getElementById('bookmarkChapterTag').textContent = info.chapter;
+
+  // 同日同時間帯はキャッシュから
+  const cacheKey = `bookmark_${info.dateStr}_${info.chapter}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      renderBookmark(data);
+      return;
+    } catch (e) {}
+  }
+
+  // 取得
+  try {
+    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({
+      action: "getTodaysBookmark",
+      dayInfo: info
+    })});
+    const data = await res.json();
+    if (data.status === 'success') {
+      const localBook = [...allData, ...readerData].find(b => b.id === data.bookmark.bookId);
+      if (localBook) {
+        data.bookmark.image = localBook.image;
+        data.bookmark.url = localBook.url;
+      }
+      localStorage.setItem(cacheKey, JSON.stringify(data.bookmark));
+      saveToArchive(info.dateStr, data.bookmark);
+      renderBookmark(data.bookmark);
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById('bookmarkContent').innerHTML = `
+      <div style="text-align:center; padding:40px; color:var(--text-muted); font-family:'Noto Serif JP', serif;">
+        今日の栞は、もう少しお待ちください。<br>
+        <span style="font-size:12px; opacity:0.7;">司書が物語の中で迷子になっているようです。</span>
+      </div>`;
+  }
+}
+
+function renderBookmark(b) {
+  const saved = isBookmarkSaved(b.bookId);
+  const pairing = b.pairing || { drink: '—', scene: '—', sound: '—' };
+  const content = document.getElementById('bookmarkContent');
+  content.innerHTML = `
+    <div class="bookmark-passage-wrapper">
+      <div class="bookmark-passage">${b.passage}</div>
+    </div>
+    <div class="bookmark-source">— 『<strong>${b.title}</strong>』 ${b.author}</div>
+
+    <div class="bookmark-book-row" onclick="window.open('${b.url || '#'}', '_blank')">
+      <img src="${b.image || 'https://via.placeholder.com/72x105'}" class="bookmark-book-cover" onerror="this.src='https://via.placeholder.com/72x105'">
+      <div class="bookmark-book-info-text">
+        <div class="bk-title">『${b.title}』</div>
+        <div class="bk-author">著者：${b.author}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="bookmark-section-label">Why Today · なぜ今日この本</div>
+      <div class="bookmark-why">${b.reason}</div>
+    </div>
+
+    <div>
+      <div class="bookmark-section-label">Pairing · お供の三品</div>
+      <div class="bookmark-pairing">
+        <div class="pairing-item"><span class="pairing-icon">☕</span><div class="pairing-text">${pairing.drink}</div></div>
+        <div class="pairing-item"><span class="pairing-icon">🪟</span><div class="pairing-text">${pairing.scene}</div></div>
+        <div class="pairing-item"><span class="pairing-icon">🎵</span><div class="pairing-text">${pairing.sound}</div></div>
+      </div>
+    </div>
+
+    <div class="bookmark-question">
+      <div class="bookmark-question-label">Today's Question · 心の問い</div>
+      <p class="bookmark-question-text">${b.question}</p>
+    </div>
+
+    <div class="bookmark-actions">
+      <button class="bookmark-btn primary" onclick="openSampleModal('${b.bookId}')">📖 3ページ読む</button>
+      <button class="bookmark-btn ${saved?'saved':''}" id="bookmarkSaveBtn" onclick="toggleBookmarkSave('${b.bookId}')">${saved?'🔖 保管中':'🔖 栞を保管'}</button>
+      <button class="bookmark-btn" onclick="shareBookmarkPassage()">🌿 この一節を贈る</button>
+      <button class="bookmark-btn" onclick="openArchiveModal()">📅 栞箱を開く</button>
+    </div>
+  `;
+}
+
+/* --- 保管/解除 --- */
+function isBookmarkSaved(bookId) {
+  const saved = JSON.parse(localStorage.getItem('savedBookmarks') || '[]');
+  return saved.includes(bookId);
+}
+function toggleBookmarkSave(bookId) {
+  let saved = JSON.parse(localStorage.getItem('savedBookmarks') || '[]');
+  if (saved.includes(bookId)) saved = saved.filter(id => id !== bookId);
+  else { saved.push(bookId); spawnSmallConfetti(); }
+  localStorage.setItem('savedBookmarks', JSON.stringify(saved));
+  // 保存ボタンだけ即時更新
+  const btn = document.getElementById('bookmarkSaveBtn');
+  if (btn) {
+    const now = isBookmarkSaved(bookId);
+    btn.className = `bookmark-btn ${now?'saved':''}`;
+    btn.textContent = now ? '🔖 保管中' : '🔖 栞を保管';
+  }
+}
+
+/* --- アーカイブ保存 --- */
+function saveToArchive(dateStr, bookmark) {
+  const archive = JSON.parse(localStorage.getItem('bookmarkArchive') || '{}');
+  archive[dateStr] = {
+    bookId: bookmark.bookId,
+    title: bookmark.title,
+    author: bookmark.author,
+    passage: bookmark.passage,
+    image: bookmark.image,
+    url: bookmark.url
+  };
+  localStorage.setItem('bookmarkArchive', JSON.stringify(archive));
+}
+
+function openArchiveModal() {
+  const archive = JSON.parse(localStorage.getItem('bookmarkArchive') || '{}');
+  const entries = Object.entries(archive).sort((a,b) => b[0].localeCompare(a[0]));
+  let html = '';
+  if (entries.length === 0) {
+    html = `<div style="text-align:center; padding:60px 20px; color:var(--text-muted); font-family:'Noto Serif JP', serif; line-height:2;">
+      まだ栞箱は空っぽです。<br>
+      <span style="font-size:13px; opacity:0.8;">日々訪れて、少しずつ物語を集めましょう。</span>
+    </div>`;
+  } else {
+    const thisYear = new Date().getFullYear();
+    const thisYearCount = entries.filter(([d]) => d.startsWith(String(thisYear))).length;
+    html = `<div class="archive-stats">今年あなたが出会った本：<strong>${thisYearCount}</strong>冊 / 累計 <strong>${entries.length}</strong> 日</div>`;
+    html += '<div class="archive-grid">';
+    entries.slice(0, 60).forEach(([date, b]) => {
+      html += `
+        <div class="archive-item" onclick="window.open('${b.url || '#'}', '_blank')">
+          <div class="archive-item-date">${date}</div>
+          <img src="${b.image || 'https://via.placeholder.com/60x88'}" class="archive-item-cover" onerror="this.src='https://via.placeholder.com/60x88'">
+          <div class="archive-item-title">${b.title}</div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('archiveContent').innerHTML = html;
+  document.getElementById('archiveModal').style.display = 'flex';
+}
+function closeArchiveModal() { document.getElementById('archiveModal').style.display = 'none'; }
+
+/* --- 3ページモード --- */
+async function openSampleModal(bookId) {
+  document.getElementById('sampleModal').style.display = 'flex';
+  const content = document.getElementById('sampleContent');
+  content.innerHTML = '<div class="pulse-text" style="text-align:center; padding:30px;">物語の扉を、そっと開いています...</div>';
+  try {
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ action: "generateOpeningSample", bookId: bookId })});
+    const data = await res.json();
+    if (data.status === 'success') {
+      content.innerHTML = data.sample.replace(/\n/g, '<br>');
+    } else { throw new Error(data.message); }
+  } catch (e) {
+    content.innerHTML = '<div style="text-align:center; color:var(--accent-burgundy);">扉が今は重く閉ざされています。少し時間を置いてもう一度。</div>';
+  }
+}
+function closeSampleModal() { document.getElementById('sampleModal').style.display = 'none'; }
+
+/* --- シェア画像生成 (Canvas) --- */
+function shareBookmarkPassage() {
+  const info = getDayInfo();
+  const cacheKey = `bookmark_${info.dateStr}_${info.chapter}`;
+  const data = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+  if (!data) return alert('栞のデータが見つかりませんでした。');
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1350;
+  const ctx = canvas.getContext('2d');
+
+  // 背景（古書喫茶）
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#f5ecd9');
+  grad.addColorStop(1, '#ede0c4');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 紙のテクスチャ（点描）
+  ctx.fillStyle = 'rgba(80, 60, 30, 0.04)';
+  for (let i = 0; i < 3000; i++) {
+    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 2, 2);
+  }
+
+  // 装飾枠
+  ctx.strokeStyle = '#3a5a3a';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(50, 50, canvas.width-100, canvas.height-100);
+  ctx.strokeStyle = '#c4842c';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(75, 75, canvas.width-150, canvas.height-150);
+
+  // 日付
+  ctx.fillStyle = '#8b3a3a';
+  ctx.font = 'bold 36px "Cormorant Garamond", serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(info.dateStr, canvas.width/2, 175);
+
+  // 曜日 + 節気
+  ctx.fillStyle = '#6b5840';
+  ctx.font = '22px "Noto Serif JP", serif';
+  ctx.fillText(`${info.dayJp}曜  ·  ${info.sekki.name}のころ`, canvas.width/2, 215);
+
+  // タイトル
+  ctx.fillStyle = '#2e2418';
+  ctx.font = 'bold 72px "Noto Serif JP", serif';
+  ctx.fillText('本日の栞', canvas.width/2, 340);
+
+  // サブタイトル
+  ctx.font = 'italic 22px "Cormorant Garamond", serif';
+  ctx.fillStyle = '#3a5a3a';
+  ctx.fillText('Today\'s Bookmark', canvas.width/2, 380);
+
+  // 一節（中央に大きく）
+  ctx.fillStyle = '#2e2418';
+  ctx.font = '42px "Shippori Mincho", "Noto Serif JP", serif';
+  const lines = wrapJapaneseText(ctx, data.passage, canvas.width - 280);
+  let y = 600 - (lines.length * 30);
+  lines.forEach(line => { ctx.fillText(line, canvas.width/2, y); y += 75; });
+
+  // 引用元
+  ctx.font = '26px "Noto Serif JP", serif';
+  ctx.fillStyle = '#6b5840';
+  ctx.fillText(`— 『${data.title}』 ${data.author}`, canvas.width/2, canvas.height - 280);
+
+  // サイト名
+  ctx.font = 'italic 22px "Cormorant Garamond", serif';
+  ctx.fillStyle = '#9e8c70';
+  ctx.fillText('AI Book Shelf  ·  Antique Bookshop', canvas.width/2, canvas.height - 130);
+
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookmark_${info.dateStr.replace(/\./g,'')}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setTimeout(() => alert('🌿 一節の画像をダウンロードしました。\nSNSへの共有や、壁紙にどうぞ。'), 100);
+  });
+}
+
+function wrapJapaneseText(ctx, text, maxWidth) {
+  const lines = [];
+  let line = '';
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = ch;
+    } else { line = test; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function spawnSmallConfetti() {
+  const colors = ['#c4842c', '#3a5a3a', '#8b3a3a'];
+  for (let i = 0; i < 20; i++) {
+    const c = document.createElement('div');
+    const size = Math.random() * 6 + 4;
+    c.style.cssText = `position:fixed; width:${size}px; height:${size}px; background:${colors[Math.floor(Math.random()*colors.length)]}; left:${Math.random()*100}vw; top:30vh; border-radius:50%; animation: fall ${Math.random()*2+1.5}s linear forwards; z-index:4000; opacity:0.9;`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3500);
+  }
+}
 
 </script>
 </body>
