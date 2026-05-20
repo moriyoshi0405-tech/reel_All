@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Book Shelf | 穏やかな読書体験を</title>
 <meta name="description" content="物語と出会うための古書喫茶のような本棚。AI司書があなたに最も深く効く一冊を、そっと処方します。">
+
+<!-- OGP (SNSプレビュー) -->
+<meta property="og:title" content="AI Book Shelf | 本日の栞">
+<meta property="og:description" content="今日のあなたに、一冊を。古書喫茶のような本棚から、AI司書があなたの心に響く物語をそっと処方します。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="logos/ogp_1200x630_light.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="logos/ogp_1200x630_light.png">
+
+<!-- ファビコン -->
+<link rel="icon" type="image/png" sizes="64x64" href="logos/favicon_64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="logos/favicon_32.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Cormorant+Garamond:wght@500;700&display=swap" rel="stylesheet">
@@ -3261,7 +3274,8 @@ function renderBookmark(b) {
     <div class="bookmark-actions">
       <button class="bookmark-btn primary" onclick="openSampleModal('${b.bookId}')">📖 3ページ読む</button>
       <button class="bookmark-btn ${saved?'saved':''}" id="bookmarkSaveBtn" onclick="toggleBookmarkSave('${b.bookId}')">${saved?'🔖 保管中':'🔖 栞を保管'}</button>
-      <button class="bookmark-btn" onclick="shareBookmarkPassage()">🌿 この一節を贈る</button>
+      <button class="bookmark-btn" onclick="shareBookmarkPassage()">🌿 画像で贈る</button>
+      <button class="bookmark-btn" onclick="shareBookmarkLink()">🔗 リンクで贈る</button>
       <button class="bookmark-btn" onclick="openArchiveModal()">📅 栞箱を開く</button>
     </div>
   `;
@@ -3345,6 +3359,92 @@ async function openSampleModal(bookId) {
   }
 }
 function closeSampleModal() { document.getElementById('sampleModal').style.display = 'none'; }
+
+/* --- 共有リンク生成 --- */
+function shareBookmarkLink() {
+  const info = getDayInfo();
+  const chapterCode = info.chapter === '朝の章' ? 'morning' : (info.chapter === '夜の章' ? 'night' : 'noon');
+  const dateCode = info.dateStr.replace(/\./g, '');
+
+  // 同じディレクトリの bookmark.html を絶対URLに
+  const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
+  const shareUrl = `${baseUrl}bookmark.html?d=${dateCode}&c=${chapterCode}`;
+
+  // クリップボードにコピー
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showShareToast(shareUrl);
+    }).catch(() => {
+      fallbackCopy(shareUrl);
+    });
+  } else {
+    fallbackCopy(shareUrl);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed; left:-9999px; top:-9999px;';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showShareToast(text);
+  } catch (e) {
+    prompt('このURLをコピーしてご利用ください：', text);
+  }
+  document.body.removeChild(ta);
+}
+
+function showShareToast(url) {
+  // 既存のトーストがあれば消す
+  const existing = document.getElementById('shareToast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.id = 'shareToast';
+  toast.innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+      <span style="font-size:24px;">🔗</span>
+      <div>
+        <div style="font-family:'Noto Serif JP',serif; font-weight:700; font-size:15px; letter-spacing:2px;">共有リンクをコピーしました</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:3px; font-family:'Cormorant Garamond',serif; letter-spacing:1px;">SHARE LINK COPIED</div>
+      </div>
+    </div>
+    <div style="font-size:11px; color:var(--text-muted); word-break:break-all; padding:10px 12px; background:var(--bg-soft); border-radius:8px; margin-bottom:8px; line-height:1.5;">${url}</div>
+    <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; font-family:'Noto Serif JP',serif;">
+      Instagramストーリーや<br>SNSに貼り付けてご利用ください
+    </div>
+  `;
+  toast.style.cssText = `
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--bg-card);
+    border:1px solid var(--border-soft);
+    border-left:4px solid var(--accent-secondary);
+    padding:18px 22px;
+    border-radius:18px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.18);
+    z-index:5000;
+    max-width:340px;
+    opacity:0;
+    transition:0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color:var(--text-primary);
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+  }, 50);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 4500);
+}
 
 /* --- シェア画像生成 (Canvas) --- */
 function shareBookmarkPassage() {
