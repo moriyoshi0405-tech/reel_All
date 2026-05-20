@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本日の栞 | AI Book Shelf</title>
+<meta name="description" content="AI Book Shelf - 古書喫茶のような本棚から、今日のあなたに一冊を。">
+
+<!-- OGP (SNSプレビュー) -->
+<meta property="og:title" content="本日の栞 | AI Book Shelf">
+<meta property="og:description" content="今日のあなたに、一冊を。古書喫茶のような本棚から、AI司書があなたの心に響く物語をそっと処方します。">
+<meta property="og:type" content="article">
+<meta property="og:image" content="logos/ogp_1200x630_light.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="logos/ogp_1200x630_light.png">
+
+<!-- ファビコン -->
+<link rel="icon" type="image/png" sizes="64x64" href="logos/favicon_64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="logos/favicon_32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Cormorant+Garamond:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   栞専用ページ - 古書喫茶テーマ
+   ============================================================ */
+:root {
+  --bg-page: #f5ecd9;
+  --bg-page-alt: #ede0c4;
+  --bg-card: #fffcf3;
+  --bg-soft: #f9f0db;
+  --text-primary: #2e2418;
+  --text-secondary: #6b5840;
+  --text-muted: #9e8c70;
+  --accent-primary: #3a5a3a;
+  --accent-secondary: #c4842c;
+  --accent-burgundy: #8b3a3a;
+  --accent-ink: #1f3a5f;
+  --border-soft: #e0d2b5;
+  --border-strong: #c8b58f;
+  --shadow-soft: 0 10px 30px rgba(80, 60, 30, 0.08);
+  --shadow-medium: 0 15px 40px rgba(80, 60, 30, 0.12);
+  --shadow-hard: 0 25px 60px rgba(80, 60, 30, 0.18);
+  --shadow-warm: 0 10px 30px rgba(196, 132, 44, 0.2);
+  --gradient-page: linear-gradient(135deg, #f5ecd9 0%, #ede0c4 100%);
+  --gradient-warm: linear-gradient(135deg, #c4842c 0%, #8b3a3a 100%);
+  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="dark"] {
+  --bg-page: #14171f;
+  --bg-page-alt: #1a1e28;
+  --bg-card: #232936;
+  --bg-soft: #1c212c;
+  --text-primary: #f0e6d2;
+  --text-secondary: #b8a98c;
+  --text-muted: #7d7058;
+  --accent-primary: #e8b04e;
+  --accent-secondary: #d4869e;
+  --accent-burgundy: #c97082;
+  --accent-ink: #7eb8d4;
+  --border-soft: #3a4156;
+  --border-strong: #4a536b;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-medium: 0 15px 40px rgba(0, 0, 0, 0.45);
+  --shadow-hard: 0 25px 60px rgba(0, 0, 0, 0.55);
+  --shadow-warm: 0 10px 30px rgba(232, 176, 78, 0.18);
+  --gradient-page: linear-gradient(135deg, #14171f 0%, #1a1e28 100%);
+  --gradient-warm: linear-gradient(135deg, #e8b04e 0%, #c97082 100%);
+  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.8 0 0 0 0 0.6 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Zen Maru Gothic', 'Noto Serif JP', sans-serif;
+  background: var(--gradient-page);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.8;
+  position: relative;
+  transition: background 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: var(--paper-texture);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+}
+body > * { position: relative; z-index: 2; }
+
+/* 浮かぶ文字 */
+.floating-chars-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.floating-char {
+  position: absolute;
+  font-family: 'Noto Serif JP', 'Shippori Mincho', serif;
+  font-weight: 500;
+  color: rgba(80, 60, 30, 0.18);
+  user-select: none;
+  will-change: transform, opacity;
+  animation: floatCharRise linear infinite;
+  bottom: -50px;
+}
+[data-theme="dark"] .floating-char { color: rgba(232, 176, 78, 0.16); }
+@keyframes floatCharRise {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateY(-50vh) translateX(20px) rotate(180deg); }
+  90% { opacity: 1; }
+  100% { transform: translateY(-105vh) translateX(-20px) rotate(360deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-chars-container { display: none; }
+}
+
+/* テーマ切替ボタン */
+.theme-toggle {
+  position: fixed; top: 20px; right: 20px;
+  z-index: 1500;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 18px;
+}
+.theme-toggle:hover { transform: rotate(30deg) scale(1.1); }
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+  position: absolute;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+[data-theme="light"] .sun-icon { transform: scale(0) rotate(180deg); opacity: 0; }
+[data-theme="light"] .moon-icon { transform: scale(1) rotate(0deg); opacity: 1; }
+[data-theme="dark"] .sun-icon { transform: scale(1) rotate(0deg); opacity: 1; }
+[data-theme="dark"] .moon-icon { transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* ヘッダー（シンプル） */
+.simple-header {
+  text-align: center;
+  padding: 50px 20px 30px;
+  position: relative;
+}
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity 0.3s;
+}
+.logo-mark:hover { opacity: 0.7; }
+.logo-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+.logo-text {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 4px;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.logo-text-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 2px;
+}
+
+/* メインカード */
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.bookmark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 32px;
+  padding: 55px 50px;
+  position: relative;
+  box-shadow: var(--shadow-medium);
+  margin-bottom: 30px;
+  animation: cardFadeIn 1s ease-out;
+}
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bookmark-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-texture);
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: 32px;
+}
+.bookmark-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 60px;
+  width: 50px;
+  height: 28px;
+  background: var(--gradient-warm);
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+  box-shadow: 0 4px 12px rgba(139, 58, 58, 0.3);
+}
+.bookmark-card > * { position: relative; z-index: 2; }
+
+.chapter-tag {
+  position: absolute;
+  top: 22px;
+  right: 25px;
+  background: var(--bg-soft);
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1px solid var(--border-soft);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  letter-spacing: 3px;
+  z-index: 5;
+}
+
+.seal {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 35px;
+  padding-top: 30px;
+  flex-wrap: wrap;
+}
+.date-stamp {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 22px;
+  border: 2px solid var(--accent-burgundy);
+  border-radius: 100px;
+  color: var(--accent-burgundy);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 700;
+  background: rgba(139, 58, 58, 0.06);
+  letter-spacing: 3px;
+}
+.date-meta {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+}
+.date-meta strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.page-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  text-align: center;
+  letter-spacing: 10px;
+}
+.page-subtitle {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 6px;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+
+.section-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+.section-label::before, .section-label::after {
+  content: "";
+  height: 1px;
+  background: var(--border-soft);
+  flex: 1;
+}
+
+.passage-wrapper {
+  margin: 30px auto 22px;
+  padding: 40px 25px;
+  background: linear-gradient(180deg, var(--bg-soft) 0%, transparent 100%);
+  border-radius: 24px;
+  display: flex;
+  justify-content: center;
+  min-height: 260px;
+}
+.passage {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.3em;
+  line-height: 2.4;
+  max-height: 340px;
+  padding: 0 20px;
+  position: relative;
+  text-align: justify;
+}
+.passage::before, .passage::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--accent-secondary);
+  opacity: 0.35;
+}
+.passage::before { right: 0; }
+.passage::after { left: 0; }
+.passage-source {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+}
+.passage-source strong {
+  color: var(--accent-burgundy);
+  font-weight: 700;
+}
+
+.book-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 22px 25px;
+  background: var(--bg-soft);
+  border-radius: 18px;
+  margin: 22px 0;
+  border: 1px solid var(--border-soft);
+  text-decoration: none;
+  color: inherit;
+  transition: 0.3s;
+}
+.book-row:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+.book-cover {
+  width: 72px;
+  height: 105px;
+  object-fit: cover;
+  border-radius: 5px;
+  box-shadow: 4px 6px 14px rgba(80, 60, 30, 0.2);
+  flex-shrink: 0;
+}
+.book-info { flex: 1; }
+.book-title-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.book-author {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 2px;
+}
+
+.why-box {
+  background: rgba(58, 90, 58, 0.06);
+  border-left: 4px solid var(--accent-primary);
+  padding: 20px 24px;
+  border-radius: 0 18px 18px 0;
+  margin: 22px 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  line-height: 2;
+  color: var(--text-primary);
+}
+
+.pairing {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+.pair-item {
+  text-align: center;
+  padding: 20px 12px;
+  background: var(--bg-soft);
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+}
+.pair-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 8px;
+}
+.pair-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  line-height: 1.5;
+}
+
+.question-card {
+  background: var(--gradient-warm);
+  color: #fff;
+  padding: 30px 35px;
+  border-radius: 24px;
+  margin: 28px 0 35px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-warm);
+}
+.question-card::before {
+  content: "💭";
+  position: absolute;
+  font-size: 100px;
+  opacity: 0.12;
+  right: -15px;
+  top: -25px;
+  transform: rotate(-15deg);
+}
+.q-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  font-weight: 700;
+  position: relative; z-index: 2;
+}
+.q-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.85;
+  margin: 0;
+  letter-spacing: 2px;
+  position: relative; z-index: 2;
+}
+
+/* アクションボタン */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 30px;
+}
+.action-btn {
+  padding: 16px 14px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  letter-spacing: 1px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.action-btn:hover {
+  background: var(--bg-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--accent-primary);
+}
+.action-btn.primary {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+  grid-column: 1 / -1;
+}
+.action-btn.primary:hover {
+  filter: brightness(1.15);
+  border-color: var(--accent-primary);
+}
+.action-btn.secondary {
+  background: var(--gradient-warm);
+  color: #fff;
+  border: none;
+}
+.action-btn.secondary:hover { filter: brightness(1.15); }
+
+/* フッター */
+.shiori-footer {
+  text-align: center;
+  padding: 35px 20px 50px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+}
+.shiori-footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* ローディング */
+.loading-state {
+  text-align: center;
+  padding: 80px 20px;
+  font-family: 'Noto Serif JP', serif;
+  color: var(--text-secondary);
+}
+.pulse-text {
+  animation: pulseText 2s infinite;
+  letter-spacing: 4px;
+  font-size: 14px;
+}
+@keyframes pulseText { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+/* エラー */
+.error-state {
+  text-align: center;
+  padding: 60px 20px;
+  font-family: 'Noto Serif JP', serif;
+  color: var(--text-secondary);
+  line-height: 2;
+}
+.error-state .err-title {
+  font-size: 20px;
+  color: var(--accent-burgundy);
+  margin-bottom: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* トースト */
+#copyToast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--accent-secondary);
+  padding: 16px 24px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  z-index: 5000;
+  opacity: 0;
+  transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+#copyToast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* スマホ対応 */
+@media (max-width: 767px) {
+  .simple-header { padding: 35px 15px 20px; }
+  .logo-img { width: 42px; height: 42px; }
+  .logo-text { font-size: 15px; letter-spacing: 2px; }
+  .logo-text-sub { font-size: 9px; letter-spacing: 3px; }
+  .theme-toggle { top: 15px; right: 15px; width: 40px; height: 40px; font-size: 15px; }
+  .container { padding: 12px; }
+
+  .bookmark-card { padding: 38px 22px; border-radius: 24px; }
+  .bookmark-card::after { left: 35px; width: 40px; height: 22px; }
+  .chapter-tag { top: 16px; right: 16px; padding: 6px 14px; font-size: 10px; letter-spacing: 2px; }
+  .seal { padding-top: 28px; gap: 12px; margin-bottom: 25px; }
+  .date-stamp { font-size: 13px; padding: 8px 16px; letter-spacing: 2px; }
+  .date-meta { font-size: 12px; }
+  .date-meta strong { font-size: 13px; }
+  .page-title { font-size: 22px; letter-spacing: 5px; }
+  .page-subtitle { font-size: 11px; letter-spacing: 4px; margin-bottom: 25px; }
+
+  .passage-wrapper { padding: 32px 12px; min-height: 220px; }
+  .passage { font-size: 17px; max-height: 280px; letter-spacing: 0.25em; }
+  .passage-source { font-size: 12px; margin-bottom: 26px; }
+
+  .book-row { padding: 16px; gap: 16px; flex-direction: column; text-align: center; }
+  .book-title-jp { font-size: 16px; }
+  .why-box { padding: 18px 22px; font-size: 13px; line-height: 1.9; }
+  .pairing { gap: 8px; }
+  .pair-item { padding: 14px 8px; }
+  .pair-icon { font-size: 24px; margin-bottom: 6px; }
+  .pair-text { font-size: 11px; }
+  .question-card { padding: 22px 22px; }
+  .q-text { font-size: 14px; letter-spacing: 1px; line-height: 1.8; }
+  .q-label { font-size: 10px; letter-spacing: 3px; }
+  .actions { gap: 10px; }
+  .action-btn { padding: 14px 10px; font-size: 12px; letter-spacing: 0.5px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 浮かぶ文字背景 -->
+<div class="floating-chars-container" id="floatingChars" aria-hidden="true"></div>
+
+<!-- テーマ切替 -->
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="テーマ切替">
+  <span class="moon-icon">🌙</span>
+  <span class="sun-icon">☀️</span>
+</button>
+
+<!-- ヘッダー（クリックでメインへ） -->
+<header class="simple-header">
+  <a href="index.html" class="logo-mark" id="logoMark">
+    <img id="logoImg" src="logos/logo_512_light.png" alt="AI Book Shelf" class="logo-img">
+    <div>
+      <div class="logo-text">AI Book Shelf</div>
+      <span class="logo-text-sub">ANTIQUE BOOKSHOP</span>
+    </div>
+  </a>
+</header>
+
+<div class="container">
+  <div class="bookmark-card">
+    <div id="chapterTag" class="chapter-tag">朝の章</div>
+
+    <div class="seal">
+      <div id="dateStamp" class="date-stamp">— · — · —</div>
+      <div id="dateMeta" class="date-meta">— · —</div>
+    </div>
+
+    <h1 class="page-title">本日の栞</h1>
+    <div class="page-subtitle">Today's Bookmark</div>
+
+    <div id="bookmarkContent">
+      <div class="loading-state">
+        <div class="pulse-text">本棚から、栞を取り出しています...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="shiori-footer">
+  EST. 2024 · AI BOOK SHELF<br>
+  <a href="index.html">本棚のメインページへ →</a>
+</footer>
+
+<div id="copyToast">🔗 URLをコピーしました</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
+
+const SEKKI = [
+  { md: '01-05', name: '小寒' }, { md: '01-20', name: '大寒' },
+  { md: '02-04', name: '立春' }, { md: '02-19', name: '雨水' },
+  { md: '03-06', name: '啓蟄' }, { md: '03-21', name: '春分' },
+  { md: '04-05', name: '清明' }, { md: '04-20', name: '穀雨' },
+  { md: '05-06', name: '立夏' }, { md: '05-21', name: '小満' },
+  { md: '06-06', name: '芒種' }, { md: '06-21', name: '夏至' },
+  { md: '07-07', name: '小暑' }, { md: '07-23', name: '大暑' },
+  { md: '08-07', name: '立秋' }, { md: '08-23', name: '処暑' },
+  { md: '09-08', name: '白露' }, { md: '09-23', name: '秋分' },
+  { md: '10-08', name: '寒露' }, { md: '10-23', name: '霜降' },
+  { md: '11-07', name: '立冬' }, { md: '11-22', name: '小雪' },
+  { md: '12-07', name: '大雪' }, { md: '12-22', name: '冬至' }
+];
+
+const FLOATING_CHARS = ['物','語','本','読','頁','栞','冊','詩','歌','夜','月','星','雨','風','森','木','花','葉','朝','夕','空','窓','灯','想','夢','愛','希','望','静','優','温','光','影','声','音','心','時','永','遠','記','憶','思','懐'];
+
+/* ---------- テーマ ---------- */
+function initTheme() {
+  const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', saved);
+  updateLogoForTheme();
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateLogoForTheme();
+}
+function updateLogoForTheme() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const img = document.getElementById('logoImg');
+  if (img) img.src = theme === 'dark' ? 'logos/logo_512_dark.png' : 'logos/logo_512_light.png';
+}
+initTheme();
+
+/* ---------- 浮かぶ文字 ---------- */
+function spawnFloatingChar() {
+  const container = document.getElementById('floatingChars');
+  if (!container) return;
+  const char = document.createElement('div');
+  char.className = 'floating-char';
+  char.textContent = FLOATING_CHARS[Math.floor(Math.random() * FLOATING_CHARS.length)];
+  const size = 14 + Math.random() * 28;
+  char.style.fontSize = size + 'px';
+  char.style.left = Math.random() * 100 + 'vw';
+  const duration = 14 + Math.random() * 16 + (size / 4);
+  char.style.animationDuration = duration + 's';
+  char.style.opacity = 0.4 + Math.random() * 0.6;
+  container.appendChild(char);
+  setTimeout(() => char.remove(), duration * 1000);
+}
+let charsInterval = null;
+function startChars() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const isMobile = window.innerWidth < 768;
+  const intervalMs = isMobile ? 1800 : 1100;
+  const initialCount = isMobile ? 4 : 8;
+  for (let i = 0; i < initialCount; i++) {
+    setTimeout(spawnFloatingChar, i * 600);
+  }
+  charsInterval = setInterval(spawnFloatingChar, intervalMs);
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && charsInterval) {
+    clearInterval(charsInterval);
+    charsInterval = null;
+  } else if (!document.hidden && !charsInterval) {
+    startChars();
+  }
+});
+startChars();
+
+/* ---------- URLパラメータ取得 ---------- */
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  let dateStr = params.get('d') || '';
+  let chapter = params.get('c') || '';
+
+  // 日付バリデーション
+  if (!/^\d{8}$/.test(dateStr)) {
+    // 不正な場合は今日に
+    const now = new Date();
+    dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  }
+  if (!['morning','noon','night'].includes(chapter)) {
+    // 不正な場合は時間から推測
+    const h = new Date().getHours();
+    chapter = h < 11 ? 'morning' : (h >= 18 ? 'night' : 'noon');
+  }
+  return { dateStr, chapter };
+}
+
+function chapterCodeToJp(c) {
+  return c === 'morning' ? '朝の章' : (c === 'night' ? '夜の章' : '昼の章');
+}
+
+function buildDayInfo(dateCode, chapterCode) {
+  const y = dateCode.substring(0, 4);
+  const m = dateCode.substring(4, 6);
+  const d = dateCode.substring(6, 8);
+  const dateStr = `${y}.${m}.${d}`;
+  const dateObj = new Date(`${y}-${m}-${d}T12:00:00`);
+  const dayJp = ['日','月','火','水','木','金','土'][dateObj.getDay()];
+
+  let sekki = { md: '12-22', name: '冬至' };
+  const today = `${m}-${d}`;
+  for (const s of SEKKI) {
+    if (s.md <= today) sekki = s;
+  }
+
+  return {
+    dateStr,
+    dayJp,
+    sekki,
+    chapter: chapterCodeToJp(chapterCode),
+    hour: chapterCode === 'morning' ? 8 : (chapterCode === 'night' ? 20 : 13)
+  };
+}
+
+/* ---------- 栞を読み込む ---------- */
+async function loadBookmark() {
+  const { dateStr, chapter } = getUrlParams();
+  const dayInfo = buildDayInfo(dateStr, chapter);
+
+  // ヘッダー部表示
+  document.getElementById('dateStamp').textContent = dayInfo.dateStr;
+  document.getElementById('dateMeta').innerHTML = `<strong>${dayInfo.dayJp}曜</strong> · ${dayInfo.sekki.name}のころ`;
+  document.getElementById('chapterTag').textContent = dayInfo.chapter;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getTodaysBookmark", dayInfo: dayInfo })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      renderBookmark(data.bookmark, dayInfo);
+      // OGPのタイトルを動的に更新（クライアントサイドなのでSNSクローラには反映されないが、ブラウザタブには反映される）
+      document.title = `『${data.bookmark.title}』本日の栞 | AI Book Shelf`;
+    } else {
+      throw new Error(data.message || '栞を読み込めませんでした');
+    }
+  } catch (e) {
+    document.getElementById('bookmarkContent').innerHTML = `
+      <div class="error-state">
+        <div class="err-title">栞が見つかりませんでした</div>
+        <div>司書が物語の中で迷子になっているようです。<br>少し時間を置いてもう一度お試しください。</div>
+        <div style="margin-top:25px;">
+          <a href="index.html" class="action-btn" style="display:inline-flex; padding:14px 30px;">📚 メインの本棚へ</a>
+        </div>
+      </div>`;
+  }
+}
+
+function renderBookmark(b, dayInfo) {
+  const pairing = b.pairing || { drink: '—', scene: '—', sound: '—' };
+  const reviewBtn = (b.url && b.url !== '#') ?
+    `<a href="${b.url}" target="_blank" class="action-btn">📖 この本のレビュー</a>` :
+    `<button class="action-btn" onclick="alert('この本のレビュー記事はまだ準備中です。')">📖 この本のレビュー</button>`;
+
+  document.getElementById('bookmarkContent').innerHTML = `
+    <div class="passage-wrapper">
+      <div class="passage">${escapeHtml(b.passage)}</div>
+    </div>
+    <div class="passage-source">— 『<strong>${escapeHtml(b.title)}</strong>』 ${escapeHtml(b.author)}</div>
+
+    ${b.url && b.url !== '#' ? `<a href="${b.url}" target="_blank" class="book-row">` : `<div class="book-row">`}
+      <img src="${b.image || 'https://via.placeholder.com/72x105'}" class="book-cover" onerror="this.src='https://via.placeholder.com/72x105'" alt="${escapeHtml(b.title)}">
+      <div class="book-info">
+        <div class="book-title-jp">『${escapeHtml(b.title)}』</div>
+        <div class="book-author">著者：${escapeHtml(b.author)}</div>
+      </div>
+    ${b.url && b.url !== '#' ? `</a>` : `</div>`}
+
+    <div>
+      <div class="section-label">Why Today · なぜ今日この本</div>
+      <div class="why-box">${escapeHtml(b.reason)}</div>
+    </div>
+
+    <div>
+      <div class="section-label">Pairing · お供の三品</div>
+      <div class="pairing">
+        <div class="pair-item"><span class="pair-icon">☕</span><div class="pair-text">${escapeHtml(pairing.drink)}</div></div>
+        <div class="pair-item"><span class="pair-icon">🪟</span><div class="pair-text">${escapeHtml(pairing.scene)}</div></div>
+        <div class="pair-item"><span class="pair-icon">🎵</span><div class="pair-text">${escapeHtml(pairing.sound)}</div></div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-label">Today's Question · 心の問い</div>
+      <p class="q-text">${escapeHtml(b.question)}</p>
+    </div>
+
+    <div class="actions">
+      <button class="action-btn secondary" onclick='downloadPassageImage(${JSON.stringify({passage:b.passage,title:b.title,author:b.author,dateStr:dayInfo.dateStr,dayJp:dayInfo.dayJp,sekki:dayInfo.sekki.name})})'>🌿 一節を画像で保存</button>
+      <button class="action-btn" onclick="copyShareUrl()">🔗 URLをコピー</button>
+      ${reviewBtn}
+      <a href="index.html" class="action-btn primary">📚 AI Book Shelf を訪れる</a>
+    </div>
+  `;
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* ---------- URLコピー ---------- */
+function copyShareUrl() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showToast).catch(() => fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed; left:-9999px;';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast(); }
+  catch (e) { prompt('このURLをコピーしてください：', text); }
+  document.body.removeChild(ta);
+}
+function showToast() {
+  const t = document.getElementById('copyToast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ---------- 一節の画像ダウンロード ---------- */
+function downloadPassageImage(data) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  canvas.height = 1350;
+  const ctx = canvas.getContext('2d');
+
+  // 背景
+  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  grad.addColorStop(0, '#f5ecd9');
+  grad.addColorStop(1, '#ede0c4');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // 紙テクスチャ
+  ctx.fillStyle = 'rgba(80, 60, 30, 0.04)';
+  for (let i = 0; i < 3000; i++) {
+    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 2, 2);
+  }
+
+  // 装飾枠
+  ctx.strokeStyle = '#3a5a3a';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(50, 50, canvas.width-100, canvas.height-100);
+  ctx.strokeStyle = '#c4842c';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(75, 75, canvas.width-150, canvas.height-150);
+
+  // 日付
+  ctx.fillStyle = '#8b3a3a';
+  ctx.font = 'bold 36px "Cormorant Garamond", serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(data.dateStr, canvas.width/2, 175);
+  ctx.fillStyle = '#6b5840';
+  ctx.font = '22px "Noto Serif JP", serif';
+  ctx.fillText(`${data.dayJp}曜  ·  ${data.sekki}のころ`, canvas.width/2, 215);
+
+  // タイトル
+  ctx.fillStyle = '#2e2418';
+  ctx.font = 'bold 72px "Noto Serif JP", serif';
+  ctx.fillText('本日の栞', canvas.width/2, 340);
+  ctx.font = 'italic 22px "Cormorant Garamond", serif';
+  ctx.fillStyle = '#3a5a3a';
+  ctx.fillText("Today's Bookmark", canvas.width/2, 380);
+
+  // 一節
+  ctx.fillStyle = '#2e2418';
+  ctx.font = '42px "Shippori Mincho", "Noto Serif JP", serif';
+  const lines = wrapText(ctx, data.passage, canvas.width - 280);
+  let y = 600 - (lines.length * 30);
+  lines.forEach(line => { ctx.fillText(line, canvas.width/2, y); y += 75; });
+
+  // 引用元
+  ctx.font = '26px "Noto Serif JP", serif';
+  ctx.fillStyle = '#6b5840';
+  ctx.fillText(`— 『${data.title}』 ${data.author}`, canvas.width/2, canvas.height - 280);
+
+  // サイト名
+  ctx.font = 'italic 22px "Cormorant Garamond", serif';
+  ctx.fillStyle = '#9e8c70';
+  ctx.fillText('AI Book Shelf  ·  Antique Bookshop', canvas.width/2, canvas.height - 130);
+
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookmark_${data.dateStr.replace(/\./g,'')}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+function wrapText(ctx, text, maxWidth) {
+  const lines = [];
+  let line = '';
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = ch;
+    } else { line = test; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+// 起動
+loadBookmark();
+</script>
+
+</body>
+</html>
