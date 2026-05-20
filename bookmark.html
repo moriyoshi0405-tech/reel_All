@@ -851,8 +851,8 @@ async function loadBookmark() {
 
 function renderBookmark(b, dayInfo) {
   const pairing = b.pairing || { drink: '—', scene: '—', sound: '—' };
-  const reviewBtn = (b.url && b.url !== '#') ?
-    `<a href="${b.url}" target="_blank" class="action-btn">📖 この本のレビュー</a>` :
+  const reviewBtn = b.bookId ?
+    `<a href="review.html?id=${b.bookId}" class="action-btn">📖 この本のレビュー</a>` :
     `<button class="action-btn" onclick="alert('この本のレビュー記事はまだ準備中です。')">📖 この本のレビュー</button>`;
 
   document.getElementById('bookmarkContent').innerHTML = `
