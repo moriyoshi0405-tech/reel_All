@@ -957,6 +957,32 @@ input:focus, textarea:focus, select:focus { outline: none; }
 .toast.error { border-left-color: var(--accent-burgundy); }
 
 /* ============================================================
+   ミニ書ローダー（新規作成モーダル用）
+   ============================================================ */
+.book-loader-mini {
+  width: 50px; height: 38px;
+  position: relative;
+  margin: 0 auto;
+}
+.page-flip-mini {
+  width: 25px; height: 35px;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-primary);
+  border-radius: 0 3px 3px 0;
+  position: absolute; right: 0;
+  transform-origin: left center;
+  animation: flipMini 1.8s infinite ease-in-out;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+.page-flip-mini:nth-child(2) { animation-delay: 0.3s; }
+.page-flip-mini:nth-child(3) { animation-delay: 0.6s; }
+@keyframes flipMini {
+  0%, 20% { transform: rotateY(0deg); opacity: 1; }
+  60%, 80% { transform: rotateY(-180deg); opacity: 1; }
+  100% { transform: rotateY(-180deg); opacity: 0; }
+}
+
+/* ============================================================
    レスポンシブ
    ============================================================ */
 @media (max-width: 980px) {
@@ -1038,6 +1064,9 @@ input:focus, textarea:focus, select:focus { outline: none; }
         <div class="list-title">📚 蔵書一覧</div>
         <span class="list-title-sub">YOUR LIBRARY</span>
       </div>
+      <button class="btn-new-review" onclick="openNewBookModal()">
+        ✨ 新しい物語を迎える
+      </button>
     </div>
     <div class="list-toolbar">
       <input type="text" class="search-input" id="listSearch" placeholder="🔍 タイトルや著者で検索..." oninput="renderList()">
@@ -1071,6 +1100,7 @@ input:focus, textarea:focus, select:focus { outline: none; }
         <button class="edit-back-btn" onclick="backToList()">← 一覧へ戻る</button>
         <div class="edit-status" id="editStatus"></div>
         <div class="edit-actions">
+          <button class="btn-preview" onclick="openNewBookModal()" title="新規作成">+ 新規</button>
           <button class="btn-preview" onclick="togglePreviewMobile()">👁 プレビュー</button>
           <button class="btn-save" id="saveBtn" onclick="saveCurrentReview()">💾 保存</button>
         </div>
@@ -1262,6 +1292,116 @@ input:focus, textarea:focus, select:focus { outline: none; }
     <div class="modal-actions">
       <button class="modal-btn secondary" onclick="closeAiModal()">閉じる</button>
       <button class="modal-btn primary" id="aiAdoptBtn" onclick="adoptAiResult()">採用する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== モーダル: 新規作成 ============== -->
+<div class="modal-overlay" id="newBookModal">
+  <div class="modal-card" style="max-width: 540px;">
+    <!-- Step 1: 入力 -->
+    <div id="newBookStep1">
+      <div class="modal-title">✨ 新しい物語を本棚に迎える</div>
+      <div class="modal-sub">WELCOME A NEW STORY</div>
+
+      <div class="field-group" style="margin-bottom: 16px;">
+        <div>
+          <span class="field-label">TITLE</span>
+          <span class="field-label-jp">書名 ※必須</span>
+        </div>
+        <input
+          type="text"
+          class="field-input"
+          id="newBookTitle"
+          placeholder="例：夜は短し歩けよ乙女"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter') document.getElementById('newBookAuthor').focus();">
+      </div>
+
+      <div class="field-group" style="margin-bottom: 18px;">
+        <div>
+          <span class="field-label">AUTHOR</span>
+          <span class="field-label-jp">著者(任意)</span>
+        </div>
+        <input
+          type="text"
+          class="field-input"
+          id="newBookAuthor"
+          placeholder="不明ならAIが推測します"
+          autocomplete="off"
+          onkeydown="if(event.key==='Enter') startEnrich();">
+      </div>
+
+      <div style="background: linear-gradient(135deg, rgba(196,132,44,0.08), rgba(58,90,58,0.05)); border-radius: 12px; padding: 14px 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; letter-spacing: 0.5px;">
+        💡 <strong>タイトルだけでもOK</strong>。AIが Google Books から書影と著者を取得し、ジャンルとデザインも自動で判定します。
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="closeNewBookModal()">キャンセル</button>
+        <button class="modal-btn primary" onclick="startEnrich()">✨ AIで詳細を取得</button>
+      </div>
+    </div>
+
+    <!-- Step 2: ローディング -->
+    <div id="newBookStep2" style="display:none; text-align:center;">
+      <div class="modal-title">司書が本棚を探しています...</div>
+      <div class="modal-sub" id="enrichProgress">📚 Google Books で書影を検索中...</div>
+      <div style="padding: 30px 0;">
+        <div class="book-loader-mini">
+          <div class="page-flip-mini"></div>
+          <div class="page-flip-mini"></div>
+          <div class="page-flip-mini"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: プレビュー -->
+    <div id="newBookStep3" style="display:none;">
+      <div class="modal-title">✓ 本の情報を取得しました</div>
+      <div class="modal-sub">CONFIRM & ADD</div>
+
+      <div id="enrichPreview" style="background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 14px; padding: 18px; margin: 18px 0; display: flex; gap: 15px;">
+        <img id="enrichCover" src="" style="width: 80px; height: 116px; object-fit: cover; border-radius: 4px; box-shadow: 4px 5px 12px rgba(80,60,30,0.18); flex-shrink: 0;" onerror="this.style.opacity=0.3; this.alt='書影なし'">
+        <div style="flex: 1; min-width: 0;">
+          <div id="enrichTitle" style="font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 16px; margin-bottom: 4px; line-height: 1.4;"></div>
+          <div id="enrichAuthor" style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-family: 'Cormorant Garamond', serif; letter-spacing: 1px;"></div>
+          <div id="enrichTags" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;"></div>
+          <div id="enrichDesign" style="font-size: 11px; color: var(--accent-primary); font-weight: 700; letter-spacing: 1px;"></div>
+        </div>
+      </div>
+
+      <div id="enrichSummaryWrap" style="background: rgba(196,132,44,0.05); border-left: 3px solid var(--accent-secondary); border-radius: 0 12px 12px 0; padding: 14px 18px; margin-bottom: 18px; max-height: 160px; overflow-y: auto;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 10px; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 6px;">SUMMARY · あらすじ</div>
+        <div id="enrichSummary" style="font-size: 13px; line-height: 1.9; color: var(--text-secondary); font-family: 'Noto Serif JP', serif;"></div>
+      </div>
+
+      <div style="background: rgba(58,90,58,0.06); padding: 12px 16px; border-radius: 10px; font-size: 11px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 18px;">
+        🌿 この内容で本棚に追加し、すぐにレビューを書き始められます。あとから編集画面でも変更できます。
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn secondary" onclick="resetNewBookModal()">やり直す</button>
+        <button class="modal-btn primary" onclick="createNewBook()">📚 本棚に並べる</button>
+      </div>
+    </div>
+
+    <!-- Step 4: 完了 -->
+    <div id="newBookStep4" style="display:none;">
+      <div class="modal-title">✓ 本棚に並べました</div>
+      <div class="modal-sub" id="createdBookTitle">YOUR NEW BOOK</div>
+
+      <div style="text-align: center; padding: 25px 0;">
+        <div style="font-size: 60px; margin-bottom: 10px;">📖</div>
+        <div style="font-family: 'Noto Serif JP', serif; font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+          次は何をしましょう？
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px;">
+        <button class="modal-btn primary" style="padding: 14px;" onclick="afterCreate('editor')">📝 続けてレビューを書く</button>
+        <button class="modal-btn secondary" style="padding: 14px;" onclick="afterCreate('new')">📚 また別の本を追加</button>
+        <button class="modal-btn secondary" style="padding: 14px;" onclick="afterCreate('list')">👀 一覧に戻る</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2098,6 +2238,198 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// ============================================================
+// ✨ 新規作成フロー (Phase 3)
+// ============================================================
+let enrichedData = null;       // AI取得結果を保持
+let createdBookId = null;      // 作成されたNotionページID
+
+function openNewBookModal() {
+  // 編集中で未保存なら確認
+  if (unsavedChanges) {
+    if (!confirm('未保存の変更があります。新規作成を始めますか？')) return;
+  }
+  resetNewBookModal();
+  document.getElementById('newBookModal').classList.add('show');
+  setTimeout(() => document.getElementById('newBookTitle').focus(), 100);
+}
+
+function closeNewBookModal() {
+  document.getElementById('newBookModal').classList.remove('show');
+}
+
+function resetNewBookModal() {
+  document.getElementById('newBookTitle').value = '';
+  document.getElementById('newBookAuthor').value = '';
+  document.getElementById('newBookStep1').style.display = 'block';
+  document.getElementById('newBookStep2').style.display = 'none';
+  document.getElementById('newBookStep3').style.display = 'none';
+  document.getElementById('newBookStep4').style.display = 'none';
+  enrichedData = null;
+  createdBookId = null;
+}
+
+async function startEnrich() {
+  const title = document.getElementById('newBookTitle').value.trim();
+  const author = document.getElementById('newBookAuthor').value.trim();
+  if (!title) {
+    showToast('書名を入力してください', true);
+    document.getElementById('newBookTitle').focus();
+    return;
+  }
+
+  // Step 1 → Step 2 (ローディング)
+  document.getElementById('newBookStep1').style.display = 'none';
+  document.getElementById('newBookStep2').style.display = 'block';
+
+  // 進捗メッセージを順次更新
+  const progress = document.getElementById('enrichProgress');
+  progress.textContent = '📚 Google Books で書影を検索中...';
+
+  try {
+    // 少し時間を稼いで段階的なメッセージを見せる
+    setTimeout(() => {
+      if (document.getElementById('newBookStep2').style.display !== 'none') {
+        progress.textContent = '🧠 AIがジャンルとデザインを判定中...';
+      }
+    }, 1800);
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'enrichBookInfo',
+        password: editorPassword,
+        title: title,
+        author: author
+      })
+    });
+    const r = await res.json();
+    if (r.status !== 'success') throw new Error(r.message);
+    enrichedData = r.data;
+
+    // Step 2 → Step 3 (プレビュー)
+    showEnrichPreview(enrichedData);
+  } catch (e) {
+    document.getElementById('newBookStep2').style.display = 'none';
+    document.getElementById('newBookStep1').style.display = 'block';
+    showToast('情報取得に失敗しました: ' + e.message, true);
+  }
+}
+
+function showEnrichPreview(data) {
+  document.getElementById('newBookStep2').style.display = 'none';
+  document.getElementById('newBookStep3').style.display = 'block';
+
+  // 書影
+  const coverImg = document.getElementById('enrichCover');
+  if (data.image) {
+    coverImg.src = data.image;
+    coverImg.style.opacity = 1;
+  } else {
+    coverImg.src = '';
+    coverImg.style.opacity = 0.2;
+  }
+
+  document.getElementById('enrichTitle').textContent = data.title || '';
+  document.getElementById('enrichAuthor').textContent = data.author || '著者不明';
+
+  // タグ
+  const tagsEl = document.getElementById('enrichTags');
+  if (data.suggestedTags && data.suggestedTags.length > 0) {
+    tagsEl.innerHTML = data.suggestedTags.map(t =>
+      `<span class="meta-chip" style="background:rgba(58,90,58,0.1); color:var(--accent-primary);">${escapeHtml(t)}</span>`
+    ).join('');
+  } else {
+    tagsEl.innerHTML = '<span style="font-size:11px; color:var(--text-muted);">タグの提案なし</span>';
+  }
+
+  // デザイン
+  const design = data.suggestedDesign || 'A_上品';
+  document.getElementById('enrichDesign').textContent = `🎨 デザイン: ${design}`;
+
+  // あらすじ
+  if (data.summary) {
+    document.getElementById('enrichSummaryWrap').style.display = '';
+    document.getElementById('enrichSummary').textContent = data.summary;
+  } else {
+    document.getElementById('enrichSummaryWrap').style.display = 'none';
+  }
+}
+
+async function createNewBook() {
+  if (!enrichedData) return;
+
+  // 保存実行
+  const btns = document.querySelectorAll('#newBookStep3 .modal-btn');
+  btns.forEach(b => b.disabled = true);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'createNewBook',
+        password: editorPassword,
+        data: {
+          title: enrichedData.title,
+          author: enrichedData.author,
+          image: enrichedData.image,
+          summary: enrichedData.summary,
+          tags: enrichedData.suggestedTags || [],
+          design: enrichedData.suggestedDesign || 'A_上品',
+          rating: '',
+          url: '',
+          openingQuote: '',
+          review: ''
+        }
+      })
+    });
+    const r = await res.json();
+    if (r.status !== 'success') throw new Error(r.message);
+    createdBookId = r.bookId;
+
+    // 一覧キャッシュに新規追加
+    allBooks.unshift({
+      id: createdBookId,
+      title: enrichedData.title,
+      author: enrichedData.author,
+      image: enrichedData.image,
+      rating: '',
+      design: enrichedData.suggestedDesign || 'A_上品',
+      tags: enrichedData.suggestedTags || [],
+      updated: new Date().toISOString(),
+      hasReview: false,
+      hasOpeningQuote: false,
+      manualRelatedCount: 0
+    });
+
+    // Step 3 → Step 4
+    document.getElementById('newBookStep3').style.display = 'none';
+    document.getElementById('newBookStep4').style.display = 'block';
+    document.getElementById('createdBookTitle').textContent = `『${enrichedData.title}』`;
+  } catch (e) {
+    showToast('登録に失敗しました: ' + e.message, true);
+  } finally {
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+async function afterCreate(action) {
+  closeNewBookModal();
+  if (action === 'editor') {
+    // エディター画面を開く
+    await openEditor(createdBookId);
+  } else if (action === 'new') {
+    // また新規作成
+    setTimeout(openNewBookModal, 300);
+  } else if (action === 'list') {
+    // 一覧に戻る
+    if (!document.getElementById('listScreen').classList.contains('active')) {
+      showScreen('listScreen');
+    }
+    renderList();
+  }
+}
 </script>
 
 </body>
