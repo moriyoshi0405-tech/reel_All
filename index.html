@@ -99,6 +99,46 @@ body::before {
 
 body > * { position: relative; z-index: 2; }
 
+/* ---------- 浮かぶ文字 (Floating Characters) ---------- */
+.floating-chars-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.floating-char {
+  position: absolute;
+  font-family: 'Noto Serif JP', 'Shippori Mincho', serif;
+  font-weight: 500;
+  color: rgba(80, 60, 30, 0.18);
+  user-select: none;
+  will-change: transform, opacity;
+  animation: floatCharRise linear infinite;
+  bottom: -50px;
+}
+[data-theme="dark"] .floating-char {
+  color: rgba(232, 176, 78, 0.16);
+}
+@keyframes floatCharRise {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  50% {
+    transform: translateY(-50vh) translateX(20px) rotate(180deg);
+  }
+  90% { opacity: 1; }
+  100% {
+    transform: translateY(-105vh) translateX(-20px) rotate(360deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-chars-container { display: none; }
+}
+
 h1, h2, h3, h4, .serif {
   font-family: 'Noto Serif JP', 'Shippori Mincho', serif;
   letter-spacing: 0.02em;
@@ -1973,6 +2013,9 @@ input[type="file"]::file-selector-button {
 </head>
 <body>
 
+<!-- 浮かぶ文字（背景アニメーション） -->
+<div class="floating-chars-container" id="floatingChars" aria-hidden="true"></div>
+
 <!-- ローディング -->
 <div id="loading">
   <div class="book-loader">
@@ -2386,6 +2429,77 @@ function toggleTheme() {
   }
 }
 initTheme();
+
+/* ---------- 浮かぶ文字 (Floating Characters) ---------- */
+const FLOATING_CHARS = [
+  // 物語系
+  '物', '語', '本', '読', '頁', '栞', '冊', '巻', '詩', '歌', '詠', '綴',
+  // 自然・季節系
+  '夜', '月', '星', '雨', '風', '森', '木', '花', '葉', '雪', '霧', '霜',
+  // 時間・空間
+  '朝', '昼', '夕', '宵', '空', '海', '山', '川', '町', '道', '窓', '灯',
+  // 心情系
+  '想', '夢', '愛', '希', '望', '静', '優', '温', '光', '影', '声', '音',
+  // 古典文学系
+  '人', '心', '時', '永', '遠', '記', '憶', '思', '懐', '念'
+];
+
+function spawnFloatingChar() {
+  const container = document.getElementById('floatingChars');
+  if (!container) return;
+  const char = document.createElement('div');
+  char.className = 'floating-char';
+  char.textContent = FLOATING_CHARS[Math.floor(Math.random() * FLOATING_CHARS.length)];
+
+  // ランダムなサイズ（小さい文字は遠く感じる、大きい文字は近く感じる）
+  const size = 14 + Math.random() * 28;
+  char.style.fontSize = size + 'px';
+
+  // 水平位置
+  char.style.left = Math.random() * 100 + 'vw';
+
+  // 動きの速度（大きい文字ほどゆっくり = 視差効果）
+  const duration = 14 + Math.random() * 16 + (size / 4);
+  char.style.animationDuration = duration + 's';
+
+  // 透明度のバリエーション（手前と奥の文字）
+  char.style.opacity = 0.4 + Math.random() * 0.6;
+
+  container.appendChild(char);
+
+  // アニメーション終了後に削除
+  setTimeout(() => char.remove(), duration * 1000);
+}
+
+let floatingCharsInterval = null;
+function startFloatingChars() {
+  // パフォーマンス配慮：reduced-motionが有効ならスキップ
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // モバイルは文字数を減らす
+  const isMobile = window.innerWidth < 768;
+  const intervalMs = isMobile ? 1800 : 1100;
+  const initialCount = isMobile ? 4 : 8;
+
+  // 初期文字を散らす（一気に表示すると不自然なので時間差で）
+  for (let i = 0; i < initialCount; i++) {
+    setTimeout(() => spawnFloatingChar(), i * 600);
+  }
+  // 以降は定期生成
+  floatingCharsInterval = setInterval(spawnFloatingChar, intervalMs);
+}
+
+// タブが非表示の時は停止（バッテリー節約）
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && floatingCharsInterval) {
+    clearInterval(floatingCharsInterval);
+    floatingCharsInterval = null;
+  } else if (!document.hidden && !floatingCharsInterval) {
+    startFloatingChars();
+  }
+});
+
+startFloatingChars();
 
 /* ---------- 初期化 ---------- */
 window.onload = async () => {
