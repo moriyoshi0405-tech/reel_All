@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>レビュー編集 | AI Book Shelf</title>
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="icon" type="image/png" sizes="64x64" href="logos/favicon_64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="logos/favicon_32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Cormorant+Garamond:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   エディター - スタイル
+   ============================================================ */
+:root {
+  --bg-page: #f5ecd9;
+  --bg-page-alt: #ede0c4;
+  --bg-card: #fffcf3;
+  --bg-soft: #f9f0db;
+  --bg-app: #fff8e8;
+  --text-primary: #2e2418;
+  --text-secondary: #6b5840;
+  --text-muted: #9e8c70;
+  --accent-primary: #3a5a3a;
+  --accent-secondary: #c4842c;
+  --accent-burgundy: #8b3a3a;
+  --accent-ink: #1f3a5f;
+  --border-soft: #e0d2b5;
+  --border-strong: #c8b58f;
+  --shadow-soft: 0 6px 18px rgba(80, 60, 30, 0.08);
+  --shadow-medium: 0 12px 32px rgba(80, 60, 30, 0.12);
+  --shadow-hard: 0 20px 50px rgba(80, 60, 30, 0.18);
+  --gradient-warm: linear-gradient(135deg, #c4842c 0%, #8b3a3a 100%);
+}
+[data-theme="dark"] {
+  --bg-page: #14171f;
+  --bg-page-alt: #1a1e28;
+  --bg-card: #232936;
+  --bg-soft: #1c212c;
+  --bg-app: #1a1e28;
+  --text-primary: #f0e6d2;
+  --text-secondary: #b8a98c;
+  --text-muted: #7d7058;
+  --accent-primary: #e8b04e;
+  --accent-secondary: #d4869e;
+  --accent-burgundy: #c97082;
+  --accent-ink: #7eb8d4;
+  --border-soft: #3a4156;
+  --border-strong: #4a536b;
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-hard: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --gradient-warm: linear-gradient(135deg, #e8b04e 0%, #c97082 100%);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Zen Maru Gothic', 'Noto Serif JP', sans-serif;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+body { line-height: 1.7; }
+
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+input:focus, textarea:focus, select:focus { outline: none; }
+
+/* ============================================================
+   トップバー
+   ============================================================ */
+.editor-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-soft);
+  height: 60px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+.editor-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.editor-brand img { width: 32px; height: 32px; }
+.editor-brand-text {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+.editor-brand-sub {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.topbar-btn {
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.topbar-btn:hover { background: var(--bg-soft); border-color: var(--accent-primary); }
+.topbar-btn.theme-toggle {
+  width: 36px; height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 14px;
+  position: relative;
+  justify-content: center;
+}
+.topbar-btn.theme-toggle .moon, .topbar-btn.theme-toggle .sun {
+  position: absolute;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+[data-theme="light"] .sun { transform: scale(0) rotate(180deg); opacity: 0; }
+[data-theme="light"] .moon { transform: scale(1) rotate(0deg); opacity: 1; }
+[data-theme="dark"] .sun { transform: scale(1) rotate(0deg); opacity: 1; }
+[data-theme="dark"] .moon { transform: scale(0) rotate(-180deg); opacity: 0; }
+
+/* ============================================================
+   画面コンテナ（切替）
+   ============================================================ */
+.screen { display: none; height: calc(100% - 60px); overflow: hidden; }
+.screen.active { display: flex; }
+.screen-vertical { flex-direction: column; }
+
+/* ============================================================
+   画面1：パスワード認証
+   ============================================================ */
+#authScreen {
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-page) 0%, var(--bg-page-alt) 100%);
+  flex-direction: column;
+  padding: 30px;
+}
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 24px;
+  padding: 50px 45px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-medium);
+}
+.auth-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: var(--gradient-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 10px 25px rgba(196, 132, 44, 0.3);
+}
+.auth-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+.auth-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  margin-bottom: 30px;
+}
+.auth-input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-size: 15px;
+  margin-bottom: 18px;
+  text-align: center;
+  letter-spacing: 4px;
+}
+.auth-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(58, 90, 58, 0.1); }
+.auth-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--accent-primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  transition: 0.3s;
+}
+.auth-btn:hover { filter: brightness(1.15); transform: translateY(-2px); }
+.auth-error {
+  color: var(--accent-burgundy);
+  font-size: 13px;
+  margin-top: 12px;
+  min-height: 18px;
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   画面2：本一覧
+   ============================================================ */
+#listScreen { padding: 0; }
+.list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px 40px;
+  background: var(--bg-app);
+}
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.list-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+.list-title-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+.list-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 11px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.search-input:focus { border-color: var(--accent-primary); }
+.filter-select {
+  padding: 11px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.btn-new-review {
+  background: var(--accent-primary);
+  color: #fff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.btn-new-review:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+.book-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.book-list-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.book-list-item:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-soft);
+}
+.book-list-cover {
+  width: 60px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow: 3px 4px 10px rgba(80, 60, 30, 0.15);
+}
+.book-list-info { flex: 1; min-width: 0; }
+.book-list-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.book-list-author {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  font-family: 'Cormorant Garamond', serif;
+}
+.book-list-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.meta-chip {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.meta-chip.design-A { background: rgba(58, 90, 58, 0.1); color: var(--accent-primary); }
+.meta-chip.design-B { background: rgba(139, 58, 58, 0.1); color: var(--accent-burgundy); }
+.meta-chip.design-C { background: rgba(31, 58, 95, 0.1); color: var(--accent-ink); }
+.meta-chip.design-D { background: rgba(196, 132, 44, 0.1); color: var(--accent-secondary); }
+[data-theme="dark"] .meta-chip.design-A { background: rgba(232, 176, 78, 0.1); color: var(--accent-primary); }
+.meta-chip.rating { background: rgba(196, 132, 44, 0.1); color: var(--accent-secondary); }
+.meta-chip.status-ok { background: rgba(58, 90, 58, 0.1); color: var(--accent-primary); }
+.meta-chip.status-empty { background: rgba(158, 140, 112, 0.15); color: var(--text-muted); }
+
+.book-list-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+  font-family: 'Noto Serif JP', serif;
+}
+
+/* ============================================================
+   画面3：エディター本体
+   ============================================================ */
+#editScreen { padding: 0; }
+.edit-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.edit-pane {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.edit-pane.left {
+  background: var(--bg-app);
+  border-right: 1px solid var(--border-soft);
+}
+.edit-pane.right {
+  background: var(--bg-page);
+}
+
+/* エディターヘッダー */
+.edit-header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  flex-shrink: 0;
+}
+.edit-back-btn {
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.edit-back-btn:hover { background: var(--bg-soft); }
+.edit-status {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+.edit-status.saved { color: var(--accent-primary); }
+.edit-status.saving { color: var(--accent-secondary); }
+.edit-status.error { color: var(--accent-burgundy); }
+
+.edit-actions { display: flex; gap: 8px; align-items: center; }
+.btn-save {
+  background: var(--accent-primary);
+  color: #fff;
+  border: none;
+  padding: 9px 22px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.btn-save:hover { filter: brightness(1.1); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-preview {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* エディター本体 */
+.edit-content {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* メタフィールド */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.field-label-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-left: 8px;
+  letter-spacing: 1px;
+}
+.field-input, .field-textarea, .field-select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.field-input:focus, .field-textarea:focus, .field-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(58, 90, 58, 0.08);
+}
+.field-textarea { resize: vertical; min-height: 60px; line-height: 1.7; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.field-row.small { grid-template-columns: 1fr 100px 1fr; }
+
+/* デザイン選択UI */
+.design-picker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.design-option {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  background: var(--bg-card);
+  transition: 0.25s;
+  position: relative;
+}
+.design-option:hover { border-color: var(--accent-primary); }
+.design-option.selected {
+  border-color: var(--accent-primary);
+  background: rgba(58, 90, 58, 0.06);
+  box-shadow: 0 4px 12px rgba(58, 90, 58, 0.1);
+}
+.design-option.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-primary);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+}
+.design-option-letter {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  margin-right: 6px;
+}
+.design-option-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.design-option-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+}
+
+/* タグ選択UI */
+.tag-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.tag-option {
+  padding: 6px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 50px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.tag-option:hover { border-color: var(--accent-primary); }
+.tag-option.selected {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+/* AIアシスタント */
+.ai-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(196, 132, 44, 0.06), rgba(58, 90, 58, 0.04));
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+.ai-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+.ai-toggle-label .ai-emoji { font-size: 20px; }
+.ai-toggle-switch {
+  width: 46px;
+  height: 26px;
+  background: var(--border-strong);
+  border-radius: 50px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.ai-toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.ai-toggle-switch.on { background: var(--accent-primary); }
+.ai-toggle-switch.on::after { left: 23px; }
+
+/* ツールバー */
+.toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+}
+.tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 6px 11px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s;
+  font-family: 'Noto Serif JP', serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tool-btn:hover {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+}
+.tool-btn.ai-tool {
+  color: var(--accent-burgundy);
+  background: rgba(139, 58, 58, 0.05);
+}
+.tool-btn.ai-tool:hover { background: rgba(139, 58, 58, 0.1); }
+.tool-btn.ai-tool[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--text-muted);
+}
+.tool-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-soft);
+  margin: 0 4px;
+}
+
+/* 本文エディター */
+.markdown-editor {
+  width: 100%;
+  min-height: 400px;
+  padding: 22px 26px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 2;
+  font-family: 'Noto Serif JP', serif;
+  resize: vertical;
+}
+.markdown-editor:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(58, 90, 58, 0.06); }
+
+/* 関連本セレクター */
+.related-picker {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 16px;
+}
+.related-search {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.related-ai-suggestion {
+  background: rgba(196, 132, 44, 0.06);
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.related-ai-suggestion strong { color: var(--accent-secondary); }
+.ai-suggest-btn {
+  background: var(--accent-secondary);
+  color: #fff;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: auto;
+}
+.related-results {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.related-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid transparent;
+}
+.related-result-item:hover { background: var(--bg-soft); }
+.related-result-item.selected {
+  background: rgba(58, 90, 58, 0.08);
+  border-color: var(--accent-primary);
+}
+.related-result-cover {
+  width: 32px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.related-result-info { flex: 1; min-width: 0; }
+.related-result-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.related-result-author {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.related-result-check {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-strong);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--bg-soft);
+  font-size: 14px;
+  font-weight: 700;
+  color: transparent;
+}
+.related-result-item.selected .related-result-check {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #fff;
+}
+.related-selected-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 2px;
+}
+
+/* ============================================================
+   プレビュー (右ペイン)
+   ============================================================ */
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg-page);
+}
+.preview-header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  flex-shrink: 0;
+}
+.preview-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.preview-pulse {
+  width: 8px; height: 8px;
+  background: var(--accent-primary);
+  border-radius: 50%;
+  animation: previewPulse 2s infinite;
+}
+@keyframes previewPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.preview-refresh-btn {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   モーダル
+   ============================================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 15, 5, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s;
+}
+.modal-overlay.show { display: flex; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+.modal-card {
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 35px 32px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-hard);
+  animation: modalPop 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+@keyframes modalPop {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+.modal-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.modal-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.modal-content { line-height: 1.9; font-size: 14px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px; }
+.modal-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  letter-spacing: 1px;
+}
+.modal-btn.primary { background: var(--accent-primary); color: #fff; }
+.modal-btn.secondary { background: var(--bg-soft); color: var(--text-primary); border: 1px solid var(--border-soft); }
+.modal-btn:hover { filter: brightness(1.1); }
+
+/* AIサジェスト結果モーダル */
+.ai-suggest-result {
+  background: var(--bg-soft);
+  border-left: 4px solid var(--accent-secondary);
+  border-radius: 0 14px 14px 0;
+  padding: 18px 22px;
+  margin: 14px 0;
+  font-family: 'Noto Serif JP', serif;
+  line-height: 2;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.ai-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-family: 'Noto Serif JP', serif;
+  letter-spacing: 3px;
+  animation: pulseText 2s infinite;
+}
+@keyframes pulseText { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+/* ============================================================
+   トースト
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--accent-primary);
+  padding: 14px 22px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-hard);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  z-index: 5000;
+  opacity: 0;
+  transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { border-left-color: var(--accent-burgundy); }
+
+/* ============================================================
+   レスポンシブ
+   ============================================================ */
+@media (max-width: 980px) {
+  .edit-layout { flex-direction: column; }
+  .edit-pane.right { display: none; }
+  .edit-pane.right.mobile-show {
+    display: flex;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+  }
+  .design-picker { grid-template-columns: 1fr 1fr; }
+  .field-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .editor-topbar { padding: 10px 14px; }
+  .editor-brand-text { font-size: 12px; letter-spacing: 2px; }
+  .editor-brand-sub { display: none; }
+  .topbar-btn { padding: 6px 10px; font-size: 11px; }
+  .list-container { padding: 18px; }
+  .list-title { font-size: 20px; letter-spacing: 2px; }
+  .book-list-grid { grid-template-columns: 1fr; }
+  .edit-content { padding: 16px; gap: 14px; }
+  .design-picker { grid-template-columns: 1fr; }
+  .markdown-editor { padding: 16px; font-size: 14px; }
+  .toolbar { padding: 6px 8px; gap: 2px; }
+  .tool-btn { padding: 5px 9px; font-size: 12px; }
+  .modal-card { padding: 24px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============== トップバー ============== -->
+<div class="editor-topbar">
+  <a href="index.html" class="editor-brand">
+    <img id="brandLogo" src="logos/logo_512_light.png" alt="">
+    <div>
+      <div class="editor-brand-text">AI Book Shelf</div>
+      <span class="editor-brand-sub">REVIEW EDITOR</span>
+    </div>
+  </a>
+  <div class="topbar-actions">
+    <a href="index.html" class="topbar-btn">📚 公開サイト</a>
+    <button class="topbar-btn theme-toggle" onclick="toggleTheme()" aria-label="テーマ切替">
+      <span class="moon">🌙</span>
+      <span class="sun">☀️</span>
+    </button>
+  </div>
+</div>
+
+<!-- ============== 画面1: 認証 ============== -->
+<div class="screen active screen-vertical" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-icon">🔐</div>
+    <div class="auth-title">編集者の合言葉</div>
+    <div class="auth-sub">EDITOR · ACCESS</div>
+    <input
+      type="password"
+      class="auth-input"
+      id="authInput"
+      placeholder="合言葉"
+      autocomplete="current-password"
+      onkeydown="if(event.key==='Enter') tryAuth()">
+    <button class="auth-btn" onclick="tryAuth()">本棚を開ける</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- ============== 画面2: 本一覧 ============== -->
+<div class="screen screen-vertical" id="listScreen">
+  <div class="list-container">
+    <div class="list-header">
+      <div>
+        <div class="list-title">📚 蔵書一覧</div>
+        <span class="list-title-sub">YOUR LIBRARY</span>
+      </div>
+    </div>
+    <div class="list-toolbar">
+      <input type="text" class="search-input" id="listSearch" placeholder="🔍 タイトルや著者で検索..." oninput="renderList()">
+      <select class="filter-select" id="listFilter" onchange="renderList()">
+        <option value="all">すべて表示</option>
+        <option value="hasReview">レビュー済み</option>
+        <option value="noReview">未着手</option>
+        <option value="A">A_上品</option>
+        <option value="B">B_雑誌風</option>
+        <option value="C">C_シネマティック</option>
+        <option value="D">D_複古調</option>
+      </select>
+      <select class="filter-select" id="listSort" onchange="renderList()">
+        <option value="updated">更新順</option>
+        <option value="title">タイトル順</option>
+        <option value="design">デザイン順</option>
+      </select>
+    </div>
+    <div id="bookListGrid" class="book-list-grid">
+      <!-- 動的描画 -->
+    </div>
+  </div>
+</div>
+
+<!-- ============== 画面3: 編集 ============== -->
+<div class="screen" id="editScreen">
+  <div class="edit-layout">
+    <!-- 左ペイン：編集 -->
+    <div class="edit-pane left">
+      <div class="edit-header">
+        <button class="edit-back-btn" onclick="backToList()">← 一覧へ戻る</button>
+        <div class="edit-status" id="editStatus"></div>
+        <div class="edit-actions">
+          <button class="btn-preview" onclick="togglePreviewMobile()">👁 プレビュー</button>
+          <button class="btn-save" id="saveBtn" onclick="saveCurrentReview()">💾 保存</button>
+        </div>
+      </div>
+
+      <div class="edit-content">
+        <!-- AIアシスト切替 -->
+        <div class="ai-toggle-row">
+          <div class="ai-toggle-label">
+            <span class="ai-emoji">✨</span>
+            <span>AIアシスタント</span>
+          </div>
+          <div class="ai-toggle-switch on" id="aiToggle" onclick="toggleAI()"></div>
+        </div>
+
+        <!-- 基本情報 -->
+        <div class="field-row">
+          <div class="field-group">
+            <div>
+              <span class="field-label">TITLE</span>
+              <span class="field-label-jp">書名</span>
+            </div>
+            <input type="text" class="field-input" id="fTitle" placeholder="書名">
+          </div>
+          <div class="field-group">
+            <div>
+              <span class="field-label">AUTHOR</span>
+              <span class="field-label-jp">著者</span>
+            </div>
+            <input type="text" class="field-input" id="fAuthor" placeholder="著者名">
+          </div>
+        </div>
+
+        <div class="field-row small">
+          <div class="field-group">
+            <div>
+              <span class="field-label">RATING</span>
+              <span class="field-label-jp">評価</span>
+            </div>
+            <select class="field-select" id="fRating">
+              <option value="">未評価</option>
+              <option value="5">★★★★★</option>
+              <option value="4">★★★★☆</option>
+              <option value="3">★★★☆☆</option>
+              <option value="2">★★☆☆☆</option>
+              <option value="1">★☆☆☆☆</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div>
+              <span class="field-label">URL</span>
+            </div>
+            <input type="text" class="field-input" id="fUrl" placeholder="Amazon等のURL（任意）">
+          </div>
+          <div class="field-group">
+            <div>
+              <span class="field-label">IMAGE</span>
+              <span class="field-label-jp">書影</span>
+            </div>
+            <input type="text" class="field-input" id="fImage" placeholder="書影URL（任意）">
+          </div>
+        </div>
+
+        <!-- デザイン選択 -->
+        <div class="field-group">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+              <span class="field-label">DESIGN</span>
+              <span class="field-label-jp">レビューページのデザイン</span>
+            </div>
+            <button class="tool-btn ai-tool" onclick="aiSuggestDesign()" id="aiDesignBtn">✨ AI判定</button>
+          </div>
+          <div class="design-picker" id="designPicker">
+            <div class="design-option selected" data-value="A_上品">
+              <div><span class="design-option-letter">A</span><span class="design-option-name">上品・静か</span></div>
+              <div class="design-option-desc">古書喫茶の佇まい、エッセイ向き</div>
+            </div>
+            <div class="design-option" data-value="B_雑誌風">
+              <div><span class="design-option-letter">B</span><span class="design-option-name">雑誌風</span></div>
+              <div class="design-option-desc">BRUTUS風、現代小説向き</div>
+            </div>
+            <div class="design-option" data-value="C_シネマティック">
+              <div><span class="design-option-letter">C</span><span class="design-option-name">シネマティック</span></div>
+              <div class="design-option-desc">真夜中の図書館、ドラマ向き</div>
+            </div>
+            <div class="design-option" data-value="D_複古調">
+              <div><span class="design-option-letter">D</span><span class="design-option-name">縦書き複古調</span></div>
+              <div class="design-option-desc">文学全集、古典・純文学向き</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- タグ -->
+        <div class="field-group">
+          <div>
+            <span class="field-label">TAGS</span>
+            <span class="field-label-jp">タグ（複数選択可）</span>
+          </div>
+          <div class="tag-picker" id="tagPicker">
+            <!-- JSで描画 -->
+          </div>
+        </div>
+
+        <!-- 冒頭の一節 -->
+        <div class="field-group">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+              <span class="field-label">OPENING QUOTE</span>
+              <span class="field-label-jp">冒頭の一節</span>
+            </div>
+            <button class="tool-btn ai-tool" onclick="aiSuggestOpening()" id="aiOpeningBtn">✨ AIで提案</button>
+          </div>
+          <textarea class="field-textarea" id="fOpeningQuote" placeholder="レビュー冒頭に大きく表示される、心を打つ一節..."></textarea>
+        </div>
+
+        <!-- マークダウンエディター -->
+        <div class="field-group">
+          <div>
+            <span class="field-label">REVIEW BODY</span>
+            <span class="field-label-jp">レビュー本文</span>
+          </div>
+          <!-- ツールバー -->
+          <div class="toolbar">
+            <button class="tool-btn" onclick="insertMd('## ', '\n')" title="見出し">## 見出し</button>
+            <button class="tool-btn" onclick="insertMd('> ', '\n')" title="引用">❝ 引用</button>
+            <button class="tool-btn" onclick="wrapMd('**')" title="太字"><strong>B</strong></button>
+            <button class="tool-btn" onclick="wrapMd('*')" title="斜体"><em>I</em></button>
+            <div class="tool-divider"></div>
+            <button class="tool-btn ai-tool" onclick="aiSuggestOutline()" id="aiOutlineBtn">✨ 章立て</button>
+            <button class="tool-btn ai-tool" onclick="aiSuggestIntro()" id="aiIntroBtn">✨ 書き出し</button>
+            <button class="tool-btn ai-tool" onclick="aiPolishSelection()" id="aiPolishBtn">✨ 文章を整える</button>
+          </div>
+          <textarea
+            class="markdown-editor"
+            id="fReview"
+            placeholder="## 章のタイトル
+
+ここに本文。**強調**や *斜体* もOK。
+
+> 印象に残った一節は引用ブロックで
+
+別の段落..."></textarea>
+        </div>
+
+        <!-- 関連本 -->
+        <div class="field-group">
+          <div>
+            <span class="field-label">RELATED BOOKS · MANUAL</span>
+            <span class="field-label-jp">関連本（手動指定）</span>
+          </div>
+          <div class="related-picker">
+            <input type="text" class="related-search" id="relatedSearch" placeholder="🔍 本を検索して選択（最大3冊推奨）" oninput="renderRelatedList()">
+            <div class="related-ai-suggestion" id="aiSuggestionBar" style="display:none;">
+              <span>💡 <strong>AI提案</strong>: <span id="aiSuggestionText"></span></span>
+              <button class="ai-suggest-btn" onclick="acceptAiSuggestions()">採用</button>
+            </div>
+            <div class="related-results" id="relatedResults"></div>
+            <div class="related-selected-count" id="relatedSelectedCount">未選択</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右ペイン：プレビュー -->
+    <div class="edit-pane right" id="previewPane">
+      <div class="preview-header">
+        <div class="preview-title">
+          <span class="preview-pulse"></span>
+          ライブプレビュー
+        </div>
+        <button class="preview-refresh-btn" onclick="refreshPreview()">↻ 更新</button>
+      </div>
+      <iframe class="preview-frame" id="previewFrame"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ============== モーダル: AI結果表示 ============== -->
+<div class="modal-overlay" id="aiResultModal">
+  <div class="modal-card">
+    <div class="modal-title" id="aiModalTitle">✨ AIからの提案</div>
+    <div class="modal-sub" id="aiModalSub"></div>
+    <div class="modal-content">
+      <div id="aiModalBody" class="ai-suggest-result"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAiModal()">閉じる</button>
+      <button class="modal-btn primary" id="aiAdoptBtn" onclick="adoptAiResult()">採用する</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
+const AVAILABLE_TAGS = ["短編小説", "長編小説", "エッセイ", "ビジネス", "心理学・精神分析", "海外文学", "恋愛小説"];
+
+let editorPassword = "";
+let allBooks = [];           // 本一覧
+let currentBook = null;      // 編集中の本
+let allBooksForPicker = []; // 関連本選択用全リスト
+let aiSuggestionsForPicker = []; // AI類似度提案
+let selectedRelatedIds = []; // 選択中の関連本ID
+let aiEnabled = true;
+let unsavedChanges = false;
+let previewDebounce = null;
+let aiPendingTarget = null; // AI結果の貼り付け先
+
+// ============================================================
+// テーマ
+// ============================================================
+function initTheme() {
+  const saved = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', saved);
+  updateLogo();
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  updateLogo();
+}
+function updateLogo() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const img = document.getElementById('brandLogo');
+  if (img) img.src = theme === 'dark' ? 'logos/logo_512_dark.png' : 'logos/logo_512_light.png';
+}
+initTheme();
+
+// ============================================================
+// 画面切替
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// 認証
+// ============================================================
+async function tryAuth() {
+  const pw = document.getElementById('authInput').value.trim();
+  const err = document.getElementById('authError');
+  if (!pw) {
+    err.textContent = '合言葉を入力してください';
+    return;
+  }
+  err.textContent = '確認中...';
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getEditorBookList', password: pw })
+    });
+    const data = await res.json();
+    if (data.status === 'success') {
+      editorPassword = pw;
+      allBooks = data.books;
+      err.textContent = '';
+      showScreen('listScreen');
+      renderList();
+    } else {
+      err.textContent = data.message || '合言葉が違います';
+    }
+  } catch (e) {
+    err.textContent = '通信エラー: ' + e.message;
+  }
+}
+
+// ============================================================
+// 一覧描画
+// ============================================================
+function renderList() {
+  const search = document.getElementById('listSearch').value.toLowerCase();
+  const filter = document.getElementById('listFilter').value;
+  const sort = document.getElementById('listSort').value;
+
+  let filtered = allBooks.filter(b => {
+    const matchSearch = (b.title + b.author).toLowerCase().includes(search);
+    let matchFilter = true;
+    if (filter === 'hasReview') matchFilter = b.hasReview;
+    else if (filter === 'noReview') matchFilter = !b.hasReview;
+    else if (filter.length === 1) matchFilter = b.design && b.design.charAt(0) === filter;
+    return matchSearch && matchFilter;
+  });
+
+  if (sort === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title, 'ja'));
+  else if (sort === 'design') filtered.sort((a, b) => (a.design || '').localeCompare(b.design || ''));
+  else filtered.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+
+  const grid = document.getElementById('bookListGrid');
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="book-list-empty">該当する本がありません</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(b => {
+    const designLetter = (b.design || 'A').charAt(0);
+    const designName = (b.design || 'A_上品').replace(/^[A-D]_/, '');
+    const stars = b.rating ? '★'.repeat(parseInt(b.rating) || 0) : '';
+    return `
+      <div class="book-list-item" onclick="openEditor('${b.id}')">
+        <img src="${escapeAttr(b.image || 'https://via.placeholder.com/60x88')}" class="book-list-cover" onerror="this.src='https://via.placeholder.com/60x88'" alt="">
+        <div class="book-list-info">
+          <div class="book-list-title">${escapeHtml(b.title)}</div>
+          <div class="book-list-author">${escapeHtml(b.author)}</div>
+          <div class="book-list-meta">
+            <span class="meta-chip design-${designLetter}">${designLetter} ${escapeHtml(designName)}</span>
+            ${stars ? `<span class="meta-chip rating">${stars}</span>` : ''}
+            ${b.hasReview ? '<span class="meta-chip status-ok">レビュー</span>' : '<span class="meta-chip status-empty">未着手</span>'}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// エディター起動
+// ============================================================
+async function openEditor(bookId) {
+  showScreen('editScreen');
+  setStatus('読み込み中...');
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getReviewForEditor', password: editorPassword, bookId: bookId })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+
+    currentBook = data.book;
+    allBooksForPicker = data.allBooks.filter(b => b.id !== bookId);
+    aiSuggestionsForPicker = data.aiSuggestions || [];
+    selectedRelatedIds = [...(currentBook.relatedManualIds || [])];
+
+    fillForm(currentBook);
+    renderTagPicker();
+    renderRelatedList();
+    showAiSuggestionBar();
+    refreshPreview();
+    setStatus('編集中', 'normal');
+    unsavedChanges = false;
+  } catch (e) {
+    setStatus('エラー: ' + e.message, 'error');
+  }
+}
+
+function backToList() {
+  if (unsavedChanges && !confirm('未保存の変更があります。一覧に戻りますか？')) return;
+  showScreen('listScreen');
+}
+
+function fillForm(b) {
+  document.getElementById('fTitle').value = b.title || '';
+  document.getElementById('fAuthor').value = b.author || '';
+  document.getElementById('fRating').value = b.rating || '';
+  document.getElementById('fUrl').value = (b.url === '#' ? '' : (b.url || ''));
+  document.getElementById('fImage').value = b.image || '';
+  document.getElementById('fOpeningQuote').value = b.openingQuote || '';
+  document.getElementById('fReview').value = b.review || '';
+
+  // デザイン選択
+  const design = b.design || 'A_上品';
+  document.querySelectorAll('.design-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.value === design);
+  });
+}
+
+function renderTagPicker() {
+  const currentTags = currentBook.tags || [];
+  document.getElementById('tagPicker').innerHTML = AVAILABLE_TAGS.map(tag => {
+    const sel = currentTags.includes(tag) ? 'selected' : '';
+    return `<div class="tag-option ${sel}" data-tag="${escapeAttr(tag)}" onclick="toggleTag(this)">${escapeHtml(tag)}</div>`;
+  }).join('');
+}
+
+function toggleTag(el) {
+  el.classList.toggle('selected');
+  markDirty();
+}
+
+// デザイン選択
+document.addEventListener('click', e => {
+  const opt = e.target.closest('.design-option');
+  if (opt && opt.parentElement.id === 'designPicker') {
+    document.querySelectorAll('#designPicker .design-option').forEach(el => el.classList.remove('selected'));
+    opt.classList.add('selected');
+    markDirty();
+  }
+});
+
+// ============================================================
+// 関連本セレクター
+// ============================================================
+function renderRelatedList() {
+  const q = document.getElementById('relatedSearch').value.toLowerCase();
+  const filtered = q ?
+    allBooksForPicker.filter(b => (b.title + b.author).toLowerCase().includes(q)).slice(0, 20) :
+    allBooksForPicker.slice(0, 20);
+
+  const container = document.getElementById('relatedResults');
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">該当する本がありません</div>';
+  } else {
+    container.innerHTML = filtered.map(b => {
+      const isSel = selectedRelatedIds.includes(b.id);
+      return `
+        <div class="related-result-item ${isSel ? 'selected' : ''}" onclick="toggleRelated('${b.id}')">
+          <img src="${escapeAttr(b.image || 'https://via.placeholder.com/32x46')}" class="related-result-cover" onerror="this.src='https://via.placeholder.com/32x46'" alt="">
+          <div class="related-result-info">
+            <div class="related-result-title">${escapeHtml(b.title)}</div>
+            <div class="related-result-author">${escapeHtml(b.author)}</div>
+          </div>
+          <div class="related-result-check">✓</div>
+        </div>
+      `;
+    }).join('');
+  }
+  document.getElementById('relatedSelectedCount').textContent =
+    selectedRelatedIds.length === 0 ? '未選択' : `${selectedRelatedIds.length} 冊を選択中`;
+}
+
+function toggleRelated(id) {
+  const idx = selectedRelatedIds.indexOf(id);
+  if (idx >= 0) selectedRelatedIds.splice(idx, 1);
+  else selectedRelatedIds.push(id);
+  renderRelatedList();
+  markDirty();
+}
+
+function showAiSuggestionBar() {
+  const bar = document.getElementById('aiSuggestionBar');
+  if (!aiEnabled || aiSuggestionsForPicker.length === 0) {
+    bar.style.display = 'none';
+    return;
+  }
+  const top3 = aiSuggestionsForPicker.slice(0, 3);
+  const titles = top3.map(b => `『${b.title}』`).join('、');
+  document.getElementById('aiSuggestionText').textContent = `この本に似ているのは: ${titles}`;
+  bar.style.display = 'flex';
+}
+
+function acceptAiSuggestions() {
+  const top3 = aiSuggestionsForPicker.slice(0, 3).map(b => b.id);
+  top3.forEach(id => {
+    if (!selectedRelatedIds.includes(id)) selectedRelatedIds.push(id);
+  });
+  renderRelatedList();
+  markDirty();
+  showToast('AI提案を3冊追加しました');
+}
+
+// ============================================================
+// マークダウン操作
+// ============================================================
+function insertMd(prefix, suffix) {
+  const ta = document.getElementById('fReview');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const selected = ta.value.substring(start, end);
+  const after = ta.value.substring(end);
+  const lineStart = before.lastIndexOf('\n') + 1;
+  const beforeLine = before.substring(0, lineStart);
+  const lineContent = before.substring(lineStart);
+  ta.value = beforeLine + prefix + lineContent + selected + (suffix || '') + after;
+  const newPos = beforeLine.length + prefix.length + lineContent.length + selected.length;
+  ta.setSelectionRange(newPos, newPos);
+  ta.focus();
+  markDirty();
+}
+
+function wrapMd(wrap) {
+  const ta = document.getElementById('fReview');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const selected = ta.value.substring(start, end) || 'テキスト';
+  const after = ta.value.substring(end);
+  ta.value = before + wrap + selected + wrap + after;
+  ta.setSelectionRange(before.length + wrap.length, before.length + wrap.length + selected.length);
+  ta.focus();
+  markDirty();
+}
+
+// ============================================================
+// AIアシスタント
+// ============================================================
+function toggleAI() {
+  aiEnabled = !aiEnabled;
+  document.getElementById('aiToggle').classList.toggle('on', aiEnabled);
+  document.querySelectorAll('.ai-tool').forEach(b => b.toggleAttribute('disabled', !aiEnabled));
+  showAiSuggestionBar();
+}
+
+function setAIBtnsDisabled(disabled) {
+  document.querySelectorAll('.ai-tool').forEach(b => {
+    if (disabled) b.setAttribute('disabled', '');
+    else if (aiEnabled) b.removeAttribute('disabled');
+  });
+}
+
+async function callAi(task, contextOverride) {
+  const ctx = contextOverride || {
+    title: document.getElementById('fTitle').value,
+    author: document.getElementById('fAuthor').value,
+    review: document.getElementById('fReview').value,
+    summary: currentBook ? currentBook.summary : '',
+    tags: getSelectedTags()
+  };
+  setAIBtnsDisabled(true);
+  showAiModalLoading();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'aiEditorSuggest', password: editorPassword, task: task, context: ctx })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+    return data.result;
+  } finally {
+    setAIBtnsDisabled(false);
+  }
+}
+
+async function aiSuggestOpening() {
+  if (!aiEnabled) return;
+  try {
+    const result = await callAi('openingQuote');
+    showAiModal('✨ 冒頭の一節を提案', result, 'OPENING QUOTE', 'fOpeningQuote');
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+async function aiSuggestOutline() {
+  if (!aiEnabled) return;
+  try {
+    const result = await callAi('outline');
+    showAiModal('✨ 章立ての提案', result, 'OUTLINE', 'fReview', 'append');
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+async function aiSuggestIntro() {
+  if (!aiEnabled) return;
+  try {
+    const result = await callAi('intro');
+    showAiModal('✨ 書き出しの提案', result, 'INTRO', 'fReview', 'append');
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+async function aiSuggestDesign() {
+  if (!aiEnabled) return;
+  try {
+    const result = await callAi('designSuggest');
+    // 結果の最初の行からデザイン名を抽出
+    const firstLine = result.split('\n')[0].trim();
+    const designOpts = ['A_上品', 'B_雑誌風', 'C_シネマティック', 'D_複古調'];
+    const matched = designOpts.find(d => firstLine.includes(d));
+    showAiModal('✨ AIのデザイン提案', result, 'DESIGN SUGGESTION', '_designSpecial');
+    if (matched) {
+      aiPendingTarget = { target: '_design', value: matched };
+    }
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+async function aiPolishSelection() {
+  if (!aiEnabled) return;
+  const ta = document.getElementById('fReview');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  if (start === end) {
+    showToast('文章を選択してから実行してください', true);
+    return;
+  }
+  const text = ta.value.substring(start, end);
+  try {
+    const result = await callAi('polish', { text: text });
+    showAiModal('✨ 文章を整える', result, 'POLISHED TEXT', '_polishSelection');
+    aiPendingTarget = { target: '_polishSelection', value: result, start, end };
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+function showAiModalLoading() {
+  document.getElementById('aiResultModal').classList.add('show');
+  document.getElementById('aiModalTitle').textContent = '✨ 司書が考えています...';
+  document.getElementById('aiModalSub').textContent = '';
+  document.getElementById('aiModalBody').className = 'ai-loading';
+  document.getElementById('aiModalBody').textContent = '言葉を選んでいます...';
+  document.getElementById('aiAdoptBtn').style.display = 'none';
+}
+
+function showAiModal(title, text, sub, targetField, mode) {
+  document.getElementById('aiResultModal').classList.add('show');
+  document.getElementById('aiModalTitle').textContent = title;
+  document.getElementById('aiModalSub').textContent = sub || '';
+  document.getElementById('aiModalBody').className = 'ai-suggest-result';
+  document.getElementById('aiModalBody').textContent = text;
+  if (targetField) {
+    document.getElementById('aiAdoptBtn').style.display = 'inline-block';
+    if (!aiPendingTarget) {
+      aiPendingTarget = { target: targetField, value: text, mode: mode };
+    } else {
+      aiPendingTarget.value = aiPendingTarget.value || text;
+    }
+  } else {
+    document.getElementById('aiAdoptBtn').style.display = 'none';
+  }
+}
+
+function closeAiModal() {
+  document.getElementById('aiResultModal').classList.remove('show');
+  aiPendingTarget = null;
+}
+
+function adoptAiResult() {
+  if (!aiPendingTarget) { closeAiModal(); return; }
+  const t = aiPendingTarget;
+  if (t.target === 'fOpeningQuote' || t.target === 'fTitle' || t.target === 'fAuthor') {
+    document.getElementById(t.target).value = t.value;
+  } else if (t.target === 'fReview' && t.mode === 'append') {
+    const ta = document.getElementById('fReview');
+    const current = ta.value.trim();
+    ta.value = current + (current ? '\n\n' : '') + t.value;
+  } else if (t.target === '_design') {
+    document.querySelectorAll('#designPicker .design-option').forEach(el => {
+      el.classList.toggle('selected', el.dataset.value === t.value);
+    });
+  } else if (t.target === '_polishSelection') {
+    const ta = document.getElementById('fReview');
+    ta.value = ta.value.substring(0, t.start) + t.value + ta.value.substring(t.end);
+  }
+  markDirty();
+  refreshPreview();
+  closeAiModal();
+  showToast('採用しました');
+}
+
+// ============================================================
+// プレビュー
+// ============================================================
+function refreshPreview() {
+  const data = collectFormData();
+  const html = buildPreviewHtml(data);
+  const iframe = document.getElementById('previewFrame');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+}
+
+function schedulePreviewRefresh() {
+  if (previewDebounce) clearTimeout(previewDebounce);
+  previewDebounce = setTimeout(refreshPreview, 600);
+}
+
+function buildPreviewHtml(data) {
+  // review.html の簡易版を埋め込む。本物はGAS経由のためプレビューだけは独自実装。
+  const design = (data.design || 'A_上品').charAt(0);
+  const stars = data.rating ? '★'.repeat(parseInt(data.rating)) + '☆'.repeat(5 - parseInt(data.rating)) : '';
+  const reviewHtml = markdownToHtml(data.review || '');
+  // 見出し抽出
+  const headings = [];
+  const reviewHtmlWithIds = reviewHtml.replace(/<h2>(.+?)<\/h2>/g, (_, txt) => {
+    const id = 'h-' + headings.length;
+    headings.push(txt);
+    if (design === 'D') {
+      const cjk = ['壹','貳','參','肆','伍','陸','柒','捌','玖','拾'];
+      return `<h2 id="${id}" data-chapter="${cjk[headings.length-1] || ''}">${txt}</h2>`;
+    }
+    return `<h2 id="${id}">${txt}</h2>`;
+  });
+  const tocHtml = headings.length >= 2 ? buildTocHtml(design, headings) : '';
+  const openingHtml = data.openingQuote ? `<div class="opening-quote">${escapeHtml(data.openingQuote)}</div>` : '';
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+  return `<!DOCTYPE html>
+<html data-theme="${isDark ? 'dark' : 'light'}"><head><meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Cormorant+Garamond:wght@500;700&family=Bodoni+Moda:wght@500;700;900&display=swap" rel="stylesheet">
+<style>${getPreviewCss()}</style>
+</head><body class="theme-${design}">
+${buildTemplateHtml(design, data, stars, openingHtml, tocHtml, reviewHtmlWithIds)}
+</body></html>`;
+}
+
+function buildTocHtml(design, headings) {
+  const title = design === 'D' ? '目 次' : (design === 'C' ? '─ NAVIGATION ─' : 'CONTENTS');
+  const items = headings.map(h => `<li>${escapeHtml(h)}</li>`).join('');
+  return `<div class="toc-block"><div class="toc-block-title">${title}</div><ol>${items}</ol></div>`;
+}
+
+function buildTemplateHtml(design, b, stars, opening, toc, body) {
+  const safeTitle = escapeHtml(b.title || '無題');
+  const safeAuthor = escapeHtml(b.author || '');
+  const cover = b.image ? `<img src="${escapeAttr(b.image)}" class="book-cover" alt="" onerror="this.style.display='none'">` : '';
+  if (design === 'A') {
+    return `<div class="review-container">
+      <div class="meta-top">REVIEW</div>
+      <div class="book-cover-wrap">${cover}</div>
+      <h1>${safeTitle}</h1>
+      <div class="book-author-line">${safeAuthor}</div>
+      ${stars ? `<div class="rating-line">${stars}</div>` : ''}
+      <div class="divider"></div>
+      ${opening}${toc}
+      <div class="review-prose">${body}</div>
+    </div>`;
+  }
+  if (design === 'B') {
+    return `<div class="hero-section">
+      <div class="hero-bg"></div>
+      <div class="issue-row"><div>VOL.${(b.bookId||'NEW').substring(0,6).toUpperCase()}</div><div>${new Date().getFullYear()}</div></div>
+      <div class="hero-content">
+        <div class="hero-label">SPOTLIGHT</div>
+        <div class="hero-title-jp">${safeTitle}</div>
+        <div class="hero-author">${safeAuthor}</div>
+      </div>
+    </div>
+    <div class="review-container">
+      <div class="body-grid">${cover}
+        <div class="intro-area">
+          ${opening || `<div class="opening-quote">物語の世界へ、ようこそ。</div>`}
+          ${stars ? `<div class="rating-line">${stars}</div>` : ''}
+        </div>
+      </div>
+      ${toc}<div class="review-prose">${body}</div>
+    </div>`;
+  }
+  if (design === 'C') {
+    return `<div class="hero">
+      <div class="hero-content">
+        <div class="episode-num">EPISODE</div>
+        ${cover}
+        <h1>${safeTitle}</h1>
+        <div class="book-author-line">${safeAuthor}</div>
+        ${stars ? `<div class="rating-line">${stars}</div>` : ''}
+      </div>
+    </div>
+    <div class="review-container">${opening}${toc}<div class="review-prose">${body}</div></div>`;
+  }
+  if (design === 'D') {
+    return `<div class="hero">
+      <div class="hero-row">
+        <div class="vertical-title-wrap"><div class="vertical-title">${safeTitle}</div></div>
+        <div class="side-info">
+          <div class="meta-label">REVIEW</div>${cover}
+          <div class="author-row">${safeAuthor}</div>
+          ${stars ? `<div class="rating-line">${stars}</div>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="review-container">${opening}${toc}<div class="review-prose">${body}</div></div>`;
+  }
+  return '';
+}
+
+// プレビュー用CSS（review.htmlを大幅圧縮したもの）
+function getPreviewCss() {
+  return `
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Zen Maru Gothic','Noto Serif JP',sans-serif;line-height:1.8;}
+img{max-width:100%;}
+.review-prose h2{margin-top:50px;margin-bottom:20px;}
+.review-prose h2:first-child{margin-top:0;}
+.review-prose p{margin-bottom:22px;}
+.review-prose blockquote{margin:30px 0;}
+.toc-block{margin:40px 0;}
+.toc-block ol{list-style:none;counter-reset:section;}
+.toc-block li{counter-increment:section;}
+.related-section{padding:40px 20px;text-align:center;}
+
+/* THEME A */
+.theme-A{background:linear-gradient(135deg,#f5ecd9 0%,#ede0c4 100%);color:#2e2418;}
+.theme-A .review-container{max-width:720px;margin:0 auto;padding:50px 30px;}
+.theme-A .meta-top{text-align:center;font-family:'Cormorant Garamond',serif;letter-spacing:6px;color:#8b7355;font-size:11px;margin-bottom:36px;}
+.theme-A .book-cover-wrap{text-align:center;margin-bottom:35px;}
+.theme-A .book-cover{width:200px;height:290px;object-fit:cover;border-left:5px solid #c4842c;box-shadow:10px 14px 30px rgba(80,60,30,0.25);}
+.theme-A h1{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;letter-spacing:6px;text-align:center;margin-bottom:8px;line-height:1.4;}
+.theme-A .book-author-line{font-family:'Cormorant Garamond',serif;font-size:14px;text-align:center;letter-spacing:4px;color:#6b5840;margin-bottom:5px;}
+.theme-A .rating-line{text-align:center;color:#c4842c;font-size:20px;letter-spacing:6px;margin-bottom:30px;}
+.theme-A .divider{width:60px;height:1px;background:#c4842c;margin:0 auto 50px;}
+.theme-A .opening-quote{font-family:'Shippori Mincho',serif;font-size:22px;text-align:center;line-height:2;padding:40px 30px;margin:40px 0;position:relative;letter-spacing:0.1em;}
+.theme-A .opening-quote::before{content:"「";font-size:60px;color:#c4842c;position:absolute;top:0;left:22%;opacity:0.4;}
+.theme-A .opening-quote::after{content:"」";font-size:60px;color:#c4842c;position:absolute;bottom:-15px;right:22%;opacity:0.4;}
+.theme-A .toc-block{background:rgba(255,252,243,0.6);border:1px solid #e0d2b5;border-radius:16px;padding:25px 30px;}
+.theme-A .toc-block-title{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:4px;color:#8b7355;margin-bottom:14px;}
+.theme-A .toc-block li{font-size:14px;padding:7px 0;color:#3a2e1f;}
+.theme-A .toc-block li::before{content:counter(section,decimal-leading-zero);font-family:'Cormorant Garamond',serif;color:#c4842c;margin-right:12px;font-weight:700;}
+.theme-A .review-prose h2{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;letter-spacing:4px;display:flex;align-items:center;gap:14px;}
+.theme-A .review-prose h2::before{content:"";width:6px;height:22px;background:#c4842c;flex-shrink:0;}
+.theme-A .review-prose p{font-family:'Noto Serif JP',serif;font-size:15px;line-height:2.1;color:#3a2e1f;text-align:justify;}
+.theme-A .review-prose blockquote{border-left:3px solid #c4842c;background:rgba(196,132,44,0.05);padding:25px 30px;font-family:'Shippori Mincho',serif;font-size:18px;line-height:2;}
+
+/* THEME B */
+.theme-B{background:#fffcf3;color:#1a1a1a;}
+.theme-B .hero-section{min-height:50vh;padding:50px;position:relative;display:flex;flex-direction:column;justify-content:space-between;color:white;overflow:hidden;}
+.theme-B .hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#d4b56a 0%,#8b3a3a 60%,#1f3a5f 100%);z-index:0;}
+.theme-B .issue-row{display:flex;justify-content:space-between;font-family:'Bodoni Moda',serif;font-size:13px;letter-spacing:4px;position:relative;z-index:2;}
+.theme-B .hero-content{position:relative;z-index:2;max-width:900px;}
+.theme-B .hero-label{font-family:'Bodoni Moda',serif;font-size:14px;letter-spacing:8px;margin-bottom:20px;opacity:0.85;}
+.theme-B .hero-title-jp{font-family:'Noto Serif JP',serif;font-size:64px;font-weight:900;line-height:0.95;letter-spacing:-2px;margin-bottom:22px;}
+.theme-B .hero-author{font-family:'Bodoni Moda',serif;font-size:18px;letter-spacing:6px;border-bottom:1px solid rgba(255,255,255,0.6);display:inline-block;padding-bottom:6px;}
+.theme-B .review-container{max-width:900px;margin:0 auto;padding:60px 30px;}
+.theme-B .body-grid{display:grid;grid-template-columns:180px 1fr;gap:40px;margin-bottom:50px;align-items:start;}
+.theme-B .book-cover{width:180px;height:260px;object-fit:cover;border-left:5px solid #c4842c;box-shadow:10px 15px 35px rgba(0,0,0,0.2);}
+.theme-B .opening-quote{font-family:'Noto Serif JP',serif;font-size:20px;line-height:1.9;font-weight:500;}
+.theme-B .opening-quote::first-letter{font-family:'Bodoni Moda',serif;font-size:60px;font-weight:900;float:left;line-height:0.8;padding-right:12px;padding-top:8px;color:#8b3a3a;}
+.theme-B .rating-line{color:#8b3a3a;font-size:18px;letter-spacing:4px;margin-top:14px;}
+.theme-B .toc-block{background:#1a1a1a;color:white;padding:30px;border-radius:4px;}
+.theme-B .toc-block-title{font-family:'Bodoni Moda',serif;font-size:13px;letter-spacing:6px;color:#d4b56a;margin-bottom:18px;}
+.theme-B .toc-block li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;}
+.theme-B .toc-block li::before{content:counter(section,decimal-leading-zero);font-family:'Bodoni Moda',serif;color:#d4b56a;margin-right:18px;font-weight:700;font-size:16px;}
+.theme-B .review-prose h2{font-family:'Noto Serif JP',serif;font-size:30px;font-weight:900;letter-spacing:-1px;padding-bottom:12px;border-bottom:2px solid #8b3a3a;}
+.theme-B .review-prose p{font-family:'Noto Serif JP',serif;font-size:16px;line-height:2;text-align:justify;}
+.theme-B .review-prose blockquote{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:700;line-height:1.6;text-align:center;padding:40px 30px;border-top:3px solid #8b3a3a;border-bottom:3px solid #8b3a3a;color:#8b3a3a;}
+
+/* THEME C */
+.theme-C{background:#0a0d14;color:#f0e6d2;}
+.theme-C .hero{min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding:40px;}
+.theme-C .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 30%,rgba(232,176,78,0.2) 0%,transparent 50%),linear-gradient(135deg,#0a0d14 0%,#14171f 50%,#1a1e28 100%);}
+.theme-C .hero-content{position:relative;z-index:2;max-width:700px;}
+.theme-C .episode-num{font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:8px;color:#e8b04e;margin-bottom:30px;}
+.theme-C .book-cover{width:200px;height:290px;object-fit:cover;border-left:5px solid #e8b04e;margin:0 auto 35px;display:block;box-shadow:0 30px 60px rgba(0,0,0,0.5),0 0 80px rgba(232,176,78,0.25);}
+.theme-C h1{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:900;letter-spacing:8px;line-height:1.1;margin-bottom:18px;background:linear-gradient(180deg,#f0e6d2 0%,#e8b04e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.theme-C .book-author-line{font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:5px;color:#b8a98c;margin-bottom:28px;}
+.theme-C .rating-line{color:#e8b04e;letter-spacing:10px;font-size:22px;}
+.theme-C .review-container{max-width:780px;margin:0 auto;padding:60px 30px;}
+.theme-C .opening-quote{text-align:center;font-family:'Shippori Mincho',serif;font-size:24px;line-height:2;padding:60px 30px;margin:0 0 50px;color:#e8b04e;letter-spacing:0.15em;border-top:1px solid rgba(232,176,78,0.3);border-bottom:1px solid rgba(232,176,78,0.3);}
+.theme-C .toc-block{background:rgba(232,176,78,0.05);border:1px solid rgba(232,176,78,0.2);padding:35px;border-radius:8px;}
+.theme-C .toc-block-title{font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:5px;color:#e8b04e;margin-bottom:20px;}
+.theme-C .toc-block li{font-family:'Noto Serif JP',serif;font-size:15px;padding:10px 0;color:#d4c5a8;border-bottom:1px solid rgba(232,176,78,0.1);}
+.theme-C .toc-block li::before{content:counter(section,decimal-leading-zero);font-family:'Cormorant Garamond',serif;color:#e8b04e;margin-right:15px;font-weight:700;}
+.theme-C .review-prose h2{font-family:'Noto Serif JP',serif;font-size:30px;font-weight:900;letter-spacing:4px;color:#f0e6d2;padding-top:25px;}
+.theme-C .review-prose h2::before{content:"─ CHAPTER ─";display:block;font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:6px;color:#e8b04e;margin-bottom:10px;font-weight:700;}
+.theme-C .review-prose p{font-family:'Noto Serif JP',serif;font-size:17px;line-height:2.2;color:#d4c5a8;text-align:justify;}
+.theme-C .review-prose blockquote{font-family:'Noto Serif JP',serif;font-size:26px;font-weight:700;line-height:1.6;text-align:center;padding:40px 30px;color:#e8b04e;border:none;}
+
+/* THEME D */
+.theme-D{background-image:radial-gradient(circle at 50% 50%,rgba(80,60,30,0.04) 1.5px,transparent 1.5px),linear-gradient(135deg,#f5ecd9 0%,#ede0c4 100%);background-size:8px 8px,100% 100%;color:#2e2418;}
+.theme-D .hero{padding:40px;border-bottom:1px solid #c8b58f;max-width:900px;margin:0 auto;}
+.theme-D .hero-row{display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:center;}
+.theme-D .vertical-title-wrap{display:flex;justify-content:center;}
+.theme-D .vertical-title{writing-mode:vertical-rl;text-orientation:mixed;font-family:'Shippori Mincho',serif;font-size:42px;font-weight:900;letter-spacing:0.4em;color:#2e2418;border-right:1.5px solid #c4842c;border-left:1.5px solid #c4842c;padding:10px 25px;line-height:1.6;max-height:340px;}
+.theme-D .meta-label{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:4px;color:#8b7355;margin-bottom:12px;}
+.theme-D .book-cover{width:160px;height:232px;object-fit:cover;border-left:5px solid #c4842c;margin-bottom:18px;box-shadow:8px 12px 28px rgba(80,60,30,0.2);}
+.theme-D .author-row{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;letter-spacing:3px;margin-bottom:14px;}
+.theme-D .rating-line{color:#c4842c;letter-spacing:4px;font-size:18px;}
+.theme-D .review-container{max-width:760px;margin:0 auto;padding:40px 30px;}
+.theme-D .opening-quote{font-family:'Shippori Mincho',serif;font-size:21px;line-height:2.4;text-align:center;padding:50px 20px;margin:0 0 50px;letter-spacing:0.2em;color:#2e2418;position:relative;}
+.theme-D .opening-quote::before,.theme-D .opening-quote::after{content:"";display:block;width:100px;height:1px;background:#c4842c;margin:0 auto;}
+.theme-D .opening-quote::before{margin-bottom:30px;}.theme-D .opening-quote::after{margin-top:30px;}
+.theme-D .toc-block{background:rgba(255,252,243,0.6);border:1px solid #c8b58f;padding:28px;border-radius:4px;}
+.theme-D .toc-block-title{font-family:'Shippori Mincho',serif;font-size:14px;letter-spacing:4px;color:#8b3a3a;margin-bottom:16px;border-bottom:1px solid #c8b58f;padding-bottom:10px;}
+.theme-D .toc-block li{font-family:'Shippori Mincho',serif;font-size:14px;padding:7px 0;color:#3a2e1f;display:flex;align-items:baseline;}
+.theme-D .toc-block li::before{content:"第" counter(section,cjk-ideographic) "章";color:#8b3a3a;margin-right:14px;font-weight:700;flex-shrink:0;font-size:12px;}
+.theme-D .review-prose h2{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:700;letter-spacing:4px;display:flex;align-items:center;gap:15px;}
+.theme-D .review-prose h2::before{content:attr(data-chapter);font-family:'Shippori Mincho',serif;font-size:14px;color:#8b3a3a;border:1.5px solid #8b3a3a;padding:5px 12px;border-radius:50px;letter-spacing:3px;flex-shrink:0;}
+.theme-D .review-prose p{font-family:'Shippori Mincho',serif;font-size:16px;line-height:2.2;color:#2e2418;text-align:justify;letter-spacing:0.06em;}
+.theme-D .review-prose blockquote{font-family:'Shippori Mincho',serif;font-size:20px;text-align:center;padding:35px 25px;background:rgba(196,132,44,0.06);border-top:1px solid #c4842c;border-bottom:1px solid #c4842c;line-height:2;letter-spacing:0.1em;}
+
+/* Dark Mode */
+[data-theme="dark"]{background:linear-gradient(135deg,#14171f 0%,#1a1e28 100%) !important;color:#f0e6d2 !important;}
+[data-theme="dark"] .review-prose p{color:#c8b89c !important;}
+[data-theme="dark"] .review-prose h2{color:#f0e6d2 !important;}
+[data-theme="dark"] h1{background:linear-gradient(180deg,#f0e6d2 0%,#e8b04e 100%) !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;}
+[data-theme="dark"] .review-prose blockquote{color:#e8b04e !important;background:rgba(232,176,78,0.05) !important;}
+  `;
+}
+
+// ============================================================
+// マークダウン → HTML（プレビュー用、review.htmlと同じロジック）
+// ============================================================
+function markdownToHtml(md) {
+  if (!md) return '<p>（まだ綴られていません）</p>';
+  const lines = md.split('\n');
+  let html = ''; let pBuf = []; let bqBuf = [];
+  function flushP(){if(pBuf.length){html+='<p>'+pBuf.join('').trim()+'</p>\n';pBuf=[];}}
+  function flushBq(){if(bqBuf.length){html+='<blockquote>'+bqBuf.join(' ').trim()+'</blockquote>\n';bqBuf=[];}}
+  for (const line of lines) {
+    const t = line.trim();
+    if (t === '') { flushP(); flushBq(); continue; }
+    if (t.startsWith('## ')||t.startsWith('# ')) { flushP(); flushBq(); html+=`<h2>${escapeHtml(t.replace(/^#+\s+/, ''))}</h2>\n`; continue; }
+    if (t.startsWith('> ')) { flushP(); bqBuf.push(escapeHtml(t.substring(2))); continue; }
+    flushBq();
+    if (pBuf.length) pBuf.push(' '+processInline(line));
+    else pBuf.push(processInline(line));
+  }
+  flushP(); flushBq();
+  return html;
+}
+function processInline(text) {
+  let t = escapeHtml(text);
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return t;
+}
+
+// ============================================================
+// 保存
+// ============================================================
+function getSelectedTags() {
+  return Array.from(document.querySelectorAll('.tag-option.selected')).map(el => el.dataset.tag);
+}
+function getSelectedDesign() {
+  const sel = document.querySelector('.design-option.selected');
+  return sel ? sel.dataset.value : 'A_上品';
+}
+
+function collectFormData() {
+  return {
+    bookId: currentBook ? currentBook.id : null,
+    title: document.getElementById('fTitle').value.trim(),
+    author: document.getElementById('fAuthor').value.trim(),
+    rating: document.getElementById('fRating').value,
+    url: document.getElementById('fUrl').value.trim(),
+    imageUrl: document.getElementById('fImage').value.trim(),
+    openingQuote: document.getElementById('fOpeningQuote').value.trim(),
+    review: document.getElementById('fReview').value,
+    design: getSelectedDesign(),
+    tags: getSelectedTags(),
+    relatedManualIds: selectedRelatedIds,
+    image: document.getElementById('fImage').value.trim()
+  };
+}
+
+async function saveCurrentReview() {
+  if (!currentBook) return;
+  const data = collectFormData();
+  if (!data.title) { showToast('書名を入力してください', true); return; }
+
+  setStatus('保存中...', 'saving');
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'saveReview', password: editorPassword, data: data })
+    });
+    const r = await res.json();
+    if (r.status !== 'success') throw new Error(r.message);
+    setStatus('保存しました ✓', 'saved');
+    unsavedChanges = false;
+    showToast('保存しました');
+    // 一覧キャッシュも更新
+    const idx = allBooks.findIndex(b => b.id === currentBook.id);
+    if (idx >= 0) {
+      allBooks[idx].title = data.title;
+      allBooks[idx].author = data.author;
+      allBooks[idx].rating = data.rating;
+      allBooks[idx].design = data.design;
+      allBooks[idx].hasReview = data.review.length > 0;
+      allBooks[idx].hasOpeningQuote = data.openingQuote.length > 0;
+      allBooks[idx].updated = new Date().toISOString();
+    }
+  } catch (e) {
+    setStatus('保存エラー', 'error');
+    showToast('保存に失敗しました: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ============================================================
+// ヘルパー
+// ============================================================
+function setStatus(text, type) {
+  const el = document.getElementById('editStatus');
+  el.textContent = text;
+  el.className = 'edit-status ' + (type || 'normal');
+}
+function markDirty() {
+  unsavedChanges = true;
+  setStatus('未保存の変更があります', 'saving');
+  schedulePreviewRefresh();
+}
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, '&quot;');
+}
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function togglePreviewMobile() {
+  document.getElementById('previewPane').classList.toggle('mobile-show');
+}
+
+// フォーム変更検知
+document.addEventListener('input', e => {
+  if (e.target.closest('#editScreen')) {
+    markDirty();
+  }
+});
+
+// 離脱警告
+window.addEventListener('beforeunload', e => {
+  if (unsavedChanges) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// Cmd/Ctrl+S で保存
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    if (document.getElementById('editScreen').classList.contains('active')) {
+      saveCurrentReview();
+    }
+  }
+});
+</script>
+
+</body>
+</html>
