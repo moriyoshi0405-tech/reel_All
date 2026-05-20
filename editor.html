@@ -1130,7 +1130,10 @@ input:focus, textarea:focus, select:focus { outline: none; }
               <span class="field-label">IMAGE</span>
               <span class="field-label-jp">書影</span>
             </div>
-            <input type="text" class="field-input" id="fImage" placeholder="書影URL（任意）">
+            <input type="text" class="field-input" id="fImage" placeholder="書影URL（変更時のみ入力）">
+            <div style="font-size:10px; color:var(--text-muted); margin-top:4px; letter-spacing:0.5px;">
+              💡 既存の書影はそのまま使えます。変更する場合は新しい画像URL（.jpg / .png等）を入力
+            </div>
           </div>
         </div>
 
@@ -1979,19 +1982,25 @@ function getSelectedDesign() {
 }
 
 function collectFormData() {
+  const currentImageInForm = document.getElementById('fImage').value.trim();
+  const originalImage = (currentBook && currentBook.image) ? currentBook.image : '';
+  // 書影URLは「変更された場合」かつ「http(s)://で始まる新しいURL」のときだけ送信
+  // 既存のNotion内部URLや lh3.googleusercontent.com 系を再送信するとAPIエラーになるため
+  const imageUrlToSend = (currentImageInForm && currentImageInForm !== originalImage) ? currentImageInForm : undefined;
+
   return {
     bookId: currentBook ? currentBook.id : null,
     title: document.getElementById('fTitle').value.trim(),
     author: document.getElementById('fAuthor').value.trim(),
     rating: document.getElementById('fRating').value,
     url: document.getElementById('fUrl').value.trim(),
-    imageUrl: document.getElementById('fImage').value.trim(),
+    imageUrl: imageUrlToSend,
     openingQuote: document.getElementById('fOpeningQuote').value.trim(),
     review: document.getElementById('fReview').value,
     design: getSelectedDesign(),
     tags: getSelectedTags(),
     relatedManualIds: selectedRelatedIds,
-    image: document.getElementById('fImage').value.trim()
+    image: currentImageInForm // プレビュー用（表示はそのまま）
   };
 }
 
