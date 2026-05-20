@@ -2741,7 +2741,7 @@ function generateCardHTML(book, sortIndex, animationDelayIndex = 0) {
     <div class="button-area">
       <div class="primary-buttons">
         ${videoBtn}
-        <a href="${book.url}" target="_blank" class="card-btn">感想を嗜む</a>
+        <a href="review.html?id=${book.id}" class="card-btn">感想を嗜む</a>
         <button onclick="showSummary('${book.id}')" class="card-btn summary">解説を見る</button>
       </div>
       <div class="action-row">
