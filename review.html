@@ -209,16 +209,54 @@ body {
 [data-theme="dark"] .review-footer a { color: #e8b04e; }
 
 /* ============================================================
-   ローディング状態
+   ローディング状態 (名言カード + 白フラッシュ演出)
    ============================================================ */
 #loadingState {
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f5ecd9 0%, #ede0c4 100%);
+  padding: 20px;
+  transition: opacity 0.6s ease;
 }
+#loadingState.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+[data-theme="dark"] #loadingState {
+  background: linear-gradient(135deg, #14171f 0%, #1a1e28 100%);
+}
+
+/* 白フラッシュ */
+#whiteFlash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-out;
+}
+#whiteFlash.flash { opacity: 1; }
+#whiteFlash.fade-out {
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+
+/* メインコンテンツのフェードイン */
+body.review-loaded #reviewMain,
+body.review-loaded .review-footer {
+  animation: reviewFadeIn 0.9s ease-out;
+}
+@keyframes reviewFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .book-loader {
   width: 70px; height: 55px;
   position: relative;
@@ -248,7 +286,61 @@ body {
   letter-spacing: 4px;
   animation: pulseText 2s infinite;
 }
+[data-theme="dark"] .loading-text { color: #b8a98c; }
 @keyframes pulseText { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+/* 名言カード */
+.loading-quote-card {
+  margin-top: 50px;
+  max-width: 540px;
+  width: 100%;
+  min-height: 130px;
+  padding: 36px 38px;
+  background: #fffcf3;
+  border: 1px solid #e0d2b5;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(80, 60, 30, 0.08);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+[data-theme="dark"] .loading-quote-card {
+  background: #232936;
+  border-color: #3a4156;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.loading-quote-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #c4842c 0%, #8b3a3a 100%);
+}
+.loading-quote-text {
+  font-family: 'Noto Serif JP', 'Shippori Mincho', serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 2;
+  color: #2e2418;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  animation: quoteFadeInOut 4.5s ease-in-out;
+}
+[data-theme="dark"] .loading-quote-text { color: #f0e6d2; }
+@keyframes quoteFadeInOut {
+  0%   { opacity: 0; transform: translateY(8px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+
+@media (max-width: 600px) {
+  .loading-quote-card { padding: 26px 22px; min-height: 110px; margin-top: 40px; }
+  .loading-quote-text { font-size: 14px; line-height: 1.9; letter-spacing: 0.06em; }
+}
 
 /* エラー状態 */
 .error-page {
@@ -1283,6 +1375,9 @@ body {
   <ol id="tocFixedList"></ol>
 </aside>
 
+<!-- 白フラッシュ演出 -->
+<div id="whiteFlash"></div>
+
 <!-- ローディング -->
 <div id="loadingState">
   <div class="book-loader">
@@ -1291,6 +1386,9 @@ body {
     <div class="page-flip"></div>
   </div>
   <div class="loading-text">レビューを綴り直しています...</div>
+  <div class="loading-quote-card">
+    <div class="loading-quote-text" id="loadingQuoteText">&nbsp;</div>
+  </div>
 </div>
 
 <!-- メインコンテンツ（動的描画） -->
@@ -1306,6 +1404,88 @@ body {
 const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
 
 const FLOATING_CHARS = ['物','語','本','読','頁','栞','冊','詩','歌','夜','月','星','雨','風','森','木','花','葉','朝','夕','空','窓','灯','想','夢','愛','希','望','静','優','温','光','影','声','音','心','時','永','遠','記','憶','思','懐'];
+
+// ===== ローディング中の名言カード =====
+const LOADING_QUOTES = [
+  // ✒️ 文学・読書にまつわる名言(7つ)
+  "本は、最も静かで変わらぬ友人である。",
+  "一冊の本との出会いは、一人の人と出会うことに似ている。",
+  "読書は、過去の最も偉大な人たちとの対話である。",
+  "本を読まない者は、読めない者より大した利点を持たない。",
+  "私は本がなければ生きられない。",
+  "本を読むとは、人生を二倍生きることだ。",
+  "良い本は、開くたびに新しい発見をくれる。",
+  // 🍃 季節・読書を描く俳句風(7つ)
+  "新緑や 頁めくる手 風と共に",
+  "夏の夜は 物語の中 月明かり",
+  "秋深し 隣に積まれし 文庫本",
+  "冬支度 暖炉の傍に 一冊を",
+  "雨音や 紅茶冷めゆく 読書時間",
+  "栞置く 春の昼下がり 木洩れ日に",
+  "古書喫茶 珈琲の香と 文字の海",
+  // 📚 読書トリビア(7つ)
+  "📚 世界最古の小説は、紫式部の『源氏物語』(11世紀初頭)とされています。",
+  "📚 「読書の秋」が定着したのは、明治時代の新聞・雑誌の影響だそうです。",
+  "📚 「栞(しおり)」の語源は、山道で枝を折って目印にする「枝折る」から来ています。",
+  "📚 古代ローマでは、本は巻物。コーデックス(冊子)が普及したのは紀元1世紀ごろ。",
+  "📚 「文庫本」のサイズは、明治の岩波文庫が始まりとされています。",
+  "📚 読書中の脳は、物語の登場人物の感情を実際に追体験しているそうです。",
+  "📚 世界で最も多く読まれた本の一冊は、『星の王子さま』。300以上の言語に翻訳。"
+];
+
+let loadingQuoteInterval = null;
+
+function startLoadingQuotes() {
+  const order = [...LOADING_QUOTES].sort(() => Math.random() - 0.5);
+  let idx = 0;
+  function showNext() {
+    const current = document.getElementById('loadingQuoteText');
+    if (!current) return;
+    const newText = order[idx % order.length];
+    idx++;
+    const newEl = current.cloneNode(false);
+    newEl.id = 'loadingQuoteText';
+    newEl.className = 'loading-quote-text';
+    newEl.textContent = newText;
+    current.parentNode.replaceChild(newEl, current);
+  }
+  showNext();
+  loadingQuoteInterval = setInterval(showNext, 4500);
+}
+
+function stopLoadingQuotes() {
+  if (loadingQuoteInterval) {
+    clearInterval(loadingQuoteInterval);
+    loadingQuoteInterval = null;
+  }
+}
+
+startLoadingQuotes();
+
+/**
+ * ローディング → 白フラッシュ → メインフェードイン の演出
+ */
+function finishReviewLoadWithFlash() {
+  const loading = document.getElementById('loadingState');
+  const flash = document.getElementById('whiteFlash');
+  stopLoadingQuotes();
+  if (!flash || !loading) {
+    if (loading) loading.style.display = 'none';
+    return;
+  }
+  flash.classList.add('flash');
+  setTimeout(() => {
+    loading.style.display = 'none';
+    document.body.classList.add('review-loaded');
+  }, 500);
+  setTimeout(() => {
+    flash.classList.remove('flash');
+    flash.classList.add('fade-out');
+  }, 600);
+  setTimeout(() => {
+    flash.style.display = 'none';
+  }, 1400);
+}
 
 // ===== テーマ =====
 function initTheme() {
@@ -1383,7 +1563,11 @@ async function loadReview() {
 }
 
 function showError(msg) {
+  stopLoadingQuotes();
   document.getElementById('loadingState').style.display = 'none';
+  const flash = document.getElementById('whiteFlash');
+  if (flash) flash.style.display = 'none';
+  document.body.classList.add('review-loaded');
   document.getElementById('reviewMain').innerHTML = `
     <div class="error-page">
       <h2>❦ 物語が見つかりません ❦</h2>
@@ -1530,8 +1714,9 @@ function renderReview(book) {
   }
 
   document.getElementById('reviewMain').innerHTML = mainHtml;
-  document.getElementById('loadingState').style.display = 'none';
   document.getElementById('reviewFooter').style.display = 'block';
+  // 白フラッシュ演出でローディングを終了
+  finishReviewLoadWithFlash();
 
   // 固定TOC（PC大画面のみ）
   if (headings.length >= 3 && window.innerWidth > 1100) {
