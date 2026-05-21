@@ -2713,7 +2713,7 @@ function renderAll() {
     activeTags.every(t => b.tags.includes(t)) &&
     (isMyShelfMode ? savedBooks.includes(b.id) : true)
   );
-  if (currentSortMode === 'new') f.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+  if (currentSortMode === 'new') f.sort((a, b) => new Date(b.bookDate || b.updated) - new Date(a.bookDate || a.updated));
   else f.sort((a, b) => b.likes - a.likes);
   document.getElementById("bookCountDisplay").textContent = `蔵書 ${allData.length} 冊 / 表示 ${f.length} 冊`;
   document.getElementById("grid").innerHTML = f.map((b, i) => generateCardHTML(b, i, i)).join("");
@@ -2723,7 +2723,11 @@ function renderAll() {
 
 function generateCardHTML(book, sortIndex, animationDelayIndex = 0) {
   const isL = likedBooks.includes(book.id), isR = readBooks.includes(book.id), isS = savedBooks.includes(book.id);
-  const isNew = (new Date() - new Date(book.updated)) / 86400000 <= 7 ? '<div class="new-badge">New</div>' : '';
+  // 「日付」プロパティが入っていればそれを優先、なければ updated にフォールバック
+  // 日付プロパティが正しく設定されている本だけが「New」になり、データ修正でNewが復活しないようにする
+  const newSourceDate = book.bookDate || book.updated;
+  const daysSince = (new Date() - new Date(newSourceDate)) / 86400000;
+  const isNew = (book.hasBookDate && daysSince <= 30) ? '<div class="new-badge">New</div>' : '';
   let crown = (currentSortMode === 'like' && sortIndex >= 0 && sortIndex <= 2 && book.likes > 0) ? `<div class="crown-badge">${['🥇','🥈','🥉'][sortIndex]}</div>` : "";
   let stars = "";
   if (book.rating) {
@@ -2972,15 +2976,24 @@ function renderMonthlyChart() {
   const colors = getThemeColors();
   const monthMap = {};
   const now = new Date();
-  // Get last 12 months
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    monthMap[key] = 0;
+  // 2026年1月から現在月までの月リストを生成
+  const startYear = 2026;
+  const startMonth = 1;
+  const currentY = now.getFullYear();
+  const currentM = now.getMonth() + 1; // 1-12
+  for (let y = startYear; y <= currentY; y++) {
+    const mStart = (y === startYear) ? startMonth : 1;
+    const mEnd = (y === currentY) ? currentM : 12;
+    for (let m = mStart; m <= mEnd; m++) {
+      const key = `${y}-${String(m).padStart(2,'0')}`;
+      monthMap[key] = 0;
+    }
   }
+  // 各本の「日付」プロパティ(bookDate)を集計対象に。未入力は updated にフォールバック
   allData.forEach(b => {
-    if (!b.updated) return;
-    const d = new Date(b.updated);
+    const dateStr = b.bookDate || b.updated;
+    if (!dateStr) return;
+    const d = new Date(dateStr);
     if (isNaN(d)) return;
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     if (key in monthMap) monthMap[key]++;
@@ -3244,7 +3257,7 @@ function renderBookmark(b) {
     </div>
     <div class="bookmark-source">— 『<strong>${b.title}</strong>』 ${b.author}</div>
 
-    <div class="bookmark-book-row" onclick="window.open('${b.url || '#'}', '_blank')">
+    <div class="bookmark-book-row" onclick="window.location.href='review.html?id=${b.bookId}'">
       <img src="${b.image || 'https://via.placeholder.com/72x105'}" class="bookmark-book-cover" onerror="this.src='https://via.placeholder.com/72x105'">
       <div class="bookmark-book-info-text">
         <div class="bk-title">『${b.title}』</div>
@@ -3329,8 +3342,9 @@ function openArchiveModal() {
     html = `<div class="archive-stats">今年あなたが出会った本：<strong>${thisYearCount}</strong>冊 / 累計 <strong>${entries.length}</strong> 日</div>`;
     html += '<div class="archive-grid">';
     entries.slice(0, 60).forEach(([date, b]) => {
+      const linkUrl = b.bookId ? `review.html?id=${b.bookId}` : (b.url || '#');
       html += `
-        <div class="archive-item" onclick="window.open('${b.url || '#'}', '_blank')">
+        <div class="archive-item" onclick="window.location.href='${linkUrl}'">
           <div class="archive-item-date">${date}</div>
           <img src="${b.image || 'https://via.placeholder.com/60x88'}" class="archive-item-cover" onerror="this.src='https://via.placeholder.com/60x88'">
           <div class="archive-item-title">${b.title}</div>
