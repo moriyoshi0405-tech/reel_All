@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>特集 | AI Book Shelf</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="logos/favicon_64.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="logos/favicon_32.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&family=Cormorant+Garamond:wght@500;700&family=Bodoni+Moda:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --bg-color: #f7f3ec;
+    --bg-card: #fffdf8;
+    --text-primary: #2d2620;
+    --text-secondary: #5c4f44;
+    --text-muted: #8a7864;
+    --border-soft: rgba(74, 51, 32, 0.12);
+    --accent-primary: #3a5a3a;
+    --accent-secondary: #c4842c;
+    --accent-burgundy: #8b3a3a;
+    --shadow-soft: 0 4px 18px rgba(74, 51, 32, 0.08);
+    --shadow-medium: 0 8px 30px rgba(74, 51, 32, 0.14);
+    --shadow-hard: 0 20px 60px rgba(74, 51, 32, 0.22);
+  }
+  body.dark {
+    --bg-color: #1a1614;
+    --bg-card: #25201d;
+    --text-primary: #f0e9de;
+    --text-secondary: #c7b9a8;
+    --text-muted: #9a8a78;
+    --border-soft: rgba(255, 240, 220, 0.1);
+    --accent-primary: #7ba47b;
+    --accent-secondary: #d4a04e;
+    --shadow-soft: 0 4px 18px rgba(0,0,0,0.35);
+  }
+
+  /* カラーテーマ別 (特集のテーマカラー) */
+  body[data-theme="autumn"] {
+    --theme-accent: #b8521f;
+    --theme-bg: linear-gradient(135deg, #f5e6d3 0%, #e8c39e 100%);
+    --theme-bg-dark: linear-gradient(135deg, #3a1f10 0%, #5a3320 100%);
+  }
+  body[data-theme="winter"] {
+    --theme-accent: #4a6a8a;
+    --theme-bg: linear-gradient(135deg, #e0e6ed 0%, #c8d4e2 100%);
+    --theme-bg-dark: linear-gradient(135deg, #1c2735 0%, #2a3b50 100%);
+  }
+  body[data-theme="spring"] {
+    --theme-accent: #d05a8c;
+    --theme-bg: linear-gradient(135deg, #fae6ee 0%, #f5c9d9 100%);
+    --theme-bg-dark: linear-gradient(135deg, #3a1c2a 0%, #5a2d40 100%);
+  }
+  body[data-theme="summer"] {
+    --theme-accent: #2d8a8a;
+    --theme-bg: linear-gradient(135deg, #d9efe9 0%, #b0d8d0 100%);
+    --theme-bg-dark: linear-gradient(135deg, #102a2a 0%, #1c4040 100%);
+  }
+  body[data-theme="melancholy"] {
+    --theme-accent: #6a4a6a;
+    --theme-bg: linear-gradient(135deg, #e6dde5 0%, #c8b8c5 100%);
+    --theme-bg-dark: linear-gradient(135deg, #2a1a2a 0%, #3a2a3a 100%);
+  }
+  body[data-theme="warm"] {
+    --theme-accent: #c4842c;
+    --theme-bg: linear-gradient(135deg, #fae8d0 0%, #f0d09e 100%);
+    --theme-bg-dark: linear-gradient(135deg, #3a2a14 0%, #5a4020 100%);
+  }
+  body[data-theme="cool"] {
+    --theme-accent: #4a7a9a;
+    --theme-bg: linear-gradient(135deg, #d9e4ed 0%, #b0c4d8 100%);
+    --theme-bg-dark: linear-gradient(135deg, #1c2a35 0%, #2d4050 100%);
+  }
+  body.dark[data-theme] { background: var(--theme-bg-dark) !important; }
+  body[data-theme]:not(.dark) { background: var(--theme-bg) !important; }
+  
+  * { box-sizing: border-box; }
+  
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.8;
+    min-height: 100vh;
+    transition: background 0.6s ease;
+  }
+
+  /* ヘッダー */
+  .site-header {
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-soft);
+    background: rgba(255, 253, 248, 0.7);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  body.dark .site-header { background: rgba(37, 32, 29, 0.7); }
+  .header-link {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 50px;
+    border: 1px solid var(--border-soft);
+    background: var(--bg-card);
+    transition: 0.3s;
+    letter-spacing: 1.5px;
+  }
+  .header-link:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+  }
+  .header-title {
+    font-family: 'Bodoni Moda', serif;
+    font-size: 16px;
+    letter-spacing: 5px;
+    color: var(--text-primary);
+  }
+  
+  /* メイン */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* 一覧用ヘッダー */
+  .list-hero {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeUp 1s ease-out;
+  }
+  .list-hero-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .list-hero-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    margin: 0 0 20px 0;
+  }
+  .list-hero-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 2;
+  }
+
+  /* 特集カード一覧 */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+  }
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    padding: 28px;
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--theme-accent, var(--accent-secondary));
+  }
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--theme-accent, var(--accent-secondary));
+  }
+  .feature-card-category {
+    display: inline-block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--theme-accent, var(--accent-secondary));
+    border: 1px solid currentColor;
+    padding: 3px 10px;
+    border-radius: 50px;
+    margin-bottom: 14px;
+  }
+  .feature-card-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+  }
+  .feature-card-lead {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.9;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .feature-card-thumbs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .feature-card-thumb {
+    width: 38px;
+    height: 56px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    background: var(--border-soft);
+  }
+  .feature-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-soft);
+    padding-top: 12px;
+  }
+
+  /* ── 特集詳細ページ ── */
+  .detail-hero {
+    text-align: center;
+    margin-bottom: 60px;
+    padding: 60px 24px 40px;
+    position: relative;
+    animation: fadeUp 1s ease-out;
+  }
+  .detail-hero-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--theme-accent, var(--accent-secondary));
+    margin-bottom: 14px;
+  }
+  .detail-hero-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 44px;
+    font-weight: 900;
+    line-height: 1.4;
+    letter-spacing: 4px;
+    margin: 0 0 30px 0;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+  .detail-hero-lead {
+    max-width: 660px;
+    margin: 0 auto;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 2.1;
+    font-family: 'Noto Serif JP', serif;
+    text-align: left;
+  }
+  .detail-hero-ornament {
+    margin: 30px auto;
+    width: 80px;
+    height: 1px;
+    background: var(--theme-accent, var(--accent-secondary));
+    position: relative;
+  }
+  .detail-hero-ornament::after {
+    content: "❦";
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-color);
+    color: var(--theme-accent, var(--accent-secondary));
+    padding: 0 12px;
+    font-size: 16px;
+  }
+  body[data-theme] .detail-hero-ornament::after {
+    background: var(--bg-card);
+  }
+  
+  /* 選書リスト */
+  .book-selection {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .book-entry {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 36px;
+    padding: 36px 30px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
+    border-radius: 18px;
+    margin-bottom: 28px;
+    transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: fadeUp 0.8s ease-out backwards;
+    position: relative;
+  }
+  .book-entry:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+  }
+  .book-entry-num {
+    position: absolute;
+    top: -15px;
+    left: 30px;
+    font-family: 'Bodoni Moda', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--theme-accent, var(--accent-secondary));
+    background: var(--bg-color);
+    padding: 4px 14px;
+    border-radius: 50px;
+    border: 1px solid currentColor;
+  }
+  body[data-theme] .book-entry-num {
+    background: var(--bg-card);
+  }
+  .book-entry-cover {
+    width: 140px;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: var(--shadow-medium);
+  }
+  .book-entry-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .book-entry-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    letter-spacing: 1px;
+  }
+  .book-entry-author {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+  }
+  .book-entry-reason {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 2;
+    padding-left: 14px;
+    border-left: 2px solid var(--theme-accent, var(--accent-secondary));
+    font-style: italic;
+  }
+  .book-entry-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--theme-accent, var(--accent-secondary));
+    text-decoration: none;
+    letter-spacing: 2px;
+    transition: 0.3s;
+  }
+  .book-entry-link:hover {
+    transform: translateX(4px);
+  }
+  
+  /* 結びの一文 */
+  .feature-closing {
+    max-width: 700px;
+    margin: 60px auto 0;
+    padding: 40px 30px;
+    text-align: center;
+    background: var(--bg-card);
+    border-radius: 18px;
+    position: relative;
+  }
+  .feature-closing::before {
+    content: "「";
+    position: absolute;
+    top: 0; left: 30px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 60px;
+    color: var(--theme-accent, var(--accent-secondary));
+    opacity: 0.3;
+    line-height: 1;
+  }
+  .feature-closing::after {
+    content: "」";
+    position: absolute;
+    bottom: -20px; right: 30px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 60px;
+    color: var(--theme-accent, var(--accent-secondary));
+    opacity: 0.3;
+    line-height: 1;
+  }
+  .feature-closing-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    line-height: 2.2;
+    color: var(--text-primary);
+    letter-spacing: 1.5px;
+    margin: 0;
+  }
+
+  /* 戻るリンク */
+  .back-to-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 2px;
+    transition: 0.3s;
+  }
+  .back-to-list:hover {
+    color: var(--accent-primary);
+    transform: translateX(-4px);
+  }
+
+  /* ローディング */
+  .loading {
+    text-align: center;
+    padding: 100px 20px;
+    color: var(--text-muted);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{ opacity: 0.5; } 50% { opacity: 1; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+    font-family: 'Noto Serif JP', serif;
+  }
+  .empty-state-emoji {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  /* レスポンシブ */
+  @media (max-width: 767px) {
+    .site-header { padding: 16px 16px; }
+    .header-link { padding: 7px 12px; font-size: 11px; }
+    .header-title { font-size: 12px; letter-spacing: 3px; }
+    .container { padding: 30px 16px 60px; }
+    .list-hero-title { font-size: 28px; letter-spacing: 3px; }
+    .list-hero-sub { font-size: 12px; }
+    .feature-grid { grid-template-columns: 1fr; gap: 20px; }
+    .feature-card { padding: 22px; }
+    .feature-card-title { font-size: 18px; }
+    .detail-hero { padding: 30px 12px 24px; }
+    .detail-hero-title { font-size: 26px; letter-spacing: 2px; }
+    .detail-hero-lead { font-size: 13px; padding: 0 8px; }
+    .book-entry {
+      grid-template-columns: 100px 1fr;
+      gap: 18px;
+      padding: 26px 20px;
+    }
+    .book-entry-cover { width: 100px; }
+    .book-entry-title { font-size: 17px; }
+    .book-entry-reason { font-size: 12px; padding-left: 10px; }
+    .feature-closing { padding: 30px 24px; }
+    .feature-closing-text { font-size: 14px; }
+    .book-entry-num { font-size: 11px; padding: 3px 10px; left: 16px; }
+  }
+  </style>
+</head>
+<body>
+
+<div class="site-header">
+  <a href="index.html" class="header-link">← 本棚へ</a>
+  <div class="header-title">特集 · FEATURES</div>
+  <div style="width: 80px;"></div>
+</div>
+
+<div class="container" id="container">
+  <div class="loading">📖 特集を読み込んでいます...</div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxnivqaTxApYmc8wWPn8BUk5p_caL2n6dPAjau7_8xkva7rLCODuY8idJJe0GJ-dyrw/exec";
+
+// ダークモード継承
+if (localStorage.getItem('darkMode') === 'on') {
+  document.body.classList.add('dark');
+}
+
+// URLからidを取得 (詳細ページモード)
+const urlParams = new URLSearchParams(window.location.search);
+const featureId = urlParams.get('id');
+
+if (featureId) {
+  loadFeatureDetail(featureId);
+} else {
+  loadFeatureList();
+}
+
+async function loadFeatureList() {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getFeaturesList', limit: 100 })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+
+    renderFeatureList(data.features || []);
+  } catch (e) {
+    document.getElementById('container').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-emoji">⚠️</div>
+        <p>読み込みに失敗しました</p>
+        <p style="font-size: 12px; color: var(--text-muted);">${escapeHtml(e.message)}</p>
+      </div>
+    `;
+  }
+}
+
+function renderFeatureList(features) {
+  const container = document.getElementById('container');
+  if (!features || features.length === 0) {
+    container.innerHTML = `
+      <div class="list-hero">
+        <div class="list-hero-eyebrow">CURATED FEATURES</div>
+        <h1 class="list-hero-title">特集</h1>
+        <div class="list-hero-sub">AIが本棚の中から、テーマに沿った本たちを選び、物語のような特集記事を編む場所だ。</div>
+      </div>
+      <div class="empty-state">
+        <div class="empty-state-emoji">📖</div>
+        <p>まだ特集はありません</p>
+        <p style="font-size: 12px;">管理人が特集を作成すると、ここに並びます</p>
+      </div>
+    `;
+    return;
+  }
+
+  const cardsHtml = features.map(f => {
+    const thumbs = (f.books || []).slice(0, 5).map(b =>
+      b.image ? `<img class="feature-card-thumb" src="${escapeHtml(b.image)}" alt="${escapeHtml(b.title || '')}" loading="lazy">` :
+      `<div class="feature-card-thumb"></div>`
+    ).join('');
+    const dateStr = formatDate(f.createdTime);
+    return `
+      <a href="features.html?id=${encodeURIComponent(f.id)}" class="feature-card" data-theme="${escapeHtml(f.colorTheme || 'warm')}">
+        ${f.category ? `<span class="feature-card-category">${escapeHtml(f.category)}</span>` : ''}
+        <h2 class="feature-card-title">${escapeHtml(f.title)}</h2>
+        <p class="feature-card-lead">${escapeHtml(f.leadText || '')}</p>
+        <div class="feature-card-thumbs">${thumbs}</div>
+        <div class="feature-card-meta">
+          <span>${f.bookCount || 0} BOOKS</span>
+          <span>${dateStr}</span>
+        </div>
+      </a>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="list-hero">
+      <div class="list-hero-eyebrow">CURATED FEATURES</div>
+      <h1 class="list-hero-title">特集</h1>
+      <div class="list-hero-sub">AIが本棚の中から、テーマに沿った本たちを選び、物語のような特集記事を編む場所だ。<br>季節や感情、シーンに合わせた読書のお供を見つけてほしい。</div>
+    </div>
+    <div class="feature-grid">${cardsHtml}</div>
+  `;
+
+  // カラーテーマの個別適用 (各カードに固有テーマを表現)
+  document.querySelectorAll('.feature-card[data-theme]').forEach(card => {
+    const theme = card.dataset.theme;
+    const colors = {
+      autumn: '#b8521f', winter: '#4a6a8a', spring: '#d05a8c',
+      summer: '#2d8a8a', melancholy: '#6a4a6a', warm: '#c4842c', cool: '#4a7a9a'
+    };
+    if (colors[theme]) {
+      card.style.setProperty('--theme-accent', colors[theme]);
+    }
+  });
+}
+
+async function loadFeatureDetail(id) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getFeatureById', id: id })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+
+    renderFeatureDetail(data.feature);
+  } catch (e) {
+    document.getElementById('container').innerHTML = `
+      <a href="features.html" class="back-to-list">← 特集一覧へ</a>
+      <div class="empty-state">
+        <div class="empty-state-emoji">⚠️</div>
+        <p>特集の読み込みに失敗しました</p>
+        <p style="font-size: 12px; color: var(--text-muted);">${escapeHtml(e.message)}</p>
+      </div>
+    `;
+  }
+}
+
+function renderFeatureDetail(feature) {
+  if (!feature) return;
+
+  // bodyにカラーテーマを設定
+  document.body.dataset.theme = feature.colorTheme || 'warm';
+
+  const booksHtml = (feature.books || []).map((book, idx) => `
+    <div class="book-entry" style="animation-delay: ${idx * 0.1}s">
+      <div class="book-entry-num">No. ${String(idx + 1).padStart(2, '0')}</div>
+      <img class="book-entry-cover" src="${escapeHtml(book.image || '')}"
+           onerror="this.style.background='var(--border-soft)';this.removeAttribute('src');"
+           alt="${escapeHtml(book.title)}">
+      <div class="book-entry-info">
+        <h3 class="book-entry-title">${escapeHtml(book.title || '無題')}</h3>
+        <div class="book-entry-author">${escapeHtml(book.author || '')}</div>
+        <div class="book-entry-reason">${escapeHtml(book.reason || '')}</div>
+        ${book.url ? `<a href="${escapeHtml(book.url)}" class="book-entry-link">レビューを読む →</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('container').innerHTML = `
+    <a href="features.html" class="back-to-list">← 特集一覧へ</a>
+
+    <div class="detail-hero">
+      ${feature.category ? `<div class="detail-hero-eyebrow">${escapeHtml(feature.category).toUpperCase()} · FEATURE</div>` : ''}
+      <h1 class="detail-hero-title">${escapeHtml(feature.title)}</h1>
+      <div class="detail-hero-ornament"></div>
+      <p class="detail-hero-lead">${escapeHtml(feature.leadText || '')}</p>
+    </div>
+
+    <div class="book-selection">${booksHtml}</div>
+
+    ${feature.closing ? `
+      <div class="feature-closing">
+        <p class="feature-closing-text">${escapeHtml(feature.closing)}</p>
+      </div>
+    ` : ''}
+
+    <div style="text-align: center; margin-top: 60px;">
+      <a href="features.html" class="back-to-list">← 他の特集も見る</a>
+    </div>
+  `;
+}
+
+function formatDate(isoStr) {
+  if (!isoStr) return '';
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+  } catch (e) { return ''; }
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
