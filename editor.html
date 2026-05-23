@@ -985,6 +985,471 @@ input:focus, textarea:focus, select:focus { outline: none; }
 /* ============================================================
    レスポンシブ
    ============================================================ */
+/* ============================================================
+   リライト・変換メニュー (ドロップダウン)
+   ============================================================ */
+.rewrite-menu {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  padding: 6px;
+  z-index: 100;
+  min-width: 200px;
+  animation: dropdownIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rewrite-option {
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;
+  font-size: 13px;
+}
+.rewrite-option:hover {
+  background: var(--bg-soft);
+}
+.rewrite-option .emoji {
+  font-size: 18px;
+}
+.rewrite-option .title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.rewrite-option .desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ============================================================
+   診断結果モーダル
+   ============================================================ */
+.diagnose-card {
+  background: linear-gradient(135deg, var(--bg-soft) 0%, var(--bg-card) 100%);
+  border-radius: 14px;
+  padding: 20px;
+  margin: 14px 0;
+}
+.diagnose-total {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.diagnose-total-score {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--accent-secondary);
+  line-height: 1;
+}
+.diagnose-total-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.diagnose-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.diagnose-bar-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 30px;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.diagnose-bar-label {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+.diagnose-bar-track {
+  height: 8px;
+  background: var(--border-soft);
+  border-radius: 50px;
+  overflow: hidden;
+}
+.diagnose-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-secondary), var(--accent-burgundy));
+  border-radius: 50px;
+  transition: width 0.8s ease-out;
+}
+.diagnose-bar-value {
+  text-align: right;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+.diagnose-section {
+  margin-top: 18px;
+}
+.diagnose-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.diagnose-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.diagnose-list li {
+  padding: 7px 0 7px 18px;
+  position: relative;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+.diagnose-list.strengths li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+.diagnose-list.improvements li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent-secondary);
+  font-weight: 700;
+}
+.diagnose-overall {
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: rgba(196, 132, 44, 0.08);
+  border-left: 3px solid var(--accent-secondary);
+  border-radius: 0 12px 12px 0;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+/* ============================================================
+   校閲結果モーダル
+   ============================================================ */
+.proofread-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.proofread-item {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+.proofread-item.severity-high { border-left: 3px solid var(--accent-burgundy); }
+.proofread-item.severity-medium { border-left: 3px solid var(--accent-secondary); }
+.proofread-item.severity-low { border-left: 3px solid var(--text-muted); }
+.proofread-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.proofread-original {
+  text-decoration: line-through;
+  color: var(--accent-burgundy);
+  font-family: 'Noto Serif JP', serif;
+  padding: 2px 6px;
+  background: rgba(139, 58, 58, 0.06);
+  border-radius: 4px;
+}
+.proofread-arrow {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.proofread-suggestion {
+  color: var(--accent-primary);
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  padding: 2px 6px;
+  background: rgba(58, 90, 58, 0.06);
+  border-radius: 4px;
+}
+.proofread-reason {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.proofread-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.proofread-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-card);
+  font-size: 11px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.proofread-btn.fix {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+.proofread-btn.fix:hover { filter: brightness(1.1); }
+.proofread-btn.ignore:hover { background: var(--bg-soft); }
+.proofread-summary {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: rgba(58, 90, 58, 0.06);
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 0 10px 10px 0;
+  font-size: 12px;
+  font-family: 'Noto Serif JP', serif;
+}
+.proofread-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-family: 'Noto Serif JP', serif;
+}
+
+/* ============================================================
+   AIチャット相棒（フローティング）
+   ============================================================ */
+.ai-chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gradient-warm);
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(196, 132, 44, 0.4);
+  z-index: 998;
+  transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-chat-fab:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(196, 132, 44, 0.55);
+}
+.ai-chat-fab.hidden { display: none; }
+.ai-chat-fab .pulse-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulseChat 2s infinite;
+}
+@keyframes pulseChat {
+  0%, 100% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.ai-chat-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 560px;
+  max-height: calc(100vh - 100px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: var(--shadow-hard);
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: chatSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ai-chat-panel.show { display: flex; }
+@keyframes chatSlideIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ai-chat-header {
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(196, 132, 44, 0.08), rgba(58, 90, 58, 0.04));
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ai-chat-header-title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ai-chat-header-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.ai-chat-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+.ai-chat-close:hover { background: var(--bg-soft); color: var(--text-primary); }
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ai-chat-msg {
+  max-width: 85%;
+  padding: 11px 15px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.75;
+  animation: msgIn 0.3s ease-out;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-chat-msg.user {
+  background: var(--accent-primary);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+}
+.ai-chat-msg.assistant {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  align-self: flex-start;
+  border-bottom-left-radius: 6px;
+  font-family: 'Noto Serif JP', serif;
+}
+.ai-chat-msg.assistant strong { color: var(--accent-secondary); }
+.ai-chat-msg.thinking {
+  background: transparent;
+  align-self: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 3px;
+  animation: pulseText 1.5s infinite;
+}
+.ai-chat-welcome {
+  text-align: center;
+  padding: 24px 16px;
+  color: var(--text-muted);
+}
+.ai-chat-welcome-emoji { font-size: 32px; margin-bottom: 10px; }
+.ai-chat-welcome-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.ai-chat-suggestion {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 50px;
+  font-size: 11px;
+  margin: 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.ai-chat-suggestion:hover { border-color: var(--accent-primary); background: rgba(58, 90, 58, 0.05); }
+.ai-chat-input-row {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.ai-chat-textarea {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: none;
+  min-height: 38px;
+  max-height: 120px;
+}
+.ai-chat-textarea:focus { border-color: var(--accent-primary); outline: none; }
+.ai-chat-send {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: 0.2s;
+}
+.ai-chat-send:hover { filter: brightness(1.15); transform: scale(1.06); }
+.ai-chat-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+@media (max-width: 600px) {
+  .ai-chat-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 80vh;
+    max-height: 80vh;
+    border-radius: 18px 18px 0 0;
+  }
+}
+
+/* ============================================================
+   レスポンシブ
+   ============================================================ */
 @media (max-width: 980px) {
   .edit-layout { flex-direction: column; }
   .edit-pane.right { display: none; }
@@ -1235,7 +1700,18 @@ input:focus, textarea:focus, select:focus { outline: none; }
             <button class="tool-btn ai-tool" onclick="aiSuggestOutline()" id="aiOutlineBtn">✨ 章立て</button>
             <button class="tool-btn ai-tool" onclick="aiSuggestIntro()" id="aiIntroBtn">✨ 書き出し</button>
             <button class="tool-btn ai-tool" onclick="aiPolishSelection()" id="aiPolishBtn">✨ 文章を整える</button>
+            <button class="tool-btn ai-tool" onclick="aiContinueWriting()" id="aiContinueBtn" title="カーソル位置の続きを書く">✨ 続きを書く</button>
+            <div class="tool-divider"></div>
+            <button class="tool-btn ai-tool" onclick="openRewriteMenu(event)" id="aiRewriteBtn" title="トーン指定でリライト">🎨 リライト ▾</button>
+            <button class="tool-btn ai-tool" onclick="openTransformMenu(event)" id="aiTransformBtn" title="変換モード">🔄 変換 ▾</button>
+            <button class="tool-btn ai-tool" onclick="aiProofread()" id="aiProofreadBtn" title="校閲">📝 校閲</button>
+            <button class="tool-btn ai-tool" onclick="aiDiagnose()" id="aiDiagnoseBtn" title="文章診断">📊 診断</button>
+            <div class="tool-divider"></div>
+            <button class="tool-btn ai-tool" onclick="aiMemoToReview()" id="aiMemoBtn" title="雑メモをレビューに構造化" style="background: rgba(196, 132, 44, 0.15); color: #c4842c; border: 1px solid rgba(196, 132, 44, 0.4);">📝→📖 メモを構造化</button>
+            <button class="tool-btn ai-tool" onclick="aiWriteInUserStyle()" id="aiStyleBtn" title="あなたの過去レビューの文体で書く">🪶 文体で書く</button>
           </div>
+          <div class="rewrite-menu" id="rewriteMenu" style="display:none;"></div>
+          <div class="rewrite-menu" id="transformMenu" style="display:none;"></div>
           <textarea
             class="markdown-editor"
             id="fReview"
@@ -1406,6 +1882,44 @@ input:focus, textarea:focus, select:focus { outline: none; }
   </div>
 </div>
 
+<!-- ============== AIチャット相棒（フローティング） ============== -->
+<button class="ai-chat-fab hidden" id="aiChatFab" onclick="openAiChat()" title="AI相棒に相談">
+  ✨
+  <span class="pulse-dot"></span>
+</button>
+<div class="ai-chat-panel" id="aiChatPanel">
+  <div class="ai-chat-header">
+    <div>
+      <div class="ai-chat-header-title">✨ 司書(AI相棒)</div>
+      <div class="ai-chat-header-sub">YOUR WRITING COMPANION</div>
+    </div>
+    <button class="ai-chat-close" onclick="closeAiChat()" title="閉じる">✕</button>
+  </div>
+  <div class="ai-chat-messages" id="aiChatMessages">
+    <div class="ai-chat-welcome">
+      <div class="ai-chat-welcome-emoji">📚✨</div>
+      <div class="ai-chat-welcome-text">
+        書評の執筆に困ったら、気軽に話しかけてくれ。<br>
+        本の内容も読んでいるので、文脈を踏まえて答える。
+      </div>
+      <div style="margin-top: 14px;">
+        <div class="ai-chat-suggestion" onclick="sendChatSuggestion('この本で深掘りすべき点は?')">深掘りすべき点は?</div>
+        <div class="ai-chat-suggestion" onclick="sendChatSuggestion('印象的な視点を3つ挙げて')">視点を3つ</div>
+        <div class="ai-chat-suggestion" onclick="sendChatSuggestion('章立てのアイデアを')">章立てのアイデア</div>
+      </div>
+    </div>
+  </div>
+  <div class="ai-chat-input-row">
+    <textarea
+      class="ai-chat-textarea"
+      id="aiChatInput"
+      placeholder="質問や相談を入力..."
+      rows="1"
+      onkeydown="handleChatKeydown(event)"></textarea>
+    <button class="ai-chat-send" id="aiChatSend" onclick="sendChatMessage()">▶</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1537,6 +2051,29 @@ function renderList() {
 async function openEditor(bookId) {
   showScreen('editScreen');
   setStatus('読み込み中...');
+  // チャットFABを表示
+  document.getElementById('aiChatFab').classList.remove('hidden');
+  // チャット履歴は本を変えたらリセット
+  chatHistory = [];
+  closeAiChat();
+  // welcomeメッセージを復活させる
+  const msgContainer = document.getElementById('aiChatMessages');
+  if (msgContainer && !msgContainer.querySelector('.ai-chat-welcome')) {
+    msgContainer.innerHTML = `
+      <div class="ai-chat-welcome">
+        <div class="ai-chat-welcome-emoji">📚✨</div>
+        <div class="ai-chat-welcome-text">
+          書評の執筆に困ったら、気軽に話しかけてくれ。<br>
+          本の内容も読んでいるので、文脈を踏まえて答える。
+        </div>
+        <div style="margin-top: 14px;">
+          <div class="ai-chat-suggestion" onclick="sendChatSuggestion('この本で深掘りすべき点は?')">深掘りすべき点は?</div>
+          <div class="ai-chat-suggestion" onclick="sendChatSuggestion('印象的な視点を3つ挙げて')">視点を3つ</div>
+          <div class="ai-chat-suggestion" onclick="sendChatSuggestion('章立てのアイデアを')">章立てのアイデア</div>
+        </div>
+      </div>
+    `;
+  }
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -1565,6 +2102,9 @@ async function openEditor(bookId) {
 function backToList() {
   if (unsavedChanges && !confirm('未保存の変更があります。一覧に戻りますか？')) return;
   showScreen('listScreen');
+  // チャットも閉じる
+  document.getElementById('aiChatFab').classList.add('hidden');
+  closeAiChat();
 }
 
 function fillForm(b) {
@@ -1796,6 +2336,481 @@ async function aiPolishSelection() {
   } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
 }
 
+// ============================================================
+// ✨ AI機能 (Phase 8) - 新規追加
+// ============================================================
+
+// ─── ③ 続きを書く ───
+async function aiContinueWriting() {
+  if (!aiEnabled) return;
+  const ta = document.getElementById('fReview');
+  const cursorPos = ta.selectionStart;
+  const precedingText = ta.value.substring(0, cursorPos);
+  if (precedingText.trim().length < 20) {
+    showToast('20文字以上書いてからお試しください', true);
+    return;
+  }
+  try {
+    const result = await callAi('continueWriting', {
+      title: document.getElementById('fTitle').value,
+      author: document.getElementById('fAuthor').value,
+      precedingText: precedingText
+    });
+    showAiModal('✨ 続きを書く', result, 'CONTINUATION', '_continueWriting');
+    aiPendingTarget = { target: '_continueWriting', value: result, insertAt: cursorPos };
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+// ─── ① リライト指示メニュー ───
+const REWRITE_TONES = [
+  { tone: 'emotional', emoji: '💗', title: 'もっと感情的に', desc: '心の揺れや余韻を強く' },
+  { tone: 'concise', emoji: '✂️', title: 'もっと簡潔に', desc: '冗長な表現を削ぎ落とす' },
+  { tone: 'intellectual', emoji: '🎓', title: 'もっと知的に', desc: '文学批評風の語彙で' },
+  { tone: 'poetic', emoji: '🌸', title: 'もっと詩的に', desc: '比喩や倒置法を活用' },
+  { tone: 'warm', emoji: '☕', title: 'もっと温かく', desc: '読者に寄り添う柔らかさ' },
+  { tone: 'sharp', emoji: '⚔️', title: 'もっと鋭く', desc: '批評的に核心を突く' }
+];
+
+function openRewriteMenu(event) {
+  if (!aiEnabled) return;
+  const menu = document.getElementById('rewriteMenu');
+  if (menu.style.display === 'block') {
+    menu.style.display = 'none';
+    return;
+  }
+  // 他のメニューを閉じる
+  document.getElementById('transformMenu').style.display = 'none';
+  menu.innerHTML = REWRITE_TONES.map(t => `
+    <div class="rewrite-option" onclick="aiRewriteWithTone('${t.tone}')">
+      <span class="emoji">${t.emoji}</span>
+      <div>
+        <div class="title">${t.title}</div>
+        <div class="desc">${t.desc}</div>
+      </div>
+    </div>
+  `).join('');
+  // ボタンの真下に表示
+  const rect = event.currentTarget.getBoundingClientRect();
+  const editPane = document.querySelector('.edit-pane.left');
+  const paneRect = editPane.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.left = (rect.left - paneRect.left + editPane.scrollLeft) + 'px';
+  menu.style.top = (rect.bottom - paneRect.top + editPane.scrollTop + 6) + 'px';
+  // メニュー外クリックで閉じる
+  setTimeout(() => {
+    document.addEventListener('click', closeRewriteMenuOnce);
+  }, 0);
+}
+function closeRewriteMenuOnce(e) {
+  if (!e.target.closest('#rewriteMenu') && !e.target.closest('#aiRewriteBtn')) {
+    document.getElementById('rewriteMenu').style.display = 'none';
+    document.removeEventListener('click', closeRewriteMenuOnce);
+  }
+}
+
+async function aiRewriteWithTone(tone) {
+  document.getElementById('rewriteMenu').style.display = 'none';
+  document.removeEventListener('click', closeRewriteMenuOnce);
+  const ta = document.getElementById('fReview');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const hasSelection = start !== end;
+  const text = hasSelection ? ta.value.substring(start, end) : ta.value;
+  if (text.trim().length < 10) {
+    showToast('リライトする文章がありません', true);
+    return;
+  }
+  const toneObj = REWRITE_TONES.find(t => t.tone === tone);
+  try {
+    const result = await callAi('rewriteWithTone', { text: text, tone: tone });
+    showAiModal(`🎨 リライト: ${toneObj.title}`, result, 'REWRITTEN', '_rewrite');
+    aiPendingTarget = {
+      target: '_rewrite',
+      value: result,
+      start: hasSelection ? start : 0,
+      end: hasSelection ? end : ta.value.length
+    };
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+// ─── ⑩ 変換モードメニュー ───
+const TRANSFORM_MODES = [
+  { mode: 'shrink', emoji: '🗜️', title: '200字に要約', desc: '本質だけを残して圧縮' },
+  { mode: 'expand', emoji: '🔮', title: '肉付けして拡張', desc: '1.5倍くらいに豊かに' },
+  { mode: 'catchphrase', emoji: '💥', title: 'キャッチコピー5案', desc: '3秒で読める強烈な一言' },
+  { mode: 'sns', emoji: '📱', title: 'SNS投稿向け', desc: '140字以内 + ハッシュタグ' },
+  { mode: 'english', emoji: '🌍', title: '英訳(海外向け)', desc: 'Translate to English' }
+];
+
+function openTransformMenu(event) {
+  if (!aiEnabled) return;
+  const menu = document.getElementById('transformMenu');
+  if (menu.style.display === 'block') {
+    menu.style.display = 'none';
+    return;
+  }
+  document.getElementById('rewriteMenu').style.display = 'none';
+  menu.innerHTML = TRANSFORM_MODES.map(t => `
+    <div class="rewrite-option" onclick="aiTransform('${t.mode}')">
+      <span class="emoji">${t.emoji}</span>
+      <div>
+        <div class="title">${t.title}</div>
+        <div class="desc">${t.desc}</div>
+      </div>
+    </div>
+  `).join('');
+  const rect = event.currentTarget.getBoundingClientRect();
+  const editPane = document.querySelector('.edit-pane.left');
+  const paneRect = editPane.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.left = (rect.left - paneRect.left + editPane.scrollLeft) + 'px';
+  menu.style.top = (rect.bottom - paneRect.top + editPane.scrollTop + 6) + 'px';
+  setTimeout(() => {
+    document.addEventListener('click', closeTransformMenuOnce);
+  }, 0);
+}
+function closeTransformMenuOnce(e) {
+  if (!e.target.closest('#transformMenu') && !e.target.closest('#aiTransformBtn')) {
+    document.getElementById('transformMenu').style.display = 'none';
+    document.removeEventListener('click', closeTransformMenuOnce);
+  }
+}
+
+async function aiTransform(mode) {
+  document.getElementById('transformMenu').style.display = 'none';
+  document.removeEventListener('click', closeTransformMenuOnce);
+  const ta = document.getElementById('fReview');
+  const text = ta.value;
+  if (text.trim().length < 20) {
+    showToast('レビュー本文を書いてからお試しください', true);
+    return;
+  }
+  const modeObj = TRANSFORM_MODES.find(m => m.mode === mode);
+  try {
+    const result = await callAi('transform', { text: text, mode: mode });
+    // 変換結果は表示のみ。クリップボードコピー機能を提供。コピーボタン作る代わりにadopt無効化
+    showAiModal(`🔄 ${modeObj.title}`, result, 'TRANSFORMED', null);
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+// ─── ② 文章診断 ───
+async function aiDiagnose() {
+  if (!aiEnabled) return;
+  const review = document.getElementById('fReview').value;
+  if (review.trim().length < 100) {
+    showToast('レビューを100字以上書いてから診断してください', true);
+    return;
+  }
+  showAiModalLoading();
+  document.getElementById('aiModalTitle').textContent = '📊 文章を診断中...';
+  try {
+    const resultStr = await callAi('diagnose', {
+      title: document.getElementById('fTitle').value,
+      review: review
+    });
+    const data = JSON.parse(resultStr);
+    renderDiagnoseResult(data);
+  } catch (e) {
+    showAiModal('エラー', '診断に失敗しました: ' + e.message);
+  }
+}
+
+function renderDiagnoseResult(data) {
+  const labelMap = {
+    readability: '読みやすさ',
+    emotion: '感情の起伏',
+    originality: '独自性',
+    depth: '深さ',
+    structure: '構成'
+  };
+  const scores = data.scores || {};
+  const bars = Object.keys(labelMap).map(key => {
+    const val = scores[key] || 0;
+    return `
+      <div class="diagnose-bar-row">
+        <div class="diagnose-bar-label">${labelMap[key]}</div>
+        <div class="diagnose-bar-track">
+          <div class="diagnose-bar-fill" style="width: ${val * 10}%;"></div>
+        </div>
+        <div class="diagnose-bar-value">${val}</div>
+      </div>
+    `;
+  }).join('');
+
+  const strengths = (data.strengths || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const improvements = (data.improvements || []).map(i => `<li>${escapeHtml(i)}</li>`).join('');
+
+  document.getElementById('aiResultModal').classList.add('show');
+  document.getElementById('aiModalTitle').textContent = '📊 文章診断';
+  document.getElementById('aiModalSub').textContent = 'DIAGNOSIS RESULT';
+  document.getElementById('aiModalBody').className = '';
+  document.getElementById('aiModalBody').innerHTML = `
+    <div class="diagnose-card">
+      <div class="diagnose-total">
+        <div class="diagnose-total-score">${data.totalScore || '?'}</div>
+        <div class="diagnose-total-label">TOTAL SCORE / 50</div>
+      </div>
+      <div class="diagnose-bars">${bars}</div>
+    </div>
+    ${strengths ? `<div class="diagnose-section">
+      <div class="diagnose-section-title">✓ 強み</div>
+      <ul class="diagnose-list strengths">${strengths}</ul>
+    </div>` : ''}
+    ${improvements ? `<div class="diagnose-section">
+      <div class="diagnose-section-title">→ 改善ポイント</div>
+      <ul class="diagnose-list improvements">${improvements}</ul>
+    </div>` : ''}
+    ${data.overall ? `<div class="diagnose-overall">${escapeHtml(data.overall)}</div>` : ''}
+  `;
+  document.getElementById('aiAdoptBtn').style.display = 'none';
+}
+
+// ─── ④ 校閲モード ───
+async function aiProofread() {
+  if (!aiEnabled) return;
+  const ta = document.getElementById('fReview');
+  const text = ta.value;
+  if (text.trim().length < 50) {
+    showToast('レビュー本文を50字以上書いてください', true);
+    return;
+  }
+  showAiModalLoading();
+  document.getElementById('aiModalTitle').textContent = '📝 校閲中...';
+  try {
+    const resultStr = await callAi('proofread', { text: text });
+    const data = JSON.parse(resultStr);
+    renderProofreadResult(data, text);
+  } catch (e) {
+    showAiModal('エラー', '校閲に失敗しました: ' + e.message);
+  }
+}
+
+let proofreadCurrentData = null;
+let proofreadCurrentText = '';
+
+function renderProofreadResult(data, originalText) {
+  proofreadCurrentData = data;
+  proofreadCurrentText = originalText;
+  document.getElementById('aiResultModal').classList.add('show');
+  document.getElementById('aiModalTitle').textContent = '📝 校閲結果';
+  document.getElementById('aiModalSub').textContent = 'PROOFREAD';
+  document.getElementById('aiModalBody').className = '';
+  const issues = data.issues || [];
+  let html = '';
+  if (data.summary) {
+    html += `<div class="proofread-summary">${escapeHtml(data.summary)}</div>`;
+  }
+  if (issues.length === 0) {
+    html += `<div class="proofread-empty">✨ 校閲完了。指摘事項は見つかりませんでした。</div>`;
+  } else {
+    html += `<div class="proofread-list">`;
+    issues.forEach((iss, idx) => {
+      html += `
+        <div class="proofread-item severity-${iss.severity || 'medium'}" id="proofread-item-${idx}">
+          <div class="proofread-row">
+            <span class="proofread-original">${escapeHtml(iss.original)}</span>
+            <span class="proofread-arrow">→</span>
+            <span class="proofread-suggestion">${escapeHtml(iss.suggestion)}</span>
+          </div>
+          <div class="proofread-reason">${escapeHtml(iss.reason)}</div>
+          <div class="proofread-actions">
+            <button class="proofread-btn fix" onclick="applyProofreadFix(${idx})">直す</button>
+            <button class="proofread-btn ignore" onclick="ignoreProofreadFix(${idx})">無視</button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  document.getElementById('aiModalBody').innerHTML = html;
+  document.getElementById('aiAdoptBtn').style.display = 'none';
+}
+
+function applyProofreadFix(idx) {
+  const issue = proofreadCurrentData.issues[idx];
+  if (!issue) return;
+  const ta = document.getElementById('fReview');
+  // 最初の出現箇所だけを置換
+  const pos = ta.value.indexOf(issue.original);
+  if (pos === -1) {
+    showToast('該当箇所が見つかりません', true);
+    return;
+  }
+  ta.value = ta.value.substring(0, pos) + issue.suggestion + ta.value.substring(pos + issue.original.length);
+  document.getElementById('proofread-item-' + idx).style.opacity = '0.3';
+  document.getElementById('proofread-item-' + idx).style.pointerEvents = 'none';
+  markDirty();
+  refreshPreview();
+  showToast('修正しました');
+}
+
+function ignoreProofreadFix(idx) {
+  document.getElementById('proofread-item-' + idx).style.display = 'none';
+}
+
+// ─── 🌟 雑メモ → 構造化レビュー変換 (目玉機能) ───
+async function aiMemoToReview() {
+  if (!aiEnabled) return;
+  const memo = document.getElementById('fReview').value;
+  if (memo.trim().length < 30) {
+    showToast('メモを30字以上書いてからお試しください', true);
+    return;
+  }
+  // 確認モーダル
+  if (!confirm(
+    '雑メモを構造化されたレビューに変換します。\n\n' +
+    '✨ 元のメモは見出しと段落で整理され、2〜3倍の分量に膨らみます。\n' +
+    '✨ 「だ・である調」で生成されます。\n' +
+    '⚠️ 現在の本文が置き換わります(採用時のみ)。\n\n' +
+    '続行しますか？'
+  )) return;
+  try {
+    const result = await callAi('memoToReview', {
+      title: document.getElementById('fTitle').value,
+      author: document.getElementById('fAuthor').value,
+      memo: memo
+    });
+    showAiModal('📝→📖 メモを構造化', result, 'STRUCTURED REVIEW', 'fReview', 'replace');
+    aiPendingTarget = { target: 'fReview', value: result, mode: 'replace' };
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+// ─── ⑨ 文体で書く ───
+async function aiWriteInUserStyle() {
+  if (!aiEnabled) return;
+  const title = document.getElementById('fTitle').value;
+  const author = document.getElementById('fAuthor').value;
+  const currentReview = document.getElementById('fReview').value;
+  if (!title) {
+    showToast('書名を入力してください', true);
+    return;
+  }
+  // 過去のレビューを取得（自分以外、レビュー本文があるもの上位5本）
+  const pastReviews = [];
+  if (allBooks && allBooks.length > 0 && currentBook) {
+    const candidates = allBooks
+      .filter(b => b.id !== currentBook.id && b.hasReview)
+      .slice(0, 5);
+    // allBooksには本文が含まれていないため、現実装では title+meta のみ
+    // ただし、現在のbookに本文がある場合は文体参考として使う
+    if (currentReview.length > 200) {
+      pastReviews.push({ title: title, review: currentReview });
+    }
+    candidates.forEach(b => pastReviews.push({ title: b.title, review: `(本文取得未対応 - ${b.title})` }));
+  }
+  // 指示を入力
+  const instruction = prompt(
+    'AIへの指示(空欄でもOK):\n例: 「3章構成で、もっと感情的に書いて」「メモを膨らませて」など',
+    ''
+  );
+  if (instruction === null) return; // キャンセル
+
+  try {
+    const result = await callAi('writeInUserStyle', {
+      title: title,
+      author: author,
+      review: currentReview,
+      pastReviews: pastReviews,
+      instruction: instruction || undefined
+    });
+    showAiModal('🪶 あなたの文体で書く', result, 'IN YOUR STYLE', 'fReview', 'replace');
+    aiPendingTarget = { target: 'fReview', value: result, mode: 'replace' };
+  } catch (e) { showAiModal('エラー', 'AI提案の取得に失敗しました: ' + e.message); }
+}
+
+// ============================================================
+// ✨ AIチャット相棒 (Phase 8)
+// ============================================================
+let chatHistory = []; // [{role, content}]
+
+function openAiChat() {
+  if (!aiEnabled) {
+    showToast('AIアシスタントが無効です', true);
+    return;
+  }
+  document.getElementById('aiChatFab').classList.add('hidden');
+  document.getElementById('aiChatPanel').classList.add('show');
+  setTimeout(() => document.getElementById('aiChatInput').focus(), 300);
+}
+function closeAiChat() {
+  document.getElementById('aiChatPanel').classList.remove('show');
+  document.getElementById('aiChatFab').classList.remove('hidden');
+}
+
+function handleChatKeydown(e) {
+  // Enter で送信（Shift+Enterで改行）
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
+  }
+  // 自動で高さ調整
+  const ta = e.target;
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(120, ta.scrollHeight) + 'px';
+}
+
+function sendChatSuggestion(text) {
+  document.getElementById('aiChatInput').value = text;
+  sendChatMessage();
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('aiChatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // ユーザーメッセージを表示
+  appendChatMessage('user', text);
+  input.value = '';
+  input.style.height = 'auto';
+
+  // 思考中表示
+  const thinking = appendChatMessage('thinking', '司書が考えている...');
+
+  document.getElementById('aiChatSend').disabled = true;
+
+  try {
+    const result = await callAi('chat', {
+      title: document.getElementById('fTitle').value,
+      author: document.getElementById('fAuthor').value,
+      review: document.getElementById('fReview').value,
+      history: chatHistory.slice(-10), // 直近10件のみ
+      userMessage: text
+    });
+    // 履歴に追加
+    chatHistory.push({ role: 'user', content: text });
+    chatHistory.push({ role: 'assistant', content: result });
+    // 思考中を削除、応答を表示
+    thinking.remove();
+    appendChatMessage('assistant', result);
+  } catch (e) {
+    thinking.remove();
+    appendChatMessage('assistant', '⚠️ エラーが発生しました: ' + e.message);
+  } finally {
+    document.getElementById('aiChatSend').disabled = false;
+    document.getElementById('aiChatInput').focus();
+  }
+}
+
+function appendChatMessage(role, text) {
+  const container = document.getElementById('aiChatMessages');
+  // 初回ならwelcomeを消す
+  const welcome = container.querySelector('.ai-chat-welcome');
+  if (welcome) welcome.remove();
+  const msg = document.createElement('div');
+  msg.className = 'ai-chat-msg ' + role;
+  // 簡易マークダウン（**強調**と改行のみ）
+  let html = escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+  msg.innerHTML = html;
+  container.appendChild(msg);
+  container.scrollTop = container.scrollHeight;
+  return msg;
+}
+
+// callAiの拡張：chatタスクはresultを文字列でそのまま返すので既存処理で問題ない
+
 function showAiModalLoading() {
   document.getElementById('aiResultModal').classList.add('show');
   document.getElementById('aiModalTitle').textContent = '✨ 司書が考えています...';
@@ -1837,13 +2852,26 @@ function adoptAiResult() {
     const ta = document.getElementById('fReview');
     const current = ta.value.trim();
     ta.value = current + (current ? '\n\n' : '') + t.value;
+  } else if (t.target === 'fReview' && t.mode === 'replace') {
+    // 雑メモ→構造化 や 文体で書く で使用 - 本文を全置換
+    document.getElementById('fReview').value = t.value;
   } else if (t.target === '_design') {
     document.querySelectorAll('#designPicker .design-option').forEach(el => {
       el.classList.toggle('selected', el.dataset.value === t.value);
     });
-  } else if (t.target === '_polishSelection') {
+  } else if (t.target === '_polishSelection' || t.target === '_rewrite') {
+    // 選択範囲をリライト結果で置換 (リライトは選択範囲または全体)
     const ta = document.getElementById('fReview');
     ta.value = ta.value.substring(0, t.start) + t.value + ta.value.substring(t.end);
+  } else if (t.target === '_continueWriting') {
+    // カーソル位置に挿入
+    const ta = document.getElementById('fReview');
+    const insertText = (t.value.startsWith(' ') || t.value.startsWith('\n')) ? t.value : ' ' + t.value;
+    ta.value = ta.value.substring(0, t.insertAt) + insertText + ta.value.substring(t.insertAt);
+    // カーソルを挿入後の位置に
+    const newPos = t.insertAt + insertText.length;
+    ta.setSelectionRange(newPos, newPos);
+    ta.focus();
   }
   markDirty();
   refreshPreview();
