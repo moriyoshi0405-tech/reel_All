@@ -771,6 +771,149 @@ body.loaded > *:not(#loading):not(#whiteFlash):not(.floating-chars-container) {
 .promo-banner.compass .banner-btn:hover { background: rgba(196, 132, 44, 0.2); border-color: var(--accent-secondary); box-shadow: 0 0 30px rgba(196, 132, 44, 0.4); }
 
 /* ---------- 9. 📊 読書統計セクション (NEW) ---------- */
+/* ============================================================
+   🎴 最新特集セクション (Phase 9)
+   ============================================================ */
+.featured-section {
+  margin-bottom: 80px;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, var(--bg-card) 0%, rgba(196, 132, 44, 0.05) 100%);
+  border: 1px solid var(--border-soft);
+  border-radius: 35px;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+.featured-section::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #b8521f, #c4842c, #d05a8c);
+}
+.featured-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.featured-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: 4px;
+}
+.featured-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: var(--text-muted);
+}
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+.featured-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 22px;
+  cursor: pointer;
+  transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.featured-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--featured-theme, var(--accent-secondary));
+}
+.featured-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+.featured-card-category {
+  display: inline-block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--featured-theme, var(--accent-secondary));
+  border: 1px solid currentColor;
+  padding: 3px 9px;
+  border-radius: 50px;
+  margin-bottom: 12px;
+}
+.featured-card-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  line-height: 1.5;
+  letter-spacing: 1px;
+}
+.featured-card-lead {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.featured-card-thumbs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.featured-card-thumb {
+  width: 30px;
+  height: 44px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--border-soft);
+}
+.featured-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+}
+.featured-more-link {
+  display: inline-block;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid var(--accent-secondary);
+  border-radius: 50px;
+  color: var(--accent-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  transition: 0.3s;
+}
+.featured-more-link:hover {
+  background: var(--accent-secondary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+@media (max-width: 767px) {
+  .featured-section { padding: 40px 20px; border-radius: 25px; margin-bottom: 50px; }
+  .featured-title { font-size: 22px; letter-spacing: 3px; }
+  .featured-grid { grid-template-columns: 1fr; gap: 16px; }
+  .featured-card { padding: 18px; }
+  .featured-card-title { font-size: 15px; }
+}
+
 .stats-section {
   margin-bottom: 80px;
   padding: 60px 40px;
@@ -2372,6 +2515,20 @@ input[type="file"]::file-selector-button {
     </div>
   </div>
 
+  <!-- 🎴 最新特集セクション (Phase 9) -->
+  <section id="featuredSection" class="featured-section" style="display: none;">
+    <div class="featured-header">
+      <h2 class="featured-title">🎴 今月の特集</h2>
+      <div class="featured-subtitle">CURATED FEATURES</div>
+    </div>
+    <div id="featuredGrid" class="featured-grid">
+      <!-- 動的描画 -->
+    </div>
+    <div style="text-align: center; margin-top: 30px;">
+      <a href="features.html" class="featured-more-link">過去の特集を見る →</a>
+    </div>
+  </section>
+
   <!-- 📊 読書統計セクション (NEW) -->
   <section id="statsSection" class="stats-section">
     <div class="stats-header">
@@ -2680,6 +2837,8 @@ window.onload = async () => {
     finishLoadingWithFlash();
     // 本日の栞は最後にロード（蔵書データを使うため）
     loadTodaysBookmark();
+    // 最新特集セクションを非同期で読み込み (Phase 9)
+    loadFeaturedSection();
   } catch (e) {
     console.error(e);
     alert("蔵書データの取得に失敗しました。");
@@ -3133,6 +3292,60 @@ function getThemeColors() {
     border: styles.getPropertyValue('--border-soft').trim(),
     bgSoft: styles.getPropertyValue('--bg-soft').trim()
   };
+}
+
+// ============================================================
+// 🎴 最新特集セクション (Phase 9)
+// ============================================================
+async function loadFeaturedSection() {
+  const escapeHtml = (s) => {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  };
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getFeaturesList', limit: 3 })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') return;
+    const features = data.features || [];
+    if (features.length === 0) return;
+
+    const section = document.getElementById('featuredSection');
+    const grid = document.getElementById('featuredGrid');
+    if (!section || !grid) return;
+
+    const colorMap = {
+      autumn: '#b8521f', winter: '#4a6a8a', spring: '#d05a8c',
+      summer: '#2d8a8a', melancholy: '#6a4a6a', warm: '#c4842c', cool: '#4a7a9a'
+    };
+
+    grid.innerHTML = features.map(f => {
+      const themeColor = colorMap[f.colorTheme] || colorMap.warm;
+      const thumbs = (f.books || []).slice(0, 4).map(b =>
+        b.image ? `<img class="featured-card-thumb" src="${escapeHtml(b.image)}" alt="" loading="lazy" onerror="this.style.background='var(--border-soft)';this.removeAttribute('src');">` :
+        `<div class="featured-card-thumb"></div>`
+      ).join('');
+      const dateStr = f.createdTime ? new Date(f.createdTime).toLocaleDateString('ja-JP', {month:'long', day:'numeric'}) : '';
+      return `
+        <a href="features.html?id=${encodeURIComponent(f.id)}" class="featured-card" style="--featured-theme: ${themeColor};">
+          ${f.category ? `<span class="featured-card-category">${escapeHtml(f.category)}</span>` : ''}
+          <h3 class="featured-card-title">${escapeHtml(f.title)}</h3>
+          <p class="featured-card-lead">${escapeHtml(f.leadText || '')}</p>
+          <div class="featured-card-thumbs">${thumbs}</div>
+          <div class="featured-card-meta">
+            <span>${f.bookCount || 0} BOOKS</span>
+            <span>${dateStr}</span>
+          </div>
+        </a>
+      `;
+    }).join('');
+    section.style.display = '';
+  } catch (e) {
+    // 失敗時はサイレント (本機能は補助的)
+    console.warn('Failed to load features:', e);
+  }
 }
 
 function renderStats() {
