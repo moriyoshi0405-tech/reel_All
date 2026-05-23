@@ -1450,6 +1450,326 @@ input:focus, textarea:focus, select:focus { outline: none; }
 /* ============================================================
    レスポンシブ
    ============================================================ */
+/* ============================================================
+   🎴 特集作成ウィザード (Phase 9)
+   ============================================================ */
+.feature-wizard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 950;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  overflow-y: auto;
+}
+.feature-wizard-overlay.show { display: flex; }
+.feature-wizard {
+  background: var(--bg-card);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-hard);
+  animation: wizardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes wizardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.feature-wizard-header {
+  padding: 24px 30px;
+  background: linear-gradient(135deg, rgba(196, 132, 44, 0.1), rgba(58, 90, 58, 0.05));
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.feature-wizard-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.feature-wizard-step {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--accent-secondary);
+}
+.feature-wizard-close {
+  width: 36px; height: 36px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 24px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.feature-wizard-close:hover {
+  background: var(--bg-soft);
+  color: var(--text-primary);
+}
+.feature-wizard-body {
+  padding: 30px;
+}
+
+/* ステップ1: テーマ指定 */
+.theme-mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 14px;
+}
+.theme-mode-tab {
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  border-radius: 50px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+.theme-mode-tab.active {
+  background: var(--accent-secondary);
+  color: #fff;
+  border-color: var(--accent-secondary);
+}
+.theme-input-area {
+  display: none;
+  margin-bottom: 18px;
+}
+.theme-input-area.show { display: block; }
+.theme-input-area input,
+.theme-input-area select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+}
+.theme-input-area .hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* ステップ2: コンセプト案 */
+.concept-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.concept-card {
+  padding: 22px 24px;
+  border: 2px solid var(--border-soft);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+  background: var(--bg-soft);
+}
+.concept-card:hover {
+  border-color: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+.concept-card.selected {
+  border-color: var(--accent-secondary);
+  background: rgba(196, 132, 44, 0.08);
+}
+.concept-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.concept-card-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+.concept-card-badges {
+  display: flex;
+  gap: 6px;
+}
+.concept-badge {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  padding: 3px 9px;
+  border-radius: 50px;
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--accent-secondary);
+  border: 1px solid var(--accent-secondary);
+}
+.concept-card-lead {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.9;
+  font-family: 'Noto Serif JP', serif;
+}
+
+/* ステップ3: プレビュー */
+.feature-preview {
+  background: var(--bg-soft);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.feature-preview-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+.feature-preview-lead {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.9;
+  margin-bottom: 20px;
+  text-align: center;
+  padding: 0 10px;
+}
+.feature-preview-books {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.feature-preview-book {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+}
+.feature-preview-book-cover {
+  width: 60px;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--border-soft);
+}
+.feature-preview-book-title {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.feature-preview-book-author {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.feature-preview-book-reason {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  padding-left: 10px;
+  border-left: 2px solid var(--accent-secondary);
+}
+.feature-preview-closing {
+  background: var(--bg-card);
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 2;
+  text-align: center;
+  font-family: 'Noto Serif JP', serif;
+  border-left: 3px solid var(--accent-secondary);
+}
+
+/* ボタン行 */
+.feature-wizard-footer {
+  padding: 20px 30px;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.btn-wizard {
+  padding: 11px 22px;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-wizard.primary {
+  background: var(--accent-secondary);
+  color: #fff;
+  border: 1px solid var(--accent-secondary);
+}
+.btn-wizard.primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+.btn-wizard.primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-wizard.secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-soft);
+}
+.btn-wizard.secondary:hover {
+  background: var(--bg-soft);
+}
+
+.wizard-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+}
+.wizard-loading-emoji {
+  font-size: 40px;
+  margin-bottom: 16px;
+  animation: pulseText 1.5s infinite;
+}
+@keyframes pulseText { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+
+@media (max-width: 600px) {
+  .feature-wizard { max-height: 95vh; }
+  .feature-wizard-header,
+  .feature-wizard-body,
+  .feature-wizard-footer { padding-left: 18px; padding-right: 18px; }
+  .feature-wizard-title { font-size: 16px; letter-spacing: 1px; }
+  .concept-card-title { font-size: 15px; }
+  .concept-card-lead { font-size: 11.5px; }
+  .feature-preview-title { font-size: 17px; }
+  .btn-wizard { padding: 9px 16px; font-size: 11.5px; }
+}
+
 @media (max-width: 980px) {
   .edit-layout { flex-direction: column; }
   .edit-pane.right { display: none; }
@@ -1529,9 +1849,14 @@ input:focus, textarea:focus, select:focus { outline: none; }
         <div class="list-title">📚 蔵書一覧</div>
         <span class="list-title-sub">YOUR LIBRARY</span>
       </div>
-      <button class="btn-new-review" onclick="openNewBookModal()">
-        ✨ 新しい物語を迎える
-      </button>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-new-review" onclick="openFeatureWizard()" style="background: linear-gradient(135deg, #c4842c 0%, #a06820 100%);">
+          🎴 特集を作る
+        </button>
+        <button class="btn-new-review" onclick="openNewBookModal()">
+          ✨ 新しい物語を迎える
+        </button>
+      </div>
     </div>
     <div class="list-toolbar">
       <input type="text" class="search-input" id="listSearch" placeholder="🔍 タイトルや著者で検索..." oninput="renderList()">
@@ -1878,6 +2203,25 @@ input:focus, textarea:focus, select:focus { outline: none; }
         <button class="modal-btn secondary" style="padding: 14px;" onclick="afterCreate('new')">📚 また別の本を追加</button>
         <button class="modal-btn secondary" style="padding: 14px;" onclick="afterCreate('list')">👀 一覧に戻る</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== 🎴 特集作成ウィザード (Phase 9) ============== -->
+<div class="feature-wizard-overlay" id="featureWizardOverlay">
+  <div class="feature-wizard">
+    <div class="feature-wizard-header">
+      <h3 class="feature-wizard-title">
+        🎴 特集を作る
+        <span class="feature-wizard-step" id="wizardStepLabel">STEP 1 / 4</span>
+      </h3>
+      <button class="feature-wizard-close" onclick="closeFeatureWizard()" title="閉じる">×</button>
+    </div>
+    <div class="feature-wizard-body" id="wizardBody">
+      <!-- 動的描画 -->
+    </div>
+    <div class="feature-wizard-footer" id="wizardFooter">
+      <!-- 動的描画 -->
     </div>
   </div>
 </div>
@@ -3456,6 +3800,270 @@ async function afterCreate(action) {
       showScreen('listScreen');
     }
     renderList();
+  }
+}
+
+// ============================================================
+// 🎴 特集作成ウィザード (Phase 9)
+// ============================================================
+let wizardState = {
+  step: 1,           // 1: テーマ / 2: コンセプト選択 / 3: プレビュー / 4: 保存完了
+  themeMode: 'auto', // 'auto' | 'keyword' | 'tag'
+  keyword: '',
+  tag: '',
+  concepts: [],        // step2でAIから受け取る
+  selectedConcept: null,
+  feature: null        // step3でAIから受け取る完成形
+};
+
+function openFeatureWizard() {
+  wizardState = { step: 1, themeMode: 'auto', keyword: '', tag: '', concepts: [], selectedConcept: null, feature: null };
+  document.getElementById('featureWizardOverlay').classList.add('show');
+  renderWizardStep();
+}
+
+function closeFeatureWizard() {
+  document.getElementById('featureWizardOverlay').classList.remove('show');
+}
+
+function renderWizardStep() {
+  const body = document.getElementById('wizardBody');
+  const footer = document.getElementById('wizardFooter');
+  document.getElementById('wizardStepLabel').textContent = `STEP ${wizardState.step} / 4`;
+
+  if (wizardState.step === 1) {
+    // Step1: テーマ指定
+    const tagOptions = ['短編小説', '長編小説', 'エッセイ', 'ビジネス', '心理学・精神分析', '海外文学', '恋愛小説'];
+    body.innerHTML = `
+      <div style="margin-bottom: 18px;">
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.9; margin: 0 0 18px 0;">
+          特集のテーマを指定してくれ。AIがそれに合うコンセプトを3案考えてくる。
+        </p>
+      </div>
+      <div class="theme-mode-tabs">
+        <button class="theme-mode-tab ${wizardState.themeMode === 'auto' ? 'active' : ''}" onclick="setThemeMode('auto')">✨ AIにおまかせ</button>
+        <button class="theme-mode-tab ${wizardState.themeMode === 'keyword' ? 'active' : ''}" onclick="setThemeMode('keyword')">🔤 キーワード</button>
+        <button class="theme-mode-tab ${wizardState.themeMode === 'tag' ? 'active' : ''}" onclick="setThemeMode('tag')">🏷 タグ縛り</button>
+      </div>
+      <div class="theme-input-area ${wizardState.themeMode === 'auto' ? 'show' : ''}" id="themeAreaAuto">
+        <div style="padding: 24px; background: var(--bg-soft); border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; margin-bottom: 10px;">🌿</div>
+          <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+            季節・曜日・本棚の傾向を考慮して、<br>AIが詩的なコンセプトを3案提案する。
+          </div>
+        </div>
+      </div>
+      <div class="theme-input-area ${wizardState.themeMode === 'keyword' ? 'show' : ''}" id="themeAreaKeyword">
+        <input type="text" id="wizardKeyword" placeholder="例: 雨、孤独、旅、夜、秋、希望..." value="${escapeHtml(wizardState.keyword)}" oninput="wizardState.keyword=this.value">
+        <div class="hint">単語1つでも、フレーズでもOK。AIが膨らませてくれる。</div>
+      </div>
+      <div class="theme-input-area ${wizardState.themeMode === 'tag' ? 'show' : ''}" id="themeAreaTag">
+        <select id="wizardTag" onchange="wizardState.tag=this.value">
+          <option value="">タグを選択してください</option>
+          ${tagOptions.map(t => `<option value="${t}" ${wizardState.tag === t ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+        <div class="hint">そのタグの本のみで特集を組む。</div>
+      </div>
+    `;
+    footer.innerHTML = `
+      <button class="btn-wizard secondary" onclick="closeFeatureWizard()">キャンセル</button>
+      <button class="btn-wizard primary" onclick="wizardGenerateConcepts()">コンセプトを提案させる →</button>
+    `;
+  } else if (wizardState.step === 'loading-concepts') {
+    body.innerHTML = `
+      <div class="wizard-loading">
+        <div class="wizard-loading-emoji">📖</div>
+        <div>AIがコンセプトを考えています...</div>
+        <div style="font-size: 11px; margin-top: 10px; opacity: 0.7;">CRAFTING IDEAS</div>
+      </div>
+    `;
+    footer.innerHTML = '';
+  } else if (wizardState.step === 2) {
+    // Step2: コンセプト選択
+    const conceptsHtml = wizardState.concepts.map((c, idx) => `
+      <div class="concept-card ${wizardState.selectedConcept === idx ? 'selected' : ''}" onclick="selectConcept(${idx})">
+        <div class="concept-card-header">
+          <h4 class="concept-card-title">${escapeHtml(c.title)}</h4>
+          <div class="concept-card-badges">
+            ${c.category ? `<span class="concept-badge">${escapeHtml(c.category)}</span>` : ''}
+            ${c.bookCount ? `<span class="concept-badge">${c.bookCount} books</span>` : ''}
+          </div>
+        </div>
+        <div class="concept-card-lead">${escapeHtml(c.leadText)}</div>
+      </div>
+    `).join('');
+    body.innerHTML = `
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0;">気に入ったコンセプトを選んでくれ。AIが本を選び、特集を仕上げる。</p>
+      <div class="concept-list">${conceptsHtml}</div>
+    `;
+    footer.innerHTML = `
+      <button class="btn-wizard secondary" onclick="wizardState.step=1; renderWizardStep();">← 戻る</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-wizard secondary" onclick="wizardGenerateConcepts()">🔄 別の3案を見る</button>
+        <button class="btn-wizard primary" onclick="wizardGenerateFeature()" ${wizardState.selectedConcept === null ? 'disabled' : ''}>選んで次へ →</button>
+      </div>
+    `;
+  } else if (wizardState.step === 'loading-feature') {
+    body.innerHTML = `
+      <div class="wizard-loading">
+        <div class="wizard-loading-emoji">📚</div>
+        <div>AIが本を選び、理由を考えています...</div>
+        <div style="font-size: 11px; margin-top: 10px; opacity: 0.7;">SELECTING & WRITING</div>
+      </div>
+    `;
+    footer.innerHTML = '';
+  } else if (wizardState.step === 3) {
+    // Step3: プレビュー
+    const f = wizardState.feature;
+    const booksHtml = (f.books || []).map(b => `
+      <div class="feature-preview-book">
+        <img class="feature-preview-book-cover" src="${escapeHtml(b.image || '')}" onerror="this.style.background='var(--border-soft)';this.removeAttribute('src');" alt="">
+        <div>
+          <div class="feature-preview-book-title">${escapeHtml(b.title || '')}</div>
+          <div class="feature-preview-book-author">${escapeHtml(b.author || '')}</div>
+          <div class="feature-preview-book-reason">${escapeHtml(b.reason || '')}</div>
+        </div>
+      </div>
+    `).join('');
+    body.innerHTML = `
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 16px 0;">完成イメージだ。問題なければ保存しよう。</p>
+      <div class="feature-preview">
+        <h3 class="feature-preview-title">${escapeHtml(f.title)}</h3>
+        <p class="feature-preview-lead">${escapeHtml(f.leadText)}</p>
+        <div class="feature-preview-books">${booksHtml}</div>
+        ${f.closing ? `<div class="feature-preview-closing">${escapeHtml(f.closing)}</div>` : ''}
+      </div>
+    `;
+    footer.innerHTML = `
+      <button class="btn-wizard secondary" onclick="wizardState.step=2; renderWizardStep();">← コンセプト選び直す</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-wizard secondary" onclick="wizardGenerateFeature()">🔄 もう一度生成</button>
+        <button class="btn-wizard primary" onclick="wizardSaveFeature()">💾 保存して公開</button>
+      </div>
+    `;
+  } else if (wizardState.step === 'saving') {
+    body.innerHTML = `
+      <div class="wizard-loading">
+        <div class="wizard-loading-emoji">📂</div>
+        <div>Notionに保存中...</div>
+      </div>
+    `;
+    footer.innerHTML = '';
+  } else if (wizardState.step === 4) {
+    // 完了画面
+    body.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 56px; margin-bottom: 18px;">✨</div>
+        <h3 style="font-family: 'Noto Serif JP', serif; font-size: 22px; margin: 0 0 12px 0;">特集を公開した</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.9;">
+          『${escapeHtml(wizardState.feature.title)}』<br>
+          メインページの「特集」セクションと、features.html で確認できる。
+        </p>
+      </div>
+    `;
+    footer.innerHTML = `
+      <div></div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-wizard secondary" onclick="window.open('features.html', '_blank')">特集ページを開く</button>
+        <button class="btn-wizard primary" onclick="closeFeatureWizard()">完了</button>
+      </div>
+    `;
+  }
+}
+
+function setThemeMode(mode) {
+  wizardState.themeMode = mode;
+  renderWizardStep();
+}
+function selectConcept(idx) {
+  wizardState.selectedConcept = idx;
+  renderWizardStep();
+}
+
+async function wizardGenerateConcepts() {
+  // バリデーション
+  if (wizardState.themeMode === 'keyword' && !wizardState.keyword.trim()) {
+    showToast('キーワードを入力してください', true);
+    return;
+  }
+  if (wizardState.themeMode === 'tag' && !wizardState.tag) {
+    showToast('タグを選択してください', true);
+    return;
+  }
+  wizardState.step = 'loading-concepts';
+  renderWizardStep();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'suggestFeatureConcepts',
+        password: editorPassword,
+        themeMode: wizardState.themeMode,
+        keyword: wizardState.keyword,
+        tag: wizardState.tag
+      })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+    wizardState.concepts = data.concepts || [];
+    wizardState.selectedConcept = null;
+    wizardState.step = 2;
+    renderWizardStep();
+  } catch (e) {
+    showToast('生成失敗: ' + e.message, true);
+    wizardState.step = 1;
+    renderWizardStep();
+  }
+}
+
+async function wizardGenerateFeature() {
+  if (wizardState.selectedConcept === null) return;
+  const concept = wizardState.concepts[wizardState.selectedConcept];
+  wizardState.step = 'loading-feature';
+  renderWizardStep();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'generateFeatureFromConcept',
+        password: editorPassword,
+        concept: concept
+      })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+    wizardState.feature = data.feature;
+    wizardState.step = 3;
+    renderWizardStep();
+  } catch (e) {
+    showToast('生成失敗: ' + e.message, true);
+    wizardState.step = 2;
+    renderWizardStep();
+  }
+}
+
+async function wizardSaveFeature() {
+  if (!wizardState.feature) return;
+  wizardState.step = 'saving';
+  renderWizardStep();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'saveFeature',
+        password: editorPassword,
+        feature: wizardState.feature
+      })
+    });
+    const data = await res.json();
+    if (data.status !== 'success') throw new Error(data.message);
+    wizardState.step = 4;
+    renderWizardStep();
+    showToast('特集を公開しました');
+  } catch (e) {
+    showToast('保存失敗: ' + e.message, true);
+    wizardState.step = 3;
+    renderWizardStep();
   }
 }
 </script>
