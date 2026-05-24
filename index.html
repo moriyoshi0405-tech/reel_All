@@ -29,57 +29,57 @@
 
 /* ---------- 1. デザイントークン (CSS Variables) ---------- */
 :root {
-  /* Light Mode :: 朝の図書室 (Morning Library) */
-  --bg-page: #f5ecd9;
-  --bg-page-alt: #ede0c4;
-  --bg-card: #fffcf3;
-  --bg-card-hover: #fff9e8;
-  --bg-soft: #f9f0db;
-  --text-primary: #2e2418;
-  --text-secondary: #6b5840;
-  --text-muted: #9e8c70;
-  --accent-primary: #3a5a3a;     /* 深い森の緑 */
-  --accent-secondary: #c4842c;   /* 蜂蜜色 */
-  --accent-burgundy: #8b3a3a;    /* 革表紙のえんじ */
-  --accent-ink: #1f3a5f;         /* 万年筆のインク */
-  --border-soft: #e0d2b5;
-  --border-strong: #c8b58f;
-  --shadow-soft: 0 10px 30px rgba(80, 60, 30, 0.08);
-  --shadow-medium: 0 15px 40px rgba(80, 60, 30, 0.12);
-  --shadow-hard: 0 25px 60px rgba(80, 60, 30, 0.18);
-  --shadow-warm: 0 10px 30px rgba(196, 132, 44, 0.2);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  --gradient-page: linear-gradient(135deg, #f5ecd9 0%, #ede0c4 100%);
-  --gradient-warm: linear-gradient(135deg, #c4842c 0%, #8b3a3a 100%);
-  --gradient-forest: linear-gradient(135deg, #2c4a2c 0%, #3a5a3a 50%, #4a6a3a 100%);
-  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 0 0.2 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* Light Mode :: 雲と空 (Clouds & Sky) */
+  --bg-page: #eaf1f6;
+  --bg-page-alt: #dee8f0;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f9fc;
+  --bg-soft: #f0f5f9;
+  --text-primary: #1a2535;
+  --text-secondary: #4a5a6a;
+  --text-muted: #8593a0;
+  --accent-primary: #2a3a52;     /* 深い藍色 (心理学の青) */
+  --accent-secondary: #c89554;   /* 読書の灯 (温色のアクセント) */
+  --accent-burgundy: #a5421d;    /* 印章の朱 */
+  --accent-ink: #4a6a8a;         /* 万年筆のインク (空色) */
+  --border-soft: #d6dfe6;
+  --border-strong: #b8c4d0;
+  --shadow-soft: 0 10px 30px rgba(60, 80, 110, 0.08);
+  --shadow-medium: 0 15px 40px rgba(60, 80, 110, 0.12);
+  --shadow-hard: 0 25px 60px rgba(60, 80, 110, 0.18);
+  --shadow-warm: 0 10px 30px rgba(200, 149, 84, 0.2);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --gradient-page: linear-gradient(180deg, #eaf1f6 0%, #f5f1e8 100%);
+  --gradient-warm: linear-gradient(135deg, #c89554 0%, #a5421d 100%);
+  --gradient-forest: linear-gradient(180deg, #c8dceb 0%, #d6e8f5 50%, #e9f1f8 100%);
+  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.7 0 0 0 0 0.75 0 0 0 0 0.8 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 [data-theme="dark"] {
-  /* Dark Mode :: 真夜中の図書館 (Midnight Library) */
-  --bg-page: #14171f;
-  --bg-page-alt: #1a1e28;
-  --bg-card: #232936;
-  --bg-card-hover: #2a3142;
-  --bg-soft: #1c212c;
-  --text-primary: #f0e6d2;
-  --text-secondary: #b8a98c;
-  --text-muted: #7d7058;
-  --accent-primary: #e8b04e;     /* ランプの灯り */
-  --accent-secondary: #d4869e;   /* 夜の薔薇 */
-  --accent-burgundy: #c97082;
-  --accent-ink: #7eb8d4;         /* 月光のインク */
-  --border-soft: #3a4156;
-  --border-strong: #4a536b;
+  /* Dark Mode :: 夜空と月 (Night Sky & Moon) */
+  --bg-page: #0f1620;
+  --bg-page-alt: #161e2a;
+  --bg-card: #1d2632;
+  --bg-card-hover: #242e3c;
+  --bg-soft: #181f2a;
+  --text-primary: #e9f1f8;
+  --text-secondary: #b0bcc8;
+  --text-muted: #7a8693;
+  --accent-primary: #f0d6a5;     /* 月の光 */
+  --accent-secondary: #c89554;   /* 灯火 */
+  --accent-burgundy: #d68f6b;
+  --accent-ink: #85b7eb;         /* 星明かり */
+  --border-soft: #2c3849;
+  --border-strong: #3c4a5d;
   --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
   --shadow-medium: 0 15px 40px rgba(0, 0, 0, 0.45);
   --shadow-hard: 0 25px 60px rgba(0, 0, 0, 0.55);
-  --shadow-warm: 0 10px 30px rgba(232, 176, 78, 0.18);
+  --shadow-warm: 0 10px 30px rgba(240, 214, 165, 0.18);
   --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --gradient-page: linear-gradient(135deg, #14171f 0%, #1a1e28 100%);
-  --gradient-warm: linear-gradient(135deg, #e8b04e 0%, #c97082 100%);
-  --gradient-forest: linear-gradient(135deg, #1a2e1a 0%, #2a4a3a 50%, #1a2e1a 100%);
-  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.8 0 0 0 0 0.6 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --gradient-page: linear-gradient(180deg, #0f1620 0%, #1a1f28 100%);
+  --gradient-warm: linear-gradient(135deg, #c89554 0%, #d68f6b 100%);
+  --gradient-forest: linear-gradient(180deg, #1a2535 0%, #253245 50%, #2a3645 100%);
+  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.85 0 0 0 0 0.7 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; }
@@ -98,7 +98,7 @@ body {
   overflow-x: hidden;
 }
 
-/* 紙テクスチャ オーバーレイ */
+/* 紙テクスチャ オーバーレイ (淡く、雲と空に馴染ませる) */
 body::before {
   content: "";
   position: fixed;
@@ -106,7 +106,7 @@ body::before {
   background-image: var(--paper-texture);
   pointer-events: none;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.25;
   transition: opacity 0.6s ease;
 }
 
@@ -2499,7 +2499,6 @@ input[type="file"]::file-selector-button {
     <a href="#adminProfile" class="side-nav-btn" onclick="toggleMenu()">💼 管理人の肖像</a>
     <a href="#prescriptionSection" class="side-nav-btn" onclick="toggleMenu()">💊 心の処方箋</a>
     <a href="#readerSection" class="side-nav-btn" onclick="toggleMenu()">👑 読者の推薦本</a>
-    <a href="compass.html" class="side-nav-btn">🧭 不思議な森の読書診断</a>
     <a href="planetarium.html" class="side-nav-btn">🌌 言葉のプラネタリウム</a>
     <a href="theater.html" class="side-nav-btn">🎬 AI Book Theater</a>
   </div>
@@ -2629,11 +2628,6 @@ input[type="file"]::file-selector-button {
 
 <!-- ヘッダー (読書の灯 ヒーロー / 雲と空テーマ) -->
 <header class="header">
-  <div class="admin-tools">
-    <button class="admin-btn scout" onclick="openAdminAddModal()">📖 本を新しく迎える</button>
-    <button id="updateDbBtn" class="admin-btn">🔄 知識を更新</button>
-  </div>
-
   <!-- 雲のレイヤー -->
   <div class="header-clouds">
     <div class="cloud cloud-1"></div>
@@ -2731,14 +2725,6 @@ input[type="file"]::file-selector-button {
 
   <!-- 誘導バナー -->
   <div class="banner-container">
-    <div class="promo-banner compass">
-      <div class="banner-content">
-        <span class="banner-icon">🧭</span>
-        <div class="banner-title">本棚の羅針盤</div>
-        <div class="banner-desc">不思議な森で出される3つの質問。<br>直感で答えていくと、今のあなたに一番必要な物語が見つかります。</div>
-        <a href="compass.html" class="banner-btn">不思議な森へ入る</a>
-      </div>
-    </div>
     <div class="promo-banner planetarium">
       <div class="banner-content">
         <span class="banner-icon">🌌</span>
@@ -4235,6 +4221,92 @@ function spawnSmallConfetti() {
   }
 }
 
+/* 管理エリアトリガー: ロゴを5回クリックで管理ボタンが現れる */
+let logoClickCount = 0;
+let logoClickTimer = null;
+function setupAdminTrigger() {
+  const title = document.querySelector('.hero-title-vertical');
+  if (!title) return;
+  title.addEventListener('click', () => {
+    logoClickCount++;
+    if (logoClickTimer) clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+    if (logoClickCount >= 5) {
+      logoClickCount = 0;
+      document.getElementById('hiddenAdminTools').style.display = 'flex';
+      title.style.cursor = 'default';
+    }
+  });
+  title.style.cursor = 'pointer';
+}
+window.addEventListener('load', setupAdminTrigger);
+
 </script>
+
+<!-- 隠し管理ツール (タイトル5クリックで出現) -->
+<div id="hiddenAdminTools" class="hidden-admin-tools" style="display:none">
+  <button class="admin-btn scout" onclick="openAdminAddModal()">📖 本を新しく迎える</button>
+  <button id="updateDbBtn" class="admin-btn">🔄 知識を更新</button>
+  <a href="editor.html" class="admin-btn">✏️ 編集</a>
+  <button class="admin-btn" onclick="document.getElementById('hiddenAdminTools').style.display='none'">✕ 閉じる</button>
+</div>
+
+<style>
+.hidden-admin-tools {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 14px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--border-soft);
+  backdrop-filter: blur(10px);
+  animation: hiddenAdminSlideIn 0.4s ease-out;
+}
+[data-theme="dark"] .hidden-admin-tools {
+  background: rgba(29, 38, 50, 0.95);
+  border-color: var(--border-strong);
+}
+.hidden-admin-tools .admin-btn {
+  font-size: 11px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-soft);
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+}
+.hidden-admin-tools .admin-btn.scout {
+  background: var(--accent-secondary);
+  color: #fff;
+  border-color: var(--accent-secondary);
+}
+.hidden-admin-tools .admin-btn:hover {
+  transform: translateY(-2px);
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+.hidden-admin-tools .admin-btn.scout:hover {
+  background: var(--accent-burgundy);
+  border-color: var(--accent-burgundy);
+}
+@keyframes hiddenAdminSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </body>
 </html>
