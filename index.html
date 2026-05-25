@@ -716,6 +716,151 @@ body.loaded > *:not(#loading):not(#whiteFlash):not(.floating-chars-container) {
   .cloud-3, .cloud-4, .cloud-5 { width: 160px; height: 32px; }
 }
 
+/* ============================================================
+   拉致バナー (ヒーロー直下のゲーム誘導)
+   ============================================================ */
+.rachi-banner {
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: -40px auto 30px;
+  background: linear-gradient(135deg, #0a0a0c 0%, #1a1820 50%, #2a1518 100%);
+  border-radius: 0;
+  padding: 60px 20px;
+  text-decoration: none;
+  color: #e8e3d8;
+  overflow: hidden;
+  z-index: 50;
+  text-align: center;
+  border-top: 1px solid rgba(165, 66, 29, 0.3);
+  border-bottom: 1px solid rgba(165, 66, 29, 0.3);
+  transition: 0.4s;
+}
+[data-theme="dark"] .rachi-banner {
+  background: linear-gradient(135deg, #050508 0%, #150f15 50%, #1f0e10 100%);
+}
+.rachi-banner:hover {
+  transform: scale(1.005);
+}
+.rachi-banner-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.rachi-banner-bg::before {
+  content: "";
+  position: absolute;
+  top: 20%; left: 10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(139, 42, 42, 0.25) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: rachiGlow 6s ease-in-out infinite;
+}
+.rachi-banner-bg::after {
+  content: "";
+  position: absolute;
+  bottom: 10%; right: 15%;
+  width: 250px; height: 250px;
+  background: radial-gradient(circle, rgba(232, 197, 160, 0.15) 0%, transparent 70%);
+  filter: blur(50px);
+  animation: rachiGlow 8s ease-in-out infinite reverse;
+}
+@keyframes rachiGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.rachi-banner-rain {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(180deg, transparent 70%, rgba(255,255,255,0.04) 71%, rgba(255,255,255,0.04) 72%, transparent 73%),
+    linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.03) 41%, rgba(255,255,255,0.03) 42%, transparent 43%);
+  background-size: 30px 100%, 50px 100%;
+  background-repeat: repeat;
+  opacity: 0.6;
+  animation: rachiRain 4s linear infinite;
+}
+@keyframes rachiRain {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 100px, 0 80px; }
+}
+.rachi-banner-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.rachi-banner-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 8px;
+  color: rgba(232, 197, 160, 0.7);
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.rachi-banner-title {
+  font-family: 'Noto Serif JP', 'Zen Old Mincho', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: #f0e9d8;
+  margin-bottom: 22px;
+  line-height: 1.4;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.6);
+}
+.rachi-banner-tagline {
+  font-family: 'Noto Serif JP', serif;
+  font-size: clamp(13px, 1.6vw, 16px);
+  letter-spacing: 3px;
+  color: #c3c8d0;
+  line-height: 2;
+  margin-bottom: 36px;
+}
+.rachi-banner-tagline em {
+  font-style: normal;
+  color: #d68f6b;
+  background: linear-gradient(transparent 65%, rgba(165, 66, 29, 0.25) 65%);
+  padding: 2px 6px;
+}
+.rachi-banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 36px;
+  background: transparent;
+  color: #f0e9d8;
+  border: 1px solid rgba(232, 197, 160, 0.5);
+  border-radius: 50px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  transition: 0.3s;
+}
+.rachi-banner:hover .rachi-banner-cta {
+  background: rgba(232, 197, 160, 0.15);
+  border-color: rgba(232, 197, 160, 1);
+  letter-spacing: 6px;
+}
+.rachi-arrow {
+  display: inline-block;
+  transition: transform 0.3s;
+  color: #d68f6b;
+}
+.rachi-banner:hover .rachi-arrow {
+  transform: translateX(6px);
+}
+
+@media (max-width: 767px) {
+  .rachi-banner { padding: 40px 20px; margin: -30px auto 20px; }
+  .rachi-banner-eyebrow { font-size: 9px; letter-spacing: 5px; }
+  .rachi-banner-title { letter-spacing: 3px; }
+  .rachi-banner-tagline { letter-spacing: 2px; }
+  .rachi-banner-cta { padding: 12px 28px; font-size: 11px; letter-spacing: 3px; }
+}
+
 /* ---------- 6. コンテナ & ガチャ ---------- */
 .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
 
@@ -2664,6 +2809,27 @@ input[type="file"]::file-selector-button {
   </div>
   <div id="shelfMood" class="shelf-mood">本棚の空気を読み解いています...</div>
 </header>
+
+<!-- ============================================================
+     本に、拉致されました。 (ゲームへの誘導バナー)
+     ============================================================ -->
+<a href="rachi.html" class="rachi-banner">
+  <div class="rachi-banner-bg">
+    <div class="rachi-banner-rain"></div>
+  </div>
+  <div class="rachi-banner-inner">
+    <div class="rachi-banner-eyebrow">A GAME EXPERIENCE</div>
+    <div class="rachi-banner-title">本に、拉致されました。</div>
+    <div class="rachi-banner-tagline">
+      本を読まないあなたを、<br>
+      <em>物語が拉致します。</em>
+    </div>
+    <div class="rachi-banner-cta">
+      <span>体験を始める</span>
+      <span class="rachi-arrow">→</span>
+    </div>
+  </div>
+</a>
 
 <div class="container">
 
