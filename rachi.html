@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本に、拉致されました。 | 第一章 雨の章 | shotaの本棚</title>
+<meta name="description" content="本を読まないあなたを、物語が拉致します。本格謎解きアドベンチャー、第一章。">
+
+<link rel="icon" type="image/png" sizes="64x64" href="logos/favicon_64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="logos/favicon_32.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Old+Mincho:wght@400;500;600;700;900&family=Klee+One:wght@400;600&family=Cormorant+Garamond:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink-black: #0a0a0c;
+  --ink-deep: #15161a;
+  --ink-soft: #2a2a30;
+  --paper: #e8e3d8;
+  --paper-soft: #f0ebe0;
+  --paper-bright: #f5efe2;
+  --rain-grey: #5a626e;
+  --rain-grey-light: #8a939e;
+  --rain-grey-soft: #b8c0c8;
+  --blood-red: #8b2a2a;
+  --blood-red-bright: #a5421d;
+  --blood-red-glow: rgba(165, 66, 29, 0.5);
+  --psy-blue: #2a3a52;
+  --hope-warm: #e8c5a0;
+  --gold: #c89554;
+  --error: #ff6b6b;
+  --success: #92c599;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  background: var(--ink-black);
+  color: var(--paper);
+  line-height: 1.8;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+button { font-family: inherit; cursor: pointer; }
+::selection { background: var(--blood-red); color: var(--paper); }
+
+.nav-back {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 50px;
+  transition: 0.3s;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.5);
+}
+.nav-back:hover {
+  color: var(--paper);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateX(-3px);
+}
+
+.chapter-indicator {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  padding: 8px 24px;
+  border-radius: 50px;
+  border: 1px solid rgba(165,66,29,0.3);
+}
+.chapter-indicator-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--blood-red-bright);
+  margin-bottom: 2px;
+}
+.chapter-indicator-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--paper);
+}
+
+.progress-indicator {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: 0.4s;
+}
+.progress-dot.active {
+  background: var(--blood-red-bright);
+  box-shadow: 0 0 12px var(--blood-red-glow);
+}
+.progress-dot.done { background: var(--gold); }
+
+.rain-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.rain-particles.active { opacity: 0.5; }
+.rain-drop {
+  position: absolute;
+  width: 1px;
+  height: 16px;
+  background: linear-gradient(180deg, transparent, rgba(180,200,220,0.6));
+  animation: rainFall linear infinite;
+}
+@keyframes rainFall {
+  from { transform: translateY(-30px); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.9; }
+  to { transform: translateY(calc(100vh + 30px)); opacity: 0; }
+}
+
+.scene {
+  min-height: 100vh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 24px 60px;
+  position: relative;
+  z-index: 3;
+}
+.scene.active { display: flex; }
+.scene-container {
+  max-width: 760px;
+  width: 100%;
+  position: relative;
+}
+
+.scene-prologue { background: var(--ink-black); }
+.prologue-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  letter-spacing: 8px;
+  color: var(--paper);
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeUp 1.5s ease 0.3s forwards;
+}
+.prologue-chapter {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 8px;
+  color: var(--blood-red-bright);
+  text-align: center;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: fadeUp 1.5s ease 0.8s forwards;
+}
+.prologue-tagline {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(13px, 1.6vw, 15px);
+  letter-spacing: 3px;
+  color: var(--rain-grey-soft);
+  text-align: center;
+  line-height: 2.4;
+  margin-bottom: 50px;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0;
+  animation: fadeUp 1.5s ease 1.5s forwards;
+}
+.prologue-tagline em {
+  color: var(--blood-red-bright);
+  font-style: normal;
+  border-bottom: 1px solid var(--blood-red-bright);
+}
+.start-btn {
+  display: block;
+  margin: 40px auto 0;
+  padding: 18px 50px;
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid rgba(232, 197, 160, 0.5);
+  border-radius: 50px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  letter-spacing: 6px;
+  transition: 0.4s;
+  opacity: 0;
+  animation: fadeUp 1.5s ease 2.5s forwards;
+}
+.start-btn:hover {
+  background: var(--blood-red);
+  border-color: var(--blood-red);
+  letter-spacing: 8px;
+  transform: scale(1.05);
+  box-shadow: 0 0 40px rgba(139, 42, 42, 0.4);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scene-narrative {
+  background: linear-gradient(180deg, var(--ink-black) 0%, var(--ink-deep) 100%);
+}
+.narrative-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 8px;
+  color: var(--blood-red-bright);
+  text-align: center;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.narrative-eyebrow::before, .narrative-eyebrow::after {
+  content: "";
+  width: 50px;
+  height: 1px;
+  background: var(--blood-red-bright);
+}
+
+.narrative-console {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(232, 219, 205, 0.15);
+  border-radius: 8px;
+  padding: 36px 40px;
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(15px, 1.7vw, 17px);
+  letter-spacing: 1.5px;
+  color: var(--paper);
+  line-height: 2.4;
+  min-height: 240px;
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+}
+.narrative-console::before {
+  content: "▸";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 10px;
+  color: var(--blood-red-bright);
+}
+.narrative-console::after {
+  content: "RECORDING";
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.3);
+}
+.narrative-text { display: inline; }
+.narrative-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background: var(--paper);
+  animation: blink 1s infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.narrative-controls {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.skip-btn, .next-btn {
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--rain-grey-soft);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  transition: 0.3s;
+}
+.skip-btn:hover {
+  color: var(--paper);
+  border-color: rgba(255,255,255,0.5);
+}
+.next-btn {
+  background: var(--blood-red);
+  color: var(--paper);
+  border-color: var(--blood-red);
+  opacity: 0;
+  pointer-events: none;
+}
+.next-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.next-btn:hover {
+  background: var(--blood-red-bright);
+  letter-spacing: 5px;
+  box-shadow: 0 0 25px var(--blood-red-glow);
+}
+
+.scene-puzzle {
+  background: linear-gradient(180deg, var(--ink-deep) 0%, #1d2030 100%);
+}
+.puzzle-header { text-align: center; margin-bottom: 28px; }
+.puzzle-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--hope-warm);
+  margin-bottom: 10px;
+}
+.puzzle-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: var(--paper);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.puzzle-instruction {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--rain-grey-soft);
+  line-height: 1.9;
+  margin-bottom: 6px;
+}
+.puzzle-hint {
+  font-family: 'Klee One', cursive;
+  font-size: 12px;
+  color: var(--hope-warm);
+  margin-top: 10px;
+}
+
+.puzzle-feedback {
+  margin-top: 24px;
+  padding: 18px 28px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  text-align: center;
+  display: none;
+  border-left: 3px solid var(--rain-grey);
+}
+.puzzle-feedback.show { display: block; }
+.puzzle-feedback.correct {
+  border-color: var(--success);
+  background: rgba(146, 197, 153, 0.08);
+}
+.puzzle-feedback.wrong {
+  border-color: var(--blood-red-bright);
+  background: rgba(165, 66, 29, 0.08);
+}
+.puzzle-feedback-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  color: var(--rain-grey-soft);
+}
+.puzzle-feedback.correct .puzzle-feedback-label { color: var(--success); }
+.puzzle-feedback.wrong .puzzle-feedback-label { color: var(--blood-red-bright); }
+.puzzle-feedback-text {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--paper);
+  letter-spacing: 1px;
+}
+.puzzle-action-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 32px;
+  background: var(--hope-warm);
+  color: var(--ink-deep);
+  border: none;
+  border-radius: 50px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.puzzle-action-btn:hover {
+  background: var(--paper);
+  letter-spacing: 5px;
+  transform: translateY(-2px);
+}
+
+.evidence-puzzle { margin: 0 auto; max-width: 700px; }
+.evidence-zones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 580px) {
+  .evidence-zones { grid-template-columns: repeat(2, 1fr); }
+}
+.evidence-zone {
+  min-height: 130px;
+  background: rgba(232, 219, 205, 0.04);
+  border: 1.5px dashed rgba(232, 197, 160, 0.4);
+  border-radius: 8px;
+  padding: 14px 10px 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: 0.3s;
+}
+.evidence-zone.drag-over {
+  background: rgba(232, 197, 160, 0.15);
+  border-color: var(--hope-warm);
+  border-style: solid;
+}
+.evidence-zone-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--hope-warm);
+  margin-bottom: 4px;
+}
+.evidence-zone-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--paper);
+  text-align: center;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.evidence-tray {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(232, 197, 160, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  min-height: 80px;
+  margin-bottom: 20px;
+}
+.evidence-tray-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--rain-grey-light);
+  width: 100%;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.evidence-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(232, 219, 205, 0.9);
+  color: var(--ink-deep);
+  border-radius: 6px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.evidence-item:active { cursor: grabbing; }
+.evidence-item.dragging { opacity: 0.4; }
+.evidence-item.placed {
+  background: rgba(232, 197, 160, 0.95);
+  border: 1px solid var(--hope-warm);
+}
+
+.evidence-progress {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--rain-grey-soft);
+  margin: 12px 0;
+}
+
+.testimony-puzzle { margin: 0 auto; max-width: 700px; }
+.testimony-clue-box {
+  background: rgba(232, 197, 160, 0.08);
+  border: 1px solid rgba(232, 197, 160, 0.3);
+  border-radius: 8px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  font-family: 'Shippori Mincho', serif;
+}
+.testimony-clue-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--hope-warm);
+  margin-bottom: 10px;
+}
+.testimony-clue-list {
+  list-style: none;
+  padding-left: 0;
+}
+.testimony-clue-list li {
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--paper);
+  letter-spacing: 1px;
+  line-height: 1.8;
+}
+.testimony-clue-list li::before {
+  content: "・";
+  color: var(--hope-warm);
+  margin-right: 6px;
+}
+
+.testimony-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.testimony-card {
+  padding: 22px 20px;
+  background: rgba(232, 219, 205, 0.05);
+  border: 1px solid rgba(232, 219, 205, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.testimony-card:hover:not(.disabled) {
+  background: rgba(232, 197, 160, 0.12);
+  border-color: var(--hope-warm);
+  transform: translateY(-3px);
+}
+.testimony-card.selected {
+  background: rgba(165, 66, 29, 0.2);
+  border-color: var(--blood-red-bright);
+}
+.testimony-card.correct {
+  background: rgba(146, 197, 153, 0.2);
+  border-color: var(--success);
+}
+.testimony-card.wrong {
+  background: rgba(165, 66, 29, 0.15);
+  border-color: var(--blood-red-bright);
+  opacity: 0.6;
+}
+.testimony-card.disabled { pointer-events: none; }
+.testimony-person {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--hope-warm);
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.testimony-quote {
+  font-family: 'Klee One', cursive;
+  font-size: 13px;
+  color: var(--paper);
+  line-height: 1.7;
+  letter-spacing: 1px;
+}
+.testimony-quote::before { content: "「"; opacity: 0.6; }
+.testimony-quote::after { content: "」"; opacity: 0.6; }
+
+.timeline-puzzle { margin: 0 auto; max-width: 720px; }
+.timeline-area {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(232, 197, 160, 0.2);
+}
+.timeline-track {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.timeline-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: rgba(232, 197, 160, 0.04);
+  border: 1.5px dashed rgba(232, 197, 160, 0.3);
+  border-radius: 6px;
+  min-height: 56px;
+  cursor: pointer;
+}
+.timeline-slot.has-card {
+  border-style: solid;
+  border-color: var(--hope-warm);
+  background: rgba(232, 197, 160, 0.08);
+}
+.timeline-slot-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(232, 197, 160, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--hope-warm);
+  flex-shrink: 0;
+}
+
+.timeline-cards-pool {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(232, 197, 160, 0.2);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.timeline-pool-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--rain-grey-light);
+  width: 100%;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.timeline-card {
+  display: inline-block;
+  padding: 8px 14px;
+  background: rgba(232, 219, 205, 0.9);
+  color: var(--ink-deep);
+  border-radius: 6px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.3s;
+}
+.timeline-card:hover:not(.placed) {
+  background: var(--hope-warm);
+  transform: translateY(-2px);
+}
+.timeline-card.selected {
+  background: var(--hope-warm);
+  box-shadow: 0 0 12px var(--hope-warm);
+  transform: translateY(-2px);
+}
+.timeline-card.placed {
+  opacity: 0.3;
+  pointer-events: none;
+}
+.timeline-card-in-slot {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--hope-warm);
+  color: var(--ink-deep);
+  border-radius: 4px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.timeline-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+.timeline-action-btn {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--rain-grey-soft);
+  border: 1px solid rgba(232, 197, 160, 0.3);
+  border-radius: 50px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+.timeline-action-btn:hover {
+  background: rgba(232, 197, 160, 0.1);
+  color: var(--paper);
+}
+
+.truth-puzzle { margin: 0 auto; max-width: 720px; }
+.truth-testimonies {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.truth-testimony {
+  padding: 18px 22px;
+  background: rgba(232, 219, 205, 0.05);
+  border: 1px solid rgba(232, 219, 205, 0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.truth-testimony:hover:not(.disabled) {
+  background: rgba(232, 197, 160, 0.1);
+  border-color: var(--hope-warm);
+}
+.truth-testimony.selected {
+  background: rgba(165, 66, 29, 0.2);
+  border-color: var(--blood-red-bright);
+}
+.truth-testimony.correct {
+  background: rgba(146, 197, 153, 0.2);
+  border-color: var(--success);
+}
+.truth-testimony.wrong {
+  background: rgba(165, 66, 29, 0.15);
+  border-color: var(--blood-red-bright);
+  opacity: 0.5;
+}
+.truth-testimony.disabled { pointer-events: none; }
+.truth-num {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(232, 197, 160, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  color: var(--hope-warm);
+}
+.truth-body { flex: 1; }
+.truth-person {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 13px;
+  color: var(--hope-warm);
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+}
+.truth-quote {
+  font-family: 'Klee One', cursive;
+  font-size: 13px;
+  color: var(--paper);
+  line-height: 1.6;
+}
+.truth-quote.empty {
+  font-style: italic;
+  color: var(--rain-grey-light);
+  font-family: 'Shippori Mincho', serif;
+}
+
+.scene-reveal {
+  background: linear-gradient(180deg, #1d2030 0%, #2a2515 50%, var(--ink-deep) 100%);
+}
+.reveal-intro {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  letter-spacing: 10px;
+  color: var(--hope-warm);
+  text-align: center;
+  margin-bottom: 20px;
+  opacity: 0;
+}
+.reveal-intro.show { animation: fadeUp 1.5s ease 0.5s forwards; }
+.reveal-message {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(15px, 1.9vw, 19px);
+  letter-spacing: 2px;
+  color: var(--paper);
+  text-align: center;
+  line-height: 2.4;
+  margin-bottom: 50px;
+  opacity: 0;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.reveal-message.show { animation: fadeUp 1.5s ease 1.5s forwards; }
+.reveal-message em {
+  font-style: normal;
+  color: var(--hope-warm);
+  border-bottom: 1px solid var(--hope-warm);
+}
+.reveal-book {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+}
+.reveal-book.show { animation: fadeUp 2s ease 3s forwards; }
+.reveal-cover-wrap {
+  position: relative;
+  margin-bottom: 30px;
+}
+.reveal-cover {
+  width: 220px;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  display: block;
+}
+.reveal-glow {
+  position: absolute;
+  inset: -60px;
+  background: radial-gradient(circle, rgba(232,197,160,0.3) 0%, transparent 70%);
+  z-index: -1;
+  filter: blur(50px);
+  animation: revealPulse 4s ease-in-out infinite;
+}
+@keyframes revealPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.reveal-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: 10px;
+  color: var(--paper);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.reveal-author {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  letter-spacing: 8px;
+  color: var(--hope-warm);
+  margin-bottom: 36px;
+  text-align: center;
+}
+.reveal-summary {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  line-height: 2.1;
+  color: var(--rain-grey-soft);
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 40px;
+  letter-spacing: 1.5px;
+  padding: 24px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  border-left: 2px solid var(--hope-warm);
+  border-right: 2px solid var(--hope-warm);
+}
+.reveal-chapter-end {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 8px;
+  color: var(--blood-red-bright);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.reveal-next-hint {
+  font-family: 'Klee One', cursive;
+  font-size: 15px;
+  color: var(--hope-warm);
+  text-align: center;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+.reveal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.reveal-btn {
+  padding: 14px 36px;
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid var(--hope-warm);
+  border-radius: 50px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-decoration: none;
+  transition: 0.3s;
+  cursor: pointer;
+}
+.reveal-btn.primary {
+  background: var(--hope-warm);
+  color: var(--ink-deep);
+  font-weight: 500;
+}
+.reveal-btn:hover {
+  background: var(--paper);
+  color: var(--ink-deep);
+  transform: translateY(-2px);
+  letter-spacing: 5px;
+}
+.reveal-btn.primary:hover { background: var(--paper); }
+
+@media (max-width: 580px) {
+  .scene { padding: 80px 14px 50px; }
+  .narrative-console { padding: 24px 20px; font-size: 14px; }
+  .evidence-zone { min-height: 100px; padding: 10px 6px; }
+  .evidence-zone-name { font-size: 10px; }
+  .evidence-zone-label { font-size: 8px; }
+  .evidence-item { padding: 8px 12px; font-size: 11px; }
+  .chapter-indicator { padding: 6px 14px; }
+  .chapter-indicator-num { font-size: 8px; letter-spacing: 3px; }
+  .chapter-indicator-title { font-size: 10px; letter-spacing: 2px; }
+  .nav-back { padding: 6px 10px; font-size: 9px; }
+  .progress-indicator { padding: 6px 10px; gap: 4px; }
+  .progress-dot { width: 6px; height: 6px; }
+  .reveal-cover { width: 170px; }
+  .reveal-title { letter-spacing: 6px; }
+}
+</style>
+
+</head>
+<body>
+
+<a href="index.html" class="nav-back">← 戻る</a>
+
+<div class="chapter-indicator">
+  <div class="chapter-indicator-num">CHAPTER 01</div>
+  <div class="chapter-indicator-title">雨の章</div>
+</div>
+
+<div class="progress-indicator">
+  <div class="progress-dot" data-step="0"></div>
+  <div class="progress-dot" data-step="1"></div>
+  <div class="progress-dot" data-step="2"></div>
+  <div class="progress-dot" data-step="3"></div>
+  <div class="progress-dot" data-step="4"></div>
+  <div class="progress-dot" data-step="5"></div>
+</div>
+
+<div class="rain-particles" id="rainParticles"></div>
+
+<section class="scene scene-prologue active" data-scene="0">
+  <div class="scene-container">
+    <div class="prologue-chapter">CHAPTER 01 · 雨の章</div>
+    <div class="prologue-title">本に、拉致されました。</div>
+    <div class="prologue-tagline">
+      気がつくと、<em>あなたは見知らぬ場所に立っている。</em><br>
+      手がかりは、わずかな雰囲気と、<br>
+      心の奥に響く、ある言葉だけ。<br>
+      <br>
+      4つの謎を解き明かしたとき、<br>
+      この物語の正体が明かされる──
+    </div>
+    <button class="start-btn" onclick="goToScene(1)">物語に踏み入る</button>
+  </div>
+</section>
+
+<section class="scene scene-narrative" data-scene="1">
+  <div class="scene-container">
+    <div class="narrative-eyebrow">PROLOGUE · 拉致</div>
+    <div class="narrative-console">
+      <span class="narrative-text" id="narrative1"></span><span class="narrative-cursor" id="cursor1"></span>
+    </div>
+    <div class="narrative-controls">
+      <button class="skip-btn" onclick="skipTypewriter(1)">スキップ</button>
+      <button class="next-btn" id="next1" onclick="goToScene(2)">続ける →</button>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-puzzle" data-scene="2">
+  <div class="scene-container">
+    <div class="puzzle-header">
+      <div class="puzzle-eyebrow">PUZZLE 01 · 証拠の整理</div>
+      <div class="puzzle-title">取調室の証拠を、4つの箱に分類せよ</div>
+      <div class="puzzle-instruction">事件現場から押収された7つの物品。それぞれの「重要度」に応じて、正しい箱にドラッグしてください。</div>
+      <div class="puzzle-hint">手がかりは「事件解明に直結するか」「個人的な物か」「環境にあった物か」</div>
+    </div>
+
+    <div class="evidence-puzzle">
+      <div class="evidence-zones">
+        <div class="evidence-zone" data-zone="weapon">
+          <div class="evidence-zone-label">BOX · A</div>
+          <div class="evidence-zone-name">凶器・<br>直接証拠</div>
+        </div>
+        <div class="evidence-zone" data-zone="personal">
+          <div class="evidence-zone-label">BOX · B</div>
+          <div class="evidence-zone-name">個人的な<br>遺品</div>
+        </div>
+        <div class="evidence-zone" data-zone="record">
+          <div class="evidence-zone-label">BOX · C</div>
+          <div class="evidence-zone-name">記録・<br>文書</div>
+        </div>
+        <div class="evidence-zone" data-zone="other">
+          <div class="evidence-zone-label">BOX · D</div>
+          <div class="evidence-zone-name">無関係な<br>物品</div>
+        </div>
+      </div>
+
+      <div class="evidence-progress" id="evidenceProgress">0 / 7 配置済み</div>
+
+      <div class="evidence-tray" id="evidenceTray">
+        <div class="evidence-tray-label">押収された物品</div>
+        <div class="evidence-item" draggable="true" data-id="knife" data-correct="weapon">🔪 包丁</div>
+        <div class="evidence-item" draggable="true" data-id="diary" data-correct="personal">📓 日記帳</div>
+        <div class="evidence-item" draggable="true" data-id="testimony" data-correct="record">📄 供述書</div>
+        <div class="evidence-item" draggable="true" data-id="cup" data-correct="other">☕ 紙コップ</div>
+        <div class="evidence-item" draggable="true" data-id="bloody-shirt" data-correct="weapon">👕 血のついた服</div>
+        <div class="evidence-item" draggable="true" data-id="photo" data-correct="personal">🖼️ 幼少期の写真</div>
+        <div class="evidence-item" draggable="true" data-id="police-file" data-correct="record">📁 警察ファイル</div>
+      </div>
+
+      <div class="puzzle-feedback" id="feedback2">
+        <div class="puzzle-feedback-label">RESPONSE</div>
+        <div class="puzzle-feedback-text" id="feedback2Text"></div>
+        <button class="puzzle-action-btn" onclick="goToScene(3)">物語を続ける →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-narrative" data-scene="3">
+  <div class="scene-container">
+    <div class="narrative-eyebrow">CHAPTER 01-2 · 証言</div>
+    <div class="narrative-console">
+      <span class="narrative-text" id="narrative3"></span><span class="narrative-cursor" id="cursor3"></span>
+    </div>
+    <div class="narrative-controls">
+      <button class="skip-btn" onclick="skipTypewriter(3)">スキップ</button>
+      <button class="next-btn" id="next3" onclick="goToScene(4)">推理する →</button>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-puzzle" data-scene="4">
+  <div class="scene-container">
+    <div class="puzzle-header">
+      <div class="puzzle-eyebrow">PUZZLE 02 · 嘘を見抜く</div>
+      <div class="puzzle-title">3人の証言から、嘘つきを見つけ出せ</div>
+      <div class="puzzle-instruction">事件発生時、家には3人がいたことが警察記録で確認されている。しかし1人だけ、嘘をついている。</div>
+    </div>
+
+    <div class="testimony-puzzle">
+      <div class="testimony-clue-box">
+        <div class="testimony-clue-title">CONFIRMED FACTS · 確定事項</div>
+        <ul class="testimony-clue-list">
+          <li>事件発生時刻、家には3人(姉・父・母)がいた(警察記録より確認済み)</li>
+          <li>姉と母は、その時間ずっと一緒の部屋にいたと別の目撃者が証言</li>
+          <li>父は2階の書斎にいたと家政婦が証言</li>
+        </ul>
+      </div>
+
+      <div class="testimony-cards">
+        <div class="testimony-card" onclick="selectTestimony(this, 'sister')">
+          <div class="testimony-person">姉</div>
+          <div class="testimony-quote">私はあの時、家にいませんでした</div>
+        </div>
+        <div class="testimony-card" onclick="selectTestimony(this, 'father')">
+          <div class="testimony-person">父</div>
+          <div class="testimony-quote">私は夕方、書斎にいました</div>
+        </div>
+        <div class="testimony-card" onclick="selectTestimony(this, 'mother')">
+          <div class="testimony-person">母</div>
+          <div class="testimony-quote">私はその間、姉とずっと話していました</div>
+        </div>
+      </div>
+
+      <div class="puzzle-feedback" id="feedback4">
+        <div class="puzzle-feedback-label">RESPONSE</div>
+        <div class="puzzle-feedback-text" id="feedback4Text"></div>
+        <button class="puzzle-action-btn" onclick="goToScene(5)">物語を続ける →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-narrative" data-scene="5">
+  <div class="scene-container">
+    <div class="narrative-eyebrow">CHAPTER 01-3 · 記憶の断片</div>
+    <div class="narrative-console">
+      <span class="narrative-text" id="narrative5"></span><span class="narrative-cursor" id="cursor5"></span>
+    </div>
+    <div class="narrative-controls">
+      <button class="skip-btn" onclick="skipTypewriter(5)">スキップ</button>
+      <button class="next-btn" id="next5" onclick="goToScene(6)">記憶を辿る →</button>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-puzzle" data-scene="6">
+  <div class="scene-container">
+    <div class="puzzle-header">
+      <div class="puzzle-eyebrow">PUZZLE 03 · 記憶の時系列</div>
+      <div class="puzzle-title">彼女の人生の記憶を、時系列に並べ替えよ</div>
+      <div class="puzzle-instruction">6枚のカードを、起きた順序通りに上から並べてください。年齢、季節、出来事の因果関係が手がかりです。</div>
+      <div class="puzzle-hint">カードをクリックで選択 → 空いたスロットをクリックで配置</div>
+    </div>
+
+    <div class="timeline-puzzle">
+      <div class="timeline-area">
+        <div class="timeline-track" id="timelineTrack">
+          <div class="timeline-slot" data-slot="0" onclick="placeTimelineCard(0)">
+            <div class="timeline-slot-num">1</div>
+          </div>
+          <div class="timeline-slot" data-slot="1" onclick="placeTimelineCard(1)">
+            <div class="timeline-slot-num">2</div>
+          </div>
+          <div class="timeline-slot" data-slot="2" onclick="placeTimelineCard(2)">
+            <div class="timeline-slot-num">3</div>
+          </div>
+          <div class="timeline-slot" data-slot="3" onclick="placeTimelineCard(3)">
+            <div class="timeline-slot-num">4</div>
+          </div>
+          <div class="timeline-slot" data-slot="4" onclick="placeTimelineCard(4)">
+            <div class="timeline-slot-num">5</div>
+          </div>
+          <div class="timeline-slot" data-slot="5" onclick="placeTimelineCard(5)">
+            <div class="timeline-slot-num">6</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-cards-pool" id="timelineCards">
+        <div class="timeline-pool-label">記憶のカード(クリックで選択 → 空きスロットに配置)</div>
+      </div>
+
+      <div class="timeline-actions">
+        <button class="timeline-action-btn" onclick="resetTimeline()">最初からやり直す</button>
+        <button class="timeline-action-btn" onclick="checkTimeline()">答え合わせ</button>
+      </div>
+
+      <div class="puzzle-feedback" id="feedback6">
+        <div class="puzzle-feedback-label">RESPONSE</div>
+        <div class="puzzle-feedback-text" id="feedback6Text"></div>
+        <button class="puzzle-action-btn" onclick="goToScene(7)">真実へ進む →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-narrative" data-scene="7">
+  <div class="scene-container">
+    <div class="narrative-eyebrow">CHAPTER 01-4 · 5つの声</div>
+    <div class="narrative-console">
+      <span class="narrative-text" id="narrative7"></span><span class="narrative-cursor" id="cursor7"></span>
+    </div>
+    <div class="narrative-controls">
+      <button class="skip-btn" onclick="skipTypewriter(7)">スキップ</button>
+      <button class="next-btn" id="next7" onclick="goToScene(8)">真実を見抜く →</button>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-puzzle" data-scene="8">
+  <div class="scene-container">
+    <div class="puzzle-header">
+      <div class="puzzle-eyebrow">PUZZLE 04 · 隠された真実</div>
+      <div class="puzzle-title">5つの証言の中で、「真実」を語っているのは誰か?</div>
+      <div class="puzzle-instruction">彼女の父親について、4人が証言を残している。そして5番目──彼女本人の言葉も。<br>表面的な「美しい言葉」の裏に、隠された真実がある。</div>
+      <div class="puzzle-hint">人は、本当のことほど語れないことがある</div>
+    </div>
+
+    <div class="truth-puzzle">
+      <div class="truth-testimonies">
+        <div class="truth-testimony" onclick="selectTruth(this, false)">
+          <div class="truth-num">1</div>
+          <div class="truth-body">
+            <div class="truth-person">父(本人)</div>
+            <div class="truth-quote">私は娘を、誰よりも愛していました</div>
+          </div>
+        </div>
+        <div class="truth-testimony" onclick="selectTruth(this, false)">
+          <div class="truth-num">2</div>
+          <div class="truth-body">
+            <div class="truth-person">姉</div>
+            <div class="truth-quote">父は妹を、本当に可愛がっていました</div>
+          </div>
+        </div>
+        <div class="truth-testimony" onclick="selectTruth(this, false)">
+          <div class="truth-num">3</div>
+          <div class="truth-body">
+            <div class="truth-person">母</div>
+            <div class="truth-quote">夫は良い父親でした。家族思いの</div>
+          </div>
+        </div>
+        <div class="truth-testimony" onclick="selectTruth(this, false)">
+          <div class="truth-num">4</div>
+          <div class="truth-body">
+            <div class="truth-person">友人</div>
+            <div class="truth-quote">彼女、父親のことをよく褒めてました</div>
+          </div>
+        </div>
+        <div class="truth-testimony" onclick="selectTruth(this, true)">
+          <div class="truth-num">5</div>
+          <div class="truth-body">
+            <div class="truth-person">環菜本人</div>
+            <div class="truth-quote empty">……(沈黙)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="puzzle-feedback" id="feedback8">
+        <div class="puzzle-feedback-label">RESPONSE</div>
+        <div class="puzzle-feedback-text" id="feedback8Text"></div>
+        <button class="puzzle-action-btn" onclick="goToScene(9)">真相を見る →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="scene scene-reveal" data-scene="9">
+  <div class="scene-container">
+    <div class="reveal-intro" id="revealIntro">THE TRUTH · 真相</div>
+    <div class="reveal-message" id="revealMessage">
+      あなたが立っていた世界は──<br>
+      <br>
+      <em>「初めて受けた愛」</em>が、<br>
+      人の人格を形作るという、心理ミステリーの物語。
+    </div>
+    <div class="reveal-book" id="revealBook">
+      <div class="reveal-cover-wrap">
+        <div class="reveal-glow"></div>
+        <img class="reveal-cover" src="https://b-bunshun.ismcdn.jp/mwimgs/d/a/343/img_da3ced52592de39611aa5c767f3df1b6773451.jpg" alt="ファーストラヴ">
+      </div>
+      <div class="reveal-title">ファーストラヴ</div>
+      <div class="reveal-author">島本 理生</div>
+      <div class="reveal-summary">
+        父親殺害の容疑で逮捕された女子大生・聖山環菜。<br>
+        「動機はそちらで見つけてください」──<br>
+        彼女が残した言葉の意味は、<br>
+        人格を形づくる「最初の愛」をめぐる<br>
+        心理ミステリーの中にあった。
+      </div>
+
+      <div class="reveal-chapter-end">END OF CHAPTER 01</div>
+      <div class="reveal-next-hint">次の章 ──「名付けの意味」へ続く</div>
+
+      <div class="reveal-actions">
+        <a href="firstlove.html" class="reveal-btn primary">この本の世界をもっと見る</a>
+        <a href="index.html" class="reveal-btn">本棚に戻る</a>
+        <button class="reveal-btn" onclick="restartGame()">もう一度、拉致される</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+let currentScene = 0;
+
+function goToScene(num) {
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+  setTimeout(() => {
+    const next = document.querySelector(`[data-scene="${num}"]`);
+    if (next) {
+      next.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    currentScene = num;
+    updateProgress();
+    if ([1, 3, 5, 7].includes(num)) startTypewriter(num);
+    if (num === 9) {
+      setTimeout(() => document.getElementById('revealIntro').classList.add('show'), 100);
+      setTimeout(() => document.getElementById('revealMessage').classList.add('show'), 100);
+      setTimeout(() => document.getElementById('revealBook').classList.add('show'), 100);
+      recordBookCollection();
+    }
+    if (num >= 1 && num <= 8) {
+      document.getElementById('rainParticles').classList.add('active');
+    } else {
+      document.getElementById('rainParticles').classList.remove('active');
+    }
+  }, 100);
+}
+
+function updateProgress() {
+  const dots = document.querySelectorAll('.progress-dot');
+  const stepMap = { 0: 0, 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 4, 9: 5 };
+  const activeStep = stepMap[currentScene] !== undefined ? stepMap[currentScene] : 0;
+  dots.forEach((dot, i) => {
+    dot.classList.remove('active', 'done');
+    if (i < activeStep) dot.classList.add('done');
+    else if (i === activeStep) dot.classList.add('active');
+  });
+}
+
+function createRain() {
+  const container = document.getElementById('rainParticles');
+  for (let i = 0; i < 70; i++) {
+    const drop = document.createElement('div');
+    drop.className = 'rain-drop';
+    drop.style.left = Math.random() * 100 + '%';
+    drop.style.animationDuration = (1.8 + Math.random() * 3) + 's';
+    drop.style.animationDelay = Math.random() * 5 + 's';
+    drop.style.height = (12 + Math.random() * 16) + 'px';
+    container.appendChild(drop);
+  }
+}
+createRain();
+
+const narratives = {
+  1: `気がつくと、雨の降る川辺に立っていた。
+
+春の風は冷たく、空はくすんだ灰色。──遠くで、誰かが叫んでいる。
+
+「血だ! 誰か!」
+
+見れば、若い女性が川辺で倒れている。血まみれの服。手には……包丁。
+
+そして彼女が、あなたの方を見る。「動機は、自分でもわからない」── 彼女の供述書には、そう書かれていた。`,
+  3: `気がつくと、取調室に座っている。
+
+あなたは「臨床心理士」として、彼女と話すことになっているらしい。机の上には、押収された証拠と、彼女の供述書。
+
+警察記録によると、事件発生時、家には3人がいた。──姉・父・母。そして、もう一つの確認事項。
+
+「姉と母は、その時間ずっと一緒の部屋にいた」「父は2階の書斎にいた」── 全員が「家にいた」と認めている。
+
+だが、3人のうち1人だけ、嘘をついている。誰が嘘つきなのか?`,
+  5: `嘘を見抜いたあなたを、彼女は静かに見つめた。「……あなたは、見える人なのね」
+
+そして彼女は、自分の記憶を語り始めた。断片的な、まるで散らばった写真のような、6つの記憶。──時系列はバラバラ。
+
+父に名前を呼ばれた日。絵を描いた日。父が死んだ日。窓の外、桜が散っていた日。12歳だった頃。父が、私の絵を破った日。
+
+あなたは、それを並べ替えなければならない。彼女の人生の、本当の順序へと。`,
+  7: `時系列を解いた瞬間、彼女は深く息を吐いた。「あなたには、見えてきましたか? 私の、本当のお父さんが」
+
+机の上に、4人の証言と、もう一つ──彼女自身の声が並んでいる。みんな、口を揃えて言う。
+
+「父は娘を愛していた」「父は妹を可愛がっていた」「夫は良い父親だった」「彼女は父親をよく褒めていた」
+
+そして5番目──環菜本人の言葉は、空白だ。「ねえ……どうして、私の声だけ、何もないの?」
+
+この5つの中で、「真実」を語っているのは誰か?`
+};
+
+let typewriterState = {};
+
+function startTypewriter(sceneNum) {
+  const text = narratives[sceneNum];
+  const target = document.getElementById(`narrative${sceneNum}`);
+  const nextBtn = document.getElementById(`next${sceneNum}`);
+  const cursor = document.getElementById(`cursor${sceneNum}`);
+  if (!text || !target) return;
+
+  target.innerHTML = '';
+  nextBtn.classList.remove('visible');
+  if (cursor) cursor.style.display = 'inline-block';
+
+  typewriterState[sceneNum] = { running: true };
+  let i = 0;
+  const speed = 45;
+
+  function typeChar() {
+    if (!typewriterState[sceneNum].running) return;
+    if (i >= text.length) {
+      nextBtn.classList.add('visible');
+      if (cursor) cursor.style.display = 'none';
+      return;
+    }
+    const ch = text[i];
+    if (ch === '\n') {
+      target.innerHTML += '<br>';
+    } else {
+      target.appendChild(document.createTextNode(ch));
+    }
+    i++;
+    setTimeout(typeChar, speed);
+  }
+  typeChar();
+}
+
+function skipTypewriter(sceneNum) {
+  if (typewriterState[sceneNum]) typewriterState[sceneNum].running = false;
+  const text = narratives[sceneNum];
+  const target = document.getElementById(`narrative${sceneNum}`);
+  const nextBtn = document.getElementById(`next${sceneNum}`);
+  const cursor = document.getElementById(`cursor${sceneNum}`);
+  if (!text || !target) return;
+  target.innerHTML = text.replace(/\n/g, '<br>');
+  nextBtn.classList.add('visible');
+  if (cursor) cursor.style.display = 'none';
+}
+
+const evidenceCorrectMapping = {
+  'knife': 'weapon',
+  'bloody-shirt': 'weapon',
+  'diary': 'personal',
+  'photo': 'personal',
+  'testimony': 'record',
+  'police-file': 'record',
+  'cup': 'other'
+};
+
+function setupEvidencePuzzle() {
+  const items = document.querySelectorAll('.evidence-item');
+  const zones = document.querySelectorAll('.evidence-zone');
+
+  items.forEach(item => {
+    item.addEventListener('dragstart', e => {
+      item.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', item.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+    });
+
+    let touchClone = null;
+    let touchOffset = {x:0, y:0};
+    let lastZone = null;
+
+    item.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const rect = item.getBoundingClientRect();
+      touchOffset.x = touch.clientX - rect.left;
+      touchOffset.y = touch.clientY - rect.top;
+      touchClone = item.cloneNode(true);
+      touchClone.style.position = 'fixed';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.opacity = '0.8';
+      touchClone.style.left = (touch.clientX - touchOffset.x) + 'px';
+      touchClone.style.top = (touch.clientY - touchOffset.y) + 'px';
+      document.body.appendChild(touchClone);
+      item.style.opacity = '0.3';
+    }, { passive: false });
+
+    item.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!touchClone) return;
+      const touch = e.touches[0];
+      touchClone.style.left = (touch.clientX - touchOffset.x) + 'px';
+      touchClone.style.top = (touch.clientY - touchOffset.y) + 'px';
+      touchClone.style.display = 'none';
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      const zone = elem ? elem.closest('.evidence-zone') : null;
+      if (lastZone && lastZone !== zone) lastZone.classList.remove('drag-over');
+      if (zone) zone.classList.add('drag-over');
+      lastZone = zone;
+    }, { passive: false });
+
+    item.addEventListener('touchend', e => {
+      if (!touchClone) return;
+      touchClone.remove();
+      touchClone = null;
+      item.style.opacity = '';
+      if (lastZone) {
+        lastZone.classList.remove('drag-over');
+        placeEvidence(item, lastZone);
+        lastZone = null;
+      }
+    });
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = e.dataTransfer.getData('text/plain');
+      const item = document.querySelector(`.evidence-item[data-id="${id}"]`);
+      if (item) placeEvidence(item, zone);
+    });
+  });
+}
+
+function placeEvidence(item, zone) {
+  zone.appendChild(item);
+  item.classList.add('placed');
+  const placedCount = document.querySelectorAll('.evidence-zone .evidence-item').length;
+  document.getElementById('evidenceProgress').textContent = `${placedCount} / 7 配置済み`;
+  if (placedCount === 7) setTimeout(checkEvidence, 600);
+}
+
+function checkEvidence() {
+  let correct = 0;
+  document.querySelectorAll('.evidence-item').forEach(item => {
+    const id = item.dataset.id;
+    const parentZone = item.closest('.evidence-zone');
+    if (parentZone && parentZone.dataset.zone === evidenceCorrectMapping[id]) correct++;
+  });
+  const feedback = document.getElementById('feedback2');
+  const text = document.getElementById('feedback2Text');
+  feedback.classList.add('show');
+  if (correct === 7) {
+    feedback.classList.add('correct');
+    text.innerHTML = '完璧に分類できた。<br>──証拠が整理されたことで、ようやく事件の輪郭が見えてきた。';
+  } else if (correct >= 5) {
+    feedback.classList.add('correct');
+    text.innerHTML = `${correct} / 7 個が正しい分類だった。<br>──完璧ではないが、十分に手がかりは揃った。`;
+  } else {
+    feedback.classList.add('wrong');
+    text.innerHTML = `${correct} / 7 個しか正しくない。<br>──だが、不完全な手がかりでも、推理は前に進めるだろう。`;
+  }
+}
+
+function selectTestimony(card, who) {
+  document.querySelectorAll('.testimony-card').forEach(c => c.classList.add('disabled'));
+  card.classList.add('selected');
+  const feedback = document.getElementById('feedback4');
+  const text = document.getElementById('feedback4Text');
+  setTimeout(() => {
+    feedback.classList.add('show');
+    if (who === 'sister') {
+      feedback.classList.add('correct');
+      card.classList.add('correct');
+      text.innerHTML = `正解。<br><br>姉の証言「家にいなかった」は、警察記録および母の証言「ずっと姉と話していた」と矛盾する。<br><br>姉は何かを隠している──それは、誰かを庇っているのかもしれない。`;
+    } else {
+      feedback.classList.add('wrong');
+      card.classList.add('wrong');
+      document.querySelectorAll('.testimony-card').forEach(c => {
+        if (c.querySelector('.testimony-person').textContent === '姉') c.classList.add('correct');
+      });
+      text.innerHTML = `違う。<br><br>正解は姉の証言「家にいなかった」だ。<br>これは警察記録および母の証言「ずっと姉と話していた」と矛盾する。<br><br>姉は何かを隠している──それは、誰かを庇っているのかもしれない。`;
+    }
+  }, 600);
+}
+
+const timelineData = [
+  { id: 'a', text: '父に「環菜」と名前を呼ばれた(幼少期)', order: 0 },
+  { id: 'b', text: '初めて自分の絵を描いた(幼稚園)', order: 1 },
+  { id: 'c', text: '父が私の絵を「下手だ」と笑った', order: 2 },
+  { id: 'd', text: '12歳の春、父が私の絵を破った', order: 3 },
+  { id: 'e', text: '美術大学を志し、家を出た', order: 4 },
+  { id: 'f', text: '父の勤務先で、父を刺した', order: 5 }
+];
+let selectedTimelineCard = null;
+let timelineSlots = [null, null, null, null, null, null];
+
+function setupTimelinePuzzle() {
+  const pool = document.getElementById('timelineCards');
+  pool.innerHTML = '<div class="timeline-pool-label">記憶のカード(クリックで選択 → 空きスロットに配置)</div>';
+  const shuffled = [...timelineData].sort(() => Math.random() - 0.5);
+  shuffled.forEach(card => {
+    const el = document.createElement('div');
+    el.className = 'timeline-card';
+    el.textContent = card.text;
+    el.dataset.id = card.id;
+    el.onclick = () => selectTimelineCard(el);
+    pool.appendChild(el);
+  });
+}
+
+function selectTimelineCard(el) {
+  if (el.classList.contains('placed')) return;
+  document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('selected'));
+  if (selectedTimelineCard === el) {
+    selectedTimelineCard = null;
+    return;
+  }
+  selectedTimelineCard = el;
+  el.classList.add('selected');
+}
+
+function placeTimelineCard(slotIdx) {
+  const slot = document.querySelector(`.timeline-slot[data-slot="${slotIdx}"]`);
+  if (!slot) return;
+
+  if (!selectedTimelineCard) {
+    // 配置済みカードをクリックで取り出す
+    if (timelineSlots[slotIdx]) {
+      const cardId = timelineSlots[slotIdx];
+      const poolCard = document.querySelector(`.timeline-cards-pool .timeline-card[data-id="${cardId}"]`);
+      if (poolCard) poolCard.classList.remove('placed');
+      const inSlot = slot.querySelector('.timeline-card-in-slot');
+      if (inSlot) inSlot.remove();
+      slot.classList.remove('has-card');
+      timelineSlots[slotIdx] = null;
+    }
+    return;
+  }
+
+  // 既にカードがあるスロットなら、既存を戻す
+  if (timelineSlots[slotIdx]) {
+    const oldId = timelineSlots[slotIdx];
+    const oldCard = document.querySelector(`.timeline-cards-pool .timeline-card[data-id="${oldId}"]`);
+    if (oldCard) oldCard.classList.remove('placed');
+    const oldInSlot = slot.querySelector('.timeline-card-in-slot');
+    if (oldInSlot) oldInSlot.remove();
+  }
+
+  const cardId = selectedTimelineCard.dataset.id;
+  const cardText = selectedTimelineCard.textContent;
+  const cardInSlot = document.createElement('span');
+  cardInSlot.className = 'timeline-card-in-slot';
+  cardInSlot.dataset.id = cardId;
+  cardInSlot.textContent = cardText;
+  slot.appendChild(cardInSlot);
+  slot.classList.add('has-card');
+  timelineSlots[slotIdx] = cardId;
+
+  selectedTimelineCard.classList.add('placed');
+  selectedTimelineCard.classList.remove('selected');
+  selectedTimelineCard = null;
+}
+
+function resetTimeline() {
+  timelineSlots = [null, null, null, null, null, null];
+  document.querySelectorAll('.timeline-card-in-slot').forEach(c => c.remove());
+  document.querySelectorAll('.timeline-slot').forEach(s => s.classList.remove('has-card'));
+  document.querySelectorAll('.timeline-card').forEach(c => {
+    c.classList.remove('placed', 'selected');
+  });
+  selectedTimelineCard = null;
+  const feedback = document.getElementById('feedback6');
+  feedback.classList.remove('show', 'correct', 'wrong');
+}
+
+function checkTimeline() {
+  if (timelineSlots.includes(null)) {
+    alert('全てのスロットに記憶のカードを配置してください');
+    return;
+  }
+  let correct = 0;
+  timelineSlots.forEach((id, idx) => {
+    const data = timelineData.find(d => d.id === id);
+    if (data && data.order === idx) correct++;
+  });
+  const feedback = document.getElementById('feedback6');
+  const text = document.getElementById('feedback6Text');
+  feedback.classList.add('show');
+  if (correct === 6) {
+    feedback.classList.add('correct');
+    text.innerHTML = '完璧。<br><br>彼女の人生は、ある一つの場面から始まっていた。──父に「名前を呼ばれた」その日。<br>そして、絵を描き、それを破られた末に、父を……。<br><br>名前を呼ばれることから始まった人生は、絵を破られた瞬間、別の道へと進んでいった。';
+  } else if (correct >= 4) {
+    feedback.classList.add('correct');
+    text.innerHTML = `${correct} / 6 個が正しい順序だった。<br>──完璧ではないが、彼女の人生の輪郭は見えてきた。<br>絵が、彼女の人生を貫いている。`;
+  } else {
+    feedback.classList.add('wrong');
+    text.innerHTML = `${correct} / 6 個しか正しくない。<br><br>もう一度考えてみよう。彼女の人生は「名前を呼ばれた」幼少期に始まり、「父を刺した」事件で終わる。`;
+  }
+}
+
+function selectTruth(card, correct) {
+  document.querySelectorAll('.truth-testimony').forEach(c => c.classList.add('disabled'));
+  card.classList.add('selected');
+  const feedback = document.getElementById('feedback8');
+  const text = document.getElementById('feedback8Text');
+  setTimeout(() => {
+    feedback.classList.add('show');
+    if (correct) {
+      feedback.classList.add('correct');
+      card.classList.add('correct');
+      text.innerHTML = `そう、それが真実。<br><br>「沈黙」こそが、彼女の声だった。<br>──名前を呼ばれなかった子は、自分を語る言葉を持たない。<br><br>他の4人の言葉は、どれも美しい。だが、本当に父に愛されていたなら、なぜ彼女自身は何も語れないのか?<br>愛されたという「記憶」は、誰よりも本人が知っているはずなのに。`;
+    } else {
+      feedback.classList.add('wrong');
+      card.classList.add('wrong');
+      document.querySelectorAll('.truth-testimony').forEach(c => {
+        if (c.querySelector('.truth-person').textContent === '環菜本人') c.classList.add('correct');
+      });
+      text.innerHTML = `違う。<br><br>真実は「沈黙」だった。<br>本人だけが、何も語れない──それこそが、彼女が「愛されていない」ことの証明。<br><br>名前を呼ばれなかった子は、自分を語る言葉を持たない。<br>他の4人の美しい言葉の裏で、彼女の心には、語るべき「言葉」がなかった。`;
+    }
+  }, 800);
+}
+
+function recordBookCollection() {
+  try {
+    const collected = JSON.parse(localStorage.getItem('rachi_collected') || '[]');
+    const bookData = {
+      id: 'firstlove',
+      title: 'ファーストラヴ',
+      author: '島本理生',
+      image: 'https://b-bunshun.ismcdn.jp/mwimgs/d/a/343/img_da3ced52592de39611aa5c767f3df1b6773451.jpg',
+      url: 'firstlove.html',
+      chapter: 1,
+      collectedAt: new Date().toISOString()
+    };
+    if (!collected.find(b => b.id === 'firstlove')) {
+      collected.push(bookData);
+      localStorage.setItem('rachi_collected', JSON.stringify(collected));
+    }
+  } catch (e) { console.error('保存失敗:', e); }
+}
+
+function restartGame() {
+  document.querySelectorAll('.puzzle-feedback').forEach(f => {
+    f.classList.remove('show', 'correct', 'wrong');
+  });
+  const tray = document.getElementById('evidenceTray');
+  document.querySelectorAll('.evidence-item').forEach(item => {
+    item.classList.remove('placed');
+    tray.appendChild(item);
+  });
+  document.getElementById('evidenceProgress').textContent = '0 / 7 配置済み';
+  document.querySelectorAll('.testimony-card').forEach(c => {
+    c.classList.remove('selected', 'correct', 'wrong', 'disabled');
+  });
+  resetTimeline();
+  setupTimelinePuzzle();
+  document.querySelectorAll('.truth-testimony').forEach(c => {
+    c.classList.remove('selected', 'correct', 'wrong', 'disabled');
+  });
+  document.getElementById('revealIntro').classList.remove('show');
+  document.getElementById('revealMessage').classList.remove('show');
+  document.getElementById('revealBook').classList.remove('show');
+  goToScene(0);
+}
+
+window.addEventListener('load', () => {
+  setupEvidencePuzzle();
+  setupTimelinePuzzle();
+  updateProgress();
+});
+</script>
+
+</body>
+</html>
