@@ -1,0 +1,12 @@
+# shotaの本棚 - 読書の灯 / robots.txt
+# https://moriyoshi0405-tech.github.io/reel_All/
+
+User-agent: *
+Allow: /
+
+# 管理者用ページはクロール禁止
+Disallow: /editor.html
+Disallow: /review_preview.html
+
+# サイトマップの場所を指定
+Sitemap: https://moriyoshi0405-tech.github.io/reel_All/sitemap.xml
