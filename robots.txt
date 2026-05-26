@@ -10,3 +10,4 @@ Disallow: /review_preview.html
 
 # サイトマップの場所を指定
 Sitemap: https://moriyoshi0405-tech.github.io/reel_All/sitemap.xml
+
