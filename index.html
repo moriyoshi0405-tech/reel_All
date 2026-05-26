@@ -716,150 +716,6 @@ body.loaded > *:not(#loading):not(#whiteFlash):not(.floating-chars-container) {
   .cloud-3, .cloud-4, .cloud-5 { width: 160px; height: 32px; }
 }
 
-/* ============================================================
-   拉致バナー (ヒーロー直下のゲーム誘導)
-   ============================================================ */
-.rachi-banner {
-  display: block;
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  margin: -40px auto 30px;
-  background: linear-gradient(135deg, #0a0a0c 0%, #1a1820 50%, #2a1518 100%);
-  border-radius: 0;
-  padding: 60px 20px;
-  text-decoration: none;
-  color: #e8e3d8;
-  overflow: hidden;
-  z-index: 50;
-  text-align: center;
-  border-top: 1px solid rgba(165, 66, 29, 0.3);
-  border-bottom: 1px solid rgba(165, 66, 29, 0.3);
-  transition: 0.4s;
-}
-[data-theme="dark"] .rachi-banner {
-  background: linear-gradient(135deg, #050508 0%, #150f15 50%, #1f0e10 100%);
-}
-.rachi-banner:hover {
-  transform: scale(1.005);
-}
-.rachi-banner-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 1;
-}
-.rachi-banner-bg::before {
-  content: "";
-  position: absolute;
-  top: 20%; left: 10%;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(139, 42, 42, 0.25) 0%, transparent 70%);
-  filter: blur(40px);
-  animation: rachiGlow 6s ease-in-out infinite;
-}
-.rachi-banner-bg::after {
-  content: "";
-  position: absolute;
-  bottom: 10%; right: 15%;
-  width: 250px; height: 250px;
-  background: radial-gradient(circle, rgba(232, 197, 160, 0.15) 0%, transparent 70%);
-  filter: blur(50px);
-  animation: rachiGlow 8s ease-in-out infinite reverse;
-}
-@keyframes rachiGlow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.15); }
-}
-.rachi-banner-rain {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(180deg, transparent 70%, rgba(255,255,255,0.04) 71%, rgba(255,255,255,0.04) 72%, transparent 73%),
-    linear-gradient(180deg, transparent 40%, rgba(255,255,255,0.03) 41%, rgba(255,255,255,0.03) 42%, transparent 43%);
-  background-size: 30px 100%, 50px 100%;
-  background-repeat: repeat;
-  opacity: 0.6;
-  animation: rachiRain 4s linear infinite;
-}
-@keyframes rachiRain {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 0 100px, 0 80px; }
-}
-.rachi-banner-inner {
-  position: relative;
-  z-index: 2;
-  max-width: 700px;
-  margin: 0 auto;
-}
-.rachi-banner-eyebrow {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 11px;
-  letter-spacing: 8px;
-  color: rgba(232, 197, 160, 0.7);
-  margin-bottom: 18px;
-  text-transform: uppercase;
-}
-.rachi-banner-title {
-  font-family: 'Noto Serif JP', 'Zen Old Mincho', serif;
-  font-size: clamp(28px, 5vw, 48px);
-  font-weight: 700;
-  letter-spacing: 6px;
-  color: #f0e9d8;
-  margin-bottom: 22px;
-  line-height: 1.4;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.6);
-}
-.rachi-banner-tagline {
-  font-family: 'Noto Serif JP', serif;
-  font-size: clamp(13px, 1.6vw, 16px);
-  letter-spacing: 3px;
-  color: #c3c8d0;
-  line-height: 2;
-  margin-bottom: 36px;
-}
-.rachi-banner-tagline em {
-  font-style: normal;
-  color: #d68f6b;
-  background: linear-gradient(transparent 65%, rgba(165, 66, 29, 0.25) 65%);
-  padding: 2px 6px;
-}
-.rachi-banner-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 36px;
-  background: transparent;
-  color: #f0e9d8;
-  border: 1px solid rgba(232, 197, 160, 0.5);
-  border-radius: 50px;
-  font-family: 'Noto Serif JP', serif;
-  font-size: 13px;
-  letter-spacing: 4px;
-  transition: 0.3s;
-}
-.rachi-banner:hover .rachi-banner-cta {
-  background: rgba(232, 197, 160, 0.15);
-  border-color: rgba(232, 197, 160, 1);
-  letter-spacing: 6px;
-}
-.rachi-arrow {
-  display: inline-block;
-  transition: transform 0.3s;
-  color: #d68f6b;
-}
-.rachi-banner:hover .rachi-arrow {
-  transform: translateX(6px);
-}
-
-@media (max-width: 767px) {
-  .rachi-banner { padding: 40px 20px; margin: -30px auto 20px; }
-  .rachi-banner-eyebrow { font-size: 9px; letter-spacing: 5px; }
-  .rachi-banner-title { letter-spacing: 3px; }
-  .rachi-banner-tagline { letter-spacing: 2px; }
-  .rachi-banner-cta { padding: 12px 28px; font-size: 11px; letter-spacing: 3px; }
-}
 
 /* ---------- 6. コンテナ & ガチャ ---------- */
 .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
@@ -2642,7 +2498,6 @@ input[type="file"]::file-selector-button {
     <a href="#" class="side-nav-btn" onclick="toggleMenu(); openArchiveModal(); return false;">📅 私の栞箱</a>
     <a href="#statsSection" class="side-nav-btn" onclick="toggleMenu()">📊 読書の足跡</a>
     <a href="#adminProfile" class="side-nav-btn" onclick="toggleMenu()">💼 管理人の肖像</a>
-    <a href="#prescriptionSection" class="side-nav-btn" onclick="toggleMenu()">💊 心の処方箋</a>
     <a href="#readerSection" class="side-nav-btn" onclick="toggleMenu()">👑 読者の推薦本</a>
     <a href="planetarium.html" class="side-nav-btn">🌌 言葉のプラネタリウム</a>
     <a href="theater.html" class="side-nav-btn">🎬 AI Book Theater</a>
@@ -2810,27 +2665,6 @@ input[type="file"]::file-selector-button {
   <div id="shelfMood" class="shelf-mood">本棚の空気を読み解いています...</div>
 </header>
 
-<!-- ============================================================
-     本に、拉致されました。 (ゲームへの誘導バナー)
-     ============================================================ -->
-<a href="rachi.html" class="rachi-banner">
-  <div class="rachi-banner-bg">
-    <div class="rachi-banner-rain"></div>
-  </div>
-  <div class="rachi-banner-inner">
-    <div class="rachi-banner-eyebrow">A GAME EXPERIENCE</div>
-    <div class="rachi-banner-title">本に、拉致されました。</div>
-    <div class="rachi-banner-tagline">
-      本を読まないあなたを、<br>
-      <em>物語が拉致します。</em>
-    </div>
-    <div class="rachi-banner-cta">
-      <span>体験を始める</span>
-      <span class="rachi-arrow">→</span>
-    </div>
-  </div>
-</a>
-
 <div class="container">
 
   <!-- 📜 本日の栞 (Today's Bookmark) -->
@@ -2987,28 +2821,6 @@ input[type="file"]::file-selector-button {
   </div>
 
   <div id="grid" class="grid"></div>
-
-  <!-- 処方箋 -->
-  <section id="prescriptionSection" class="prescription-section">
-    <div class="prescription-header">
-      <img id="pharmacistAvatar" class="ai-avatar-circle" src="" alt="薬剤師">
-      <div class="prescription-title">💊 不思議な薬局の処方箋</div>
-    </div>
-    <p style="text-align:center; font-size:15px; color:var(--text-secondary); max-width:700px; margin:0 auto 25px; font-family:'Noto Serif JP', serif;">
-      言葉にできない胸のつかえや、日々の疲れをお話しください。<br>あなたの心に最も深く効く物語を、司書が一冊だけ「処方」いたします。
-    </p>
-    <div class="prescription-input-group">
-      <input type="text" id="worryInput" class="ai-input worryInput" placeholder="例：誰かに優しくなりたい、仕事で少し自信をなくしている...">
-      <button id="prescribeBtn" class="prescribe-btn" onclick="runPrescription()">処方箋をもらう</button>
-    </div>
-    <div id="prescriptionResultArea" style="display:none;">
-      <div class="prescription-card">
-        <div class="prescription-book-box" id="prescribedBookBox"></div>
-        <div id="prescriptionText" class="ai-text" style="background:transparent; border:none; padding:0;"></div>
-      </div>
-      <div style="text-align:center; margin-top:35px;"><button class="btn-cancel" onclick="resetPrescription()">他のお悩みも相談する</button></div>
-    </div>
-  </section>
 
   <!-- 管理人 -->
   <section id="adminProfile" class="admin-profile-section">
@@ -4036,12 +3848,17 @@ async function loadTodaysBookmark() {
     } catch (e) {}
   }
 
-  // 取得
+  // タイムアウト付きフェッチ (15秒で諦める)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
-    const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({
-      action: "getTodaysBookmark",
-      dayInfo: info
-    })});
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getTodaysBookmark", dayInfo: info }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
     const data = await res.json();
     if (data.status === 'success') {
       const localBook = [...allData, ...readerData].find(b => b.id === data.bookmark.bookId);
@@ -4053,16 +3870,43 @@ async function loadTodaysBookmark() {
       saveToArchive(info.dateStr, data.bookmark);
       renderBookmark(data.bookmark);
     } else {
-      throw new Error(data.message);
+      throw new Error(data.message || "サーバーから栞を取得できませんでした");
     }
   } catch (e) {
-    console.error(e);
+    clearTimeout(timeoutId);
+    console.error('本日の栞取得エラー:', e);
+    // フォールバック: 本棚からランダムに1冊選んで表示
+    renderBookmarkFallback(info);
+  }
+}
+
+// APIエラー時のフォールバック表示
+function renderBookmarkFallback(info) {
+  const allBooks = [...allData, ...readerData].filter(b => b.title);
+  if (allBooks.length === 0) {
     document.getElementById('bookmarkContent').innerHTML = `
       <div style="text-align:center; padding:40px; color:var(--text-muted); font-family:'Noto Serif JP', serif;">
-        今日の栞は、もう少しお待ちください。<br>
-        <span style="font-size:12px; opacity:0.7;">司書が物語の中で迷子になっているようです。</span>
+        本棚を準備しています...<br>
+        <span style="font-size:12px; opacity:0.7;">少し後でもう一度お越しください。</span>
       </div>`;
+    return;
   }
+  // 日付ベースの擬似ランダムで本を選ぶ(同日中は同じ本)
+  const seed = info.dateStr.split('-').join('') + (info.chapter || '');
+  const seedNum = seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const book = allBooks[seedNum % allBooks.length];
+
+  const fallbackBookmark = {
+    bookId: book.id,
+    title: book.title,
+    author: book.author,
+    image: book.image,
+    url: book.url,
+    quote: book.openingQuote || `『${book.title}』の世界へ──`,
+    reason: `今日の${info.chapter || 'いま'}、この一冊をあなたに。心の静かな場所で、頁を開いてみてください。`,
+    pairing: { drink: 'ぬるめの珈琲', scene: '窓辺の椅子', sound: '雨の音' }
+  };
+  renderBookmark(fallbackBookmark);
 }
 
 function renderBookmark(b) {
